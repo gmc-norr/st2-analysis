@@ -1,0 +1,9 @@
+---
+ref: gmc_norr
+name: GMC Norr StackStorm
+description: StackStorm pack for GMC Norr
+version: 0.1.0
+python_versions:
+  - "3"
+author: Niklas Mähler
+email: niklas.mahler@regionvasterbotten.se

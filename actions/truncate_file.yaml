@@ -1,0 +1,13 @@
+---
+name: truncate_file
+runner_type: local-shell-script
+description: Truncate a file
+enabled: true
+entry_point: truncate_file.sh
+
+parameters:
+  path:
+    type: string
+    required: true
+    description: Path to the file which to truncate
+    position: 0

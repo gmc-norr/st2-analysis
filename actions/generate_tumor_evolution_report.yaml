@@ -1,0 +1,35 @@
+---
+name: generate_tumor_evolution_report
+runner_type: local-shell-script
+description: Generate a tumor evolution report from an Excel file
+enabled: true
+entry_point: generate_tumor_evolution_report.sh
+parameters:
+  excel_file:
+    type: string
+    description: Excel file with the data used for the report
+    required: true
+    position: 0
+  sheet:
+    type: string
+    description: Name of the sheet in `excel_file` that should be used for the report
+    required: true
+    position: 1
+  output_directory:
+    type: string
+    description: Directory where the report should be saved
+    required: true
+    position: 2
+    default: "{{ config_context.tumor_evolution.output_directory }}"
+  version:
+    type: string
+    description: Version of the tumor evolution report to generate
+    required: true
+    position: 3
+    default: "{{ config_context.tumor_evolution.version }}"
+  cwd:
+    type: string
+    immutable: true
+    default: /home/stanley
+  timeout:
+    default: 600

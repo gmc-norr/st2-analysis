@@ -1,0 +1,24 @@
+---
+name: tumor_evolution
+pack: gmc_norr
+description: Workflow for generating a tumor evolution report
+runner_type: orquesta
+entry_point: workflows/tumor_evolution.yaml
+enabled: true
+
+parameters:
+  watch_file:
+    description: The file to watch for new requests
+    required: true
+    type: string
+    default: "{{ config_context.tumor_evolution.watch_file }}"
+  output_directory:
+    required: true
+    type: string
+    default: "{{ config_context.tumor_evolution.output_directory }}"
+  version:
+    required: true
+    type: string
+    immutable: true
+    default: "0.3.0"
+

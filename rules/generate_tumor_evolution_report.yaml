@@ -1,0 +1,14 @@
+---
+name: generate_tumor_evolution_report
+pack: gmc_norr
+description: Generate tumor evolution report
+enabled: true
+
+trigger:
+  type: core.st2.IntervalTimer
+  parameters:
+    delta: 60
+    unit: seconds
+
+action:
+  ref: gmc_norr.tumor_evolution

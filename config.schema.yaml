@@ -1,0 +1,18 @@
+---
+tumor_evolution:
+  type: object
+  properties:
+    output_directory:
+      description: >
+        Directory where the report should be saved. This can either be an
+        absolute path on the StackStorm server, or a Windows path referring
+        to G:.
+      type: string
+      format: uri-reference
+      required: true
+
+    watch_file:
+      description: Path to file to watch on host.
+      type: string
+      format: uri-reference
+      required: true
