@@ -39,7 +39,7 @@ if [ $(docker images -q "${IMAGE}" | wc -l) -eq 0 ]; then
         git clone https://github.com/gmc-norr/tumor-evolution.git
     fi
     cd tumor-evolution
-    git pull origin main
+    git pull --tags origin main
     git checkout "v${VERSION}"
     docker build -t "${IMAGE}" .
     echo >&2 "INFO: docker image built"
