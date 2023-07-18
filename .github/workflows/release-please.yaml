@@ -13,5 +13,4 @@ jobs:
           release-type: simple
           package-name: ${{ github.event.repository.name }}
           bump-minor-pre-major: true
-          extra-files:
-            - pack.yaml
+          extra-files: pack.yaml
