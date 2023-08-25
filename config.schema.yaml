@@ -38,3 +38,13 @@ tumor_evolution:
         the package for valid values: https://github.com/gmc-norr/tumor-evolution/releases
       type: string
       required: true
+
+validate_samplesheet:
+  type: object
+  properties:
+    required_data_columns:
+      type: array
+      description: List of required columns in the Data section of the samplesheet
+      items:
+        type: string
+        description: Name of required column

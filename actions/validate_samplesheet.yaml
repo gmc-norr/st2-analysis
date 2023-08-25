@@ -1,0 +1,42 @@
+---
+name: validate_samplesheet
+runner_type: python-script
+description: >
+  Validate an Illumina SampleSheet
+enabled: true
+entry_point: validate_samplesheet.py
+parameters:
+  run_directory:
+    type: string
+    required: true
+    position: 0
+  required_data_columns:
+    type: array
+    required: true
+    position: 1
+    description: List of required columns in the Data section of the samplesheet
+    default:
+      - SampleID
+      - index
+      - index2
+    items:
+      type: string
+      description: Name of required column
+      minLength: 1
+
+output_schema:
+  type: object
+  properties:
+    success:
+      type: boolean
+      description: >
+        Whether or not the action succeeded.
+    message:
+      type: string
+      description: >
+        Message describing what happened.
+    samplesheet:
+      type: string
+      description: >
+        Path to the identified samplesheet. Will be defined
+        if success is true.
