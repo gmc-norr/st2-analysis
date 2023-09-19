@@ -2,7 +2,7 @@
 ref: gmc_norr
 name: GMC Norr StackStorm
 description: StackStorm pack for GMC Norr
-version: 0.1.1 # x-release-please-version
+version: 0.1.2 # x-release-please-version
 python_versions:
   - "3"
 author: Niklas Mähler

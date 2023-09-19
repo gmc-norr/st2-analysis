@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.1.1...v0.1.2) (2023-09-19)
+
+
+### Bug Fixes
+
+* add tumor-evolution version to config schema ([efde1c9](https://github.com/gmc-norr/st2-gmc-norr/commit/efde1c962524508109dd6e0576f385384784aad7))
+
 ## [0.1.1](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.1.0...v0.1.1) (2023-07-18)
 
 
