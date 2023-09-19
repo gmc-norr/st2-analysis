@@ -11,6 +11,7 @@ The config parameters that need to be defined are:
 
 - `tumor_evolution.output_directory`: The directory where the evolution reports will be saved.
 - `tumor_evolution.watch_file`: The path to the file that will be watched for new requests to generate reports.
+- `tumor_evolution.version`: The version of the tumor-evolution script to be used.
 
 ## Actions
 

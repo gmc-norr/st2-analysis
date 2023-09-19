@@ -16,3 +16,10 @@ tumor_evolution:
       type: string
       format: uri-reference
       required: true
+
+    version:
+      description: >
+        Version of the tumor-evolution script to use. See the releases of
+        the package for valid values: https://github.com/gmc-norr/tumor-evolution/releases
+      type: string
+      required: true
