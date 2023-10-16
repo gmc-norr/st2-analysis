@@ -35,7 +35,11 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         os.utime(older_samplesheet, (epoch_time, epoch_time - 4000))
 
         action = self.get_action_instance()
-        results = action.run(run_directory=self.run_directory.name, required_data_columns=[])
+        results = action.run(
+            run_directory=self.run_directory.name,
+            data_section="Data",
+            required_data_columns=[]
+        )
 
         assert results[1]["samplesheet"].name == "SampleSheet_v3.csv"
 
@@ -46,6 +50,7 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         action = self.get_action_instance()
         results = action.run(
             run_directory=self.run_directory.name,
+            data_section="Data",
             required_data_columns=[
                 "SampleID",
                 "index",
@@ -57,12 +62,13 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         assert results[1]["samplesheet"].name == "SampleSheet.csv"
 
     def test_missing_columns(self):
-        latest_samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
-        shutil.copy(self.samplesheet, latest_samplesheet)
+        samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
+        shutil.copy(self.samplesheet, samplesheet)
 
         action = self.get_action_instance()
         results = action.run(
             run_directory=self.run_directory.name,
+            data_section="Data",
             required_data_columns=[
                 "SampleID",
                 "index",
@@ -73,3 +79,21 @@ class SampleSheetValidatorTest(BaseActionTestCase):
 
         assert not results[0]
         assert results[1]["message"] == "missing required column: sex"
+
+    def test_missing_data_section(self):
+        samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
+        shutil.copy(self.samplesheet, samplesheet)
+
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory=self.run_directory.name,
+            data_section="BCLConvert_Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert not results[0]
+        assert results[1]["message"] == "no data section found"

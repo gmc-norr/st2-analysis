@@ -10,10 +10,16 @@ parameters:
     type: string
     required: true
     position: 0
+  data_section:
+    type: string
+    description: Name of the section of the samplesheet where to look for sample data
+    default: Data
+    required: true
+    position: 1
   required_data_columns:
     type: array
     required: true
-    position: 1
+    position: 2
     description: List of required columns in the Data section of the samplesheet
     default:
       - SampleID
