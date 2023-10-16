@@ -5,7 +5,7 @@ from st2common.runners.base_action import Action
 
 
 class ValidateSampleSheet(Action):
-    def run(self, run_directory, required_data_columns, data_section):
+    def run(self, run_directory, required_data_columns, data_section="Data"):
         self.data_section = data_section
         self.samplesheet = None
         run_directory = Path(run_directory).resolve()

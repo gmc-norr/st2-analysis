@@ -9,17 +9,10 @@ parameters:
   run_directory:
     type: string
     required: true
-    position: 0
-  data_section:
-    type: string
-    description: Name of the section of the samplesheet where to look for sample data
-    default: Data
-    required: true
-    position: 1
+    description: Path to the directory containing one or more samplesheets
   required_data_columns:
     type: array
     required: true
-    position: 2
     description: List of required columns in the Data section of the samplesheet
     default:
       - SampleID
@@ -29,6 +22,11 @@ parameters:
       type: string
       description: Name of required column
       minLength: 1
+  data_section:
+    type: string
+    required: true
+    description: Name of the section of the samplesheet where to look for sample data
+    default: Data
 
 output_schema:
   type: object
