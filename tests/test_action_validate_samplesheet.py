@@ -97,3 +97,51 @@ class SampleSheetValidatorTest(BaseActionTestCase):
 
         assert not results[0]
         assert results[1]["message"] == "no data section found"
+
+    def test_nonexistent_directory(self):
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory="nonexistent",
+            data_section="Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert not results[0]
+        assert results[1]["message"] == "run directory not found"
+
+    def test_invalid_directory(self):
+        samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
+        samplesheet.touch()
+
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory=samplesheet,
+            data_section="Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert not results[0]
+        assert results[1]["message"] == "run directory is not a directory"
+
+    def test_missing_samplesheet(self):
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory=self.run_directory.name,
+            data_section="Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert not results[0]
+        assert results[1]["message"] == "no samplesheet found"

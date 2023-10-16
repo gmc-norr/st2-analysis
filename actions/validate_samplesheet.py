@@ -7,10 +7,15 @@ from st2common.runners.base_action import Action
 class ValidateSampleSheet(Action):
     def run(self, run_directory, required_data_columns, data_section):
         self.data_section = data_section
+        self.samplesheet = None
         run_directory = Path(run_directory).resolve()
+
+        if not run_directory.exists():
+            self.logger.error(f"run directory not found: {run_directory}")
+            return self._result(False, message="run directory not found")
         if not run_directory.is_dir():
-            self.logger.error(f"not an existing directory: {run_directory}")
-            return self._result(False, message="invalid run_directory")
+            self.logger.error(f"not a directory: {run_directory}")
+            return self._result(False, message="run directory is not a directory")
 
         samplesheets = list(run_directory.glob("SampleSheet*.csv"))
 
@@ -32,9 +37,7 @@ class ValidateSampleSheet(Action):
                 return self._result(False, message=f"missing required column: {col}")
 
         return self._result(
-            True,
-            samplesheet=self.samplesheet,
-            message="valid samplesheet found"
+            True, message="valid samplesheet found"
         )
 
     def _get_most_recent_samplesheet(self, samplesheets):
@@ -53,9 +56,12 @@ class ValidateSampleSheet(Action):
 
         return csv.DictReader(data_csv)
 
-    def _result(self, success, samplesheet=None, message=None):
-        return (success, {
-            "success": success,
-            "message": message,
-            "samplesheet": samplesheet,
-        })
+    def _result(self, success, message=None):
+        return (
+            success,
+            {
+                "success": success,
+                "message": message,
+                "samplesheet": self.samplesheet,
+            },
+        )
