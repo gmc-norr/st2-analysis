@@ -1,0 +1,10 @@
+[Header]
+FileFormatVersion,2
+RunName,TestRun
+InstrumentPlatform,NextSeq
+InstumentType,NextSeq550
+[Reads]
+Read1Cycles,151
+[Data]
+SampleID,Lane,index,index2
+NA12878,1,ACTAGACA,TTACATAG
