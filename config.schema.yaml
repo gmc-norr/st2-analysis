@@ -39,12 +39,29 @@ tumor_evolution:
       type: string
       required: true
 
-validate_samplesheet:
+archer:
   type: object
   properties:
-    required_data_columns:
-      type: array
+    watch_directory:
+      description: The directory to watch for new run directories in
+      type: string
+      required: true
+    processed_directory:
+      description: The directory where to move the data once it has been processed
+      type: string
+      required: true
+    archer_directory:
+      description: The watch directory for Archer Analysis
+      type: string
+      required: true
+    required_samplesheet_columns:
       description: List of required columns in the Data section of the samplesheet
+      type: array
+      required: true
       items:
         type: string
         description: Name of required column
+    samplesheet_data_section:
+      description: The Data section of the samplesheet
+      type: string
+      required: true

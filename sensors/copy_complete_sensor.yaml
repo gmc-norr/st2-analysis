@@ -1,0 +1,29 @@
+---
+class_name: CopyCompleteSensor
+entry_point: copycomplete_sensor.py
+description: >
+  Sensor that emits triggers for subdirectories within a specific directory
+  where a new CopyComplete.txt file is written.
+poll_interval: 60
+trigger_types:
+  - name: "copy_complete"
+    pack: "gmc_norr"
+    description: >
+      Triggers when a new copycomplete file is found
+    parameters_schema:
+      type: object
+      properties:
+        watch_directory:
+          type: string
+          description: >
+            The director in which to look for copycomplete files. The search
+            is recursive with a depth of 2, i.e. inside subdirectories of this
+            directory.
+          required: true
+    payload_schema:
+      type: object
+      properties:
+        run_directory:
+          type: string
+          description: The directory in which the copycomplete file was found
+
