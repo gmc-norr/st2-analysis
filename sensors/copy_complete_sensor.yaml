@@ -13,12 +13,9 @@ trigger_types:
     parameters_schema:
       type: object
       properties:
-        watch_directory:
+        config_section:
           type: string
-          description: >
-            The director in which to look for copycomplete files. The search
-            is recursive with a depth of 2, i.e. inside subdirectories of this
-            directory.
+          description: The config section to use for configuring the sensor
           required: true
     payload_schema:
       type: object

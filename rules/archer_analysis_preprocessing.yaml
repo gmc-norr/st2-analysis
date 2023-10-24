@@ -1,0 +1,15 @@
+---
+name: archer_analysis_preprocessing
+pack: gmc_norr
+description: Process raw data for loading into Archer Analysis
+enabled: true
+
+trigger:
+  type: gmc_norr.copy_complete
+  parameters:
+    config_section: "archer"
+
+action:
+  ref: core.echo
+  parameters:
+    message: "starting archer_analysis_preprocessing in {{ trigger.run_directory }}"
