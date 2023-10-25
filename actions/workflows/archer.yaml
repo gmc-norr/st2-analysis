@@ -23,15 +23,25 @@ tasks:
       - when: <% succeeded() %>
         publish:
           - samplesheet: <% result().result.samplesheet %>
-        do: noop
+        do: bclconvert
       - when: <% failed() %>
-        do: noop
+        do: fail
 
   # Run bclconvert on vs476
   bclconvert:
-    action: core.local
+    action: core.remote
     input:
-      cmd: "echo bclconvert"
+      cmd: >-
+        bcl-convert
+          --no-lane-splitting true
+          --bcl-input-directory <% ctx().run_directory %>
+          --output-directory <% ctx().run_directory %>/fastq
+      hosts: "vs476"
+    next:
+      - when: <% succeeded() %>
+        do: copy_rename
+      - when: <% failed() %>
+        do: fail
 
   copy_rename:
     # action: gmc_norr.copy_seqdata
@@ -41,6 +51,11 @@ tasks:
     #   samplesheet: <% ctx().samplesheet %>
     input:
       cmd: "echo copy_rename"
+    next:
+      - when: <% succeeded() %>
+        do: move
+      - when: <% failed() %>
+        do: fail
 
   move:
     # action: linux.mv
@@ -50,3 +65,8 @@ tasks:
     action: core.local
     input:
       cmd: "echo move"
+    next:
+      - when: <% succeeded() %>
+        do: noop
+      - when: <% failed() %>
+        do: fail
