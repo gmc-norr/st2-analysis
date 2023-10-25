@@ -67,4 +67,4 @@ class CopyCompleteSensor(PollingSensor):
         pass
 
     def watched_directories(self):
-        return self._directories
+        return list(self._directories.keys())
