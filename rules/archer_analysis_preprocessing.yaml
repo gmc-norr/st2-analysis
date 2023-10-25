@@ -10,6 +10,6 @@ trigger:
     config_section: "archer"
 
 action:
-  ref: core.echo
+  ref: gmc_norr.archer
   parameters:
-    message: "starting archer_analysis_preprocessing in {{ trigger.run_directory }}"
+    run_directory: "{{ trigger.run_directory }}"

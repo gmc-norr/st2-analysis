@@ -1,0 +1,52 @@
+version: "1.0"
+
+description: Automation workflow for Archer Analysis
+
+input:
+  - run_directory
+  - processed_directory
+  - archer_directory
+  - required_samplesheet_columns
+  - samplesheet_data_section
+
+vars:
+  - samplesheet: null
+
+tasks:
+  validate_samplesheet:
+    action: gmc_norr.validate_samplesheet
+    input:
+      run_directory: <% ctx().run_directory %>
+      required_data_columns: <% ctx().required_samplesheet_columns %>
+      data_section: <% ctx().samplesheet_data_section %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - samplesheet: <% result().result.samplesheet %>
+        do: noop
+      - when: <% failed() %>
+        do: noop
+
+  # Run bclconvert on vs476
+  bclconvert:
+    action: core.local
+    input:
+      cmd: "echo bclconvert"
+
+  copy_rename:
+    # action: gmc_norr.copy_seqdata
+    action: core.local
+    # input:
+    #   directory: <% ctx().run_directory %>
+    #   samplesheet: <% ctx().samplesheet %>
+    input:
+      cmd: "echo copy_rename"
+
+  move:
+    # action: linux.mv
+    # input:
+    #   directory: <% ctx().run_directory %>
+    #   destination: <% ctx().processed_directory %>
+    action: core.local
+    input:
+      cmd: "echo move"

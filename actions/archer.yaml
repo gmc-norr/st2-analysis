@@ -1,0 +1,36 @@
+---
+name: archer
+pack: gmc_norr
+description: Automation workflow for Archer Analysis
+runner_type: orquesta
+entry_point: workflows/archer.yaml
+enabled: true
+
+parameters:
+  run_directory:
+    description: The path to the directory containing the sequencing run
+    required: true
+    type: string
+  processed_directory:
+    description: The directory where to move the data once it has been processed
+    required: true
+    type: string
+    default: "{{ config_context.archer.processed_directory }}"
+  archer_directory:
+    description: The watch directory for Archer Analysis
+    required: true
+    type: string
+    default: "{{ config_context.archer.archer_directory }}"
+  required_samplesheet_columns:
+    description: List of required columns in the Data section of the samplesheet
+    required: true
+    type: array
+    items:
+      type: string
+      description: Name of required column
+    default: "{{ config_context.archer.required_samplesheet_columns }}"
+  samplesheet_data_section:
+    description: The Data section of the samplesheet
+    required: true
+    type: string
+    default: "{{ config_context.archer.samplesheet_data_section }}"
