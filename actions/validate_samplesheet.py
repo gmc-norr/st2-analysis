@@ -71,6 +71,6 @@ class ValidateSampleSheet(Action):
             {
                 "success": success,
                 "message": message,
-                "samplesheet": self.samplesheet,
+                "samplesheet": str(self.samplesheet) if self.samplesheet is not None else None,
             },
         )
