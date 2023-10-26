@@ -28,15 +28,14 @@ tasks:
       - when: <% failed() %>
         do: fail
 
-  # Run bclconvert on vs476
   bclconvert:
     action: core.remote
     input:
-      cmd: >-
-        bcl-convert
-          --no-lane-splitting true
-          --bcl-input-directory <% ctx().run_directory %>
-          --output-directory <% ctx().run_directory %>/fastq
+      cmd: >
+        bcl-convert --sample-sheet <% ctx().samplesheet %> \
+          --no-lane-splitting true \
+          --bcl-input-directory <% ctx().run_directory %> \
+          --output-directory <% ctx().run_directory %>/fastq \
       hosts: <% ctx().remote_host %>
     next:
       - when: <% succeeded() %>
