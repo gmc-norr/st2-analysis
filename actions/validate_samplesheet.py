@@ -27,9 +27,13 @@ class ValidateSampleSheet(Action):
 
         samplesheet_data = self._get_data_section()
 
-        if samplesheet_data.fieldnames is None or len(samplesheet_data.fieldnames) == 0:
+        if samplesheet_data is None:
             self.logger.error(f"no data section found in {self.samplesheet}")
             return self._result(False, message="no data section found")
+
+        if samplesheet_data.fieldnames is None or len(samplesheet_data.fieldnames) == 0:
+            self.logger.error(f"data section is empty in {self.samplesheet}")
+            return self._result(False, message="data section is empty")
 
         for col in required_data_columns:
             if col not in samplesheet_data.fieldnames:
@@ -48,11 +52,16 @@ class ValidateSampleSheet(Action):
         found_data = False
         with open(self.samplesheet, "r") as f:
             for line in f:
-                if line.startswith(f"[{self.data_section}]"):
+                if not found_data and line.startswith(f"[{self.data_section}]"):
                     found_data = True
                     continue
+                if found_data and line[0] == "[":
+                    break
                 if found_data:
                     data_csv.append(line.strip())
+
+        if not found_data:
+            return None
 
         return csv.DictReader(data_csv)
 

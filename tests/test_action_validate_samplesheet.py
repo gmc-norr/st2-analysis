@@ -16,6 +16,7 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         super().setUp()
 
         self.samplesheet = Path(__file__).parent / "fixtures" / "SampleSheet.csv"
+        self.samplesheet_empty_data = Path(__file__).parent / "fixtures" / "SampleSheet_empty_data.csv"
         self.run_directory = tempfile.TemporaryDirectory()
 
     def tearDown(self):
@@ -145,3 +146,43 @@ class SampleSheetValidatorTest(BaseActionTestCase):
 
         assert not results[0]
         assert results[1]["message"] == "no samplesheet found"
+
+    def test_empty_data_section(self):
+        samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
+        shutil.copy(self.samplesheet_empty_data, samplesheet)
+
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory=self.run_directory.name,
+            data_section="Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert not results[0]
+        assert results[1]["message"] == "data section is empty"
+
+    def test_extra_sections_after_data(self):
+        samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
+        shutil.copy(self.samplesheet, samplesheet)
+        with open(samplesheet, "a") as f:
+            f.write("[Extra]\n")
+            f.write("SampleID,1,2\n")
+            f.write("NA12878,1,2\n")
+
+        action = self.get_action_instance()
+        results = action.run(
+            run_directory=self.run_directory.name,
+            data_section="Data",
+            required_data_columns=[
+                "SampleID",
+                "index",
+                "index2",
+            ]
+        )
+
+        assert results[0]
+        assert results[1]["samplesheet"].name == "SampleSheet.csv"
