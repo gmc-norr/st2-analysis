@@ -65,3 +65,7 @@ archer:
       description: The Data section of the samplesheet
       type: string
       required: true
+    remote_host:
+      description: The URL of the remote host to run on
+      type: string
+      required: true

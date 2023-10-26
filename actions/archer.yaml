@@ -34,3 +34,8 @@ parameters:
     required: true
     type: string
     default: "{{ config_context.archer.samplesheet_data_section }}"
+  remote_host:
+    description: The URL of the remote host to run on
+    required: true
+    type: string
+    default: "{{ config_context.archer.remote_host }}"

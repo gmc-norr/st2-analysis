@@ -8,6 +8,7 @@ input:
   - archer_directory
   - required_samplesheet_columns
   - samplesheet_data_section
+  - remote_host
 
 vars:
   - samplesheet: null
@@ -36,7 +37,7 @@ tasks:
           --no-lane-splitting true
           --bcl-input-directory <% ctx().run_directory %>
           --output-directory <% ctx().run_directory %>/fastq
-      hosts: "vs476"
+      hosts: <% ctx().remote_host %>
     next:
       - when: <% succeeded() %>
         do: copy_rename
