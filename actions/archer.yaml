@@ -44,3 +44,14 @@ parameters:
     required: true
     type: string
     default: "{{ config_context.archer.archer_host }}"
+  service_user:
+    description: The user that the system should act as
+    required: true
+    type: string
+    default: "{{ st2kv.system.service_user }}"
+  service_password:
+    description: The password for the service user
+    required: true
+    type: string
+    default: "{{ st2kv.system.service_password | decrypt_kv }}"
+    secret: true

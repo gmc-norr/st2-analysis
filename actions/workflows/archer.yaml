@@ -10,6 +10,8 @@ input:
   - samplesheet_data_section
   - analysis_host
   - archer_host
+  - service_user
+  - service_password
 
 vars:
   - samplesheet: null
@@ -38,6 +40,8 @@ tasks:
           --bcl-input-directory <% ctx().run_directory %> \
           --output-directory <% ctx().run_directory %>/fastq \
       hosts: <% ctx().analysis_host %>
+      username: <% ctx().service_user %>
+      password: <% ctx().service_password %>
     next:
       - when: <% succeeded() %>
         do: copy_rename
