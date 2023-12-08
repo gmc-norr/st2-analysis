@@ -43,7 +43,9 @@ archer:
   type: object
   properties:
     watch_directory:
-      description: The directory to watch for new run directories in
+      description: >
+        The directory to watch for new run directories in. This path also has to be
+        accessible on the remote host as well.
       type: string
       required: true
     processed_directory:
@@ -67,5 +69,9 @@ archer:
       required: true
     remote_host:
       description: The URL of the remote host to run on
+      type: string
+      required: true
+    archer_host:
+      description: The URL of the host on which Archer Analysis is set up
       type: string
       required: true
