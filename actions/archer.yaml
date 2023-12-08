@@ -34,8 +34,13 @@ parameters:
     required: true
     type: string
     default: "{{ config_context.archer.samplesheet_data_section }}"
-  remote_host:
-    description: The URL of the remote host to run on
+  analysis_host:
+    description: The URL of the remote host to use for bclconvert and file management
     required: true
     type: string
-    default: "{{ config_context.archer.remote_host }}"
+    default: "{{ config_context.archer.analysis_host }}"
+  archer_host:
+    description: The URL of the host on which Archer Analysis is set up
+    required: true
+    type: string
+    default: "{{ config_context.archer.archer_host }}"
