@@ -17,6 +17,21 @@ tumor_evolution:
       format: uri-reference
       required: true
 
+    watch_file_instructions:
+      description: User instructions that the watch file should be populated with.
+      type: string
+      default: |
+        # Generera en rapport genom att lägga till en ny rad med den
+        # fullständiga sökvägen till en Excel-fil (inklusive filändelse) med
+        # det data som ska presenteras. Standardbeteendet är att första
+        # arbetsbladet i dokumentet används. Det är endast sista raden i denna
+        # fil som tas hänsyn till. Eventuella felmeddelanden skrivs ut i filen
+        # report.<tidpunkt>.error.log.
+        #
+        # Ex:
+        # G:\sökväg\till\prov\D23-XXXX.xlsx
+      required: true
+
     version:
       description: >
         Version of the tumor-evolution script to use. See the releases of

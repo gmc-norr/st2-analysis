@@ -1,0 +1,13 @@
+---
+name: generate_tumor_evolution_report2
+pack: gmc_norr
+description: Generate tumor evolution report 2
+enabled: true
+
+trigger:
+  type: gmc_norr.tumor_evolution_request
+
+action:
+  ref: core.echo
+  parameters:
+    message: "tumor evolution request received {{trigger.excel_file}} {{trigger.sheet}}"
