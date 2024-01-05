@@ -17,11 +17,7 @@ The config parameters that need to be defined are:
 
 ref                                      | description
 -----------------------------------------|------------------------------------------
-gmc_norr.check_tumor_evolution_request   | Check if there is a request for generating a tumor evolution report
 gmc_norr.generate_tumor_evolution_report | Generate a tumor evolution report from an Excel file
-gmc_norr.parse_arguments                 | Parse command line arguments from a string
-gmc_norr.rm                              | Remove files
-gmc_norr.truncate_file                   | Truncate a file
 gmc_norr.tumor_evolution                 | Workflow for generating a tumor evolution report
 gmc_norr.write_file                      | Write a text string to a file
 
@@ -30,3 +26,13 @@ gmc_norr.write_file                      | Write a text string to a file
 ref                                      | description
 -----------------------------------------|---------------------------------
 gmc_norr.generate_tumor_evolution_report | Generate tumor evolution report
+
+## Sensors
+
+ref                                      | description
+-----------------------------------------|---------------------------------
+gmc_norr.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+
+# Known issues
+
+- If a quoted string is entered in the tumor evolution watch file, it will not find the file.
