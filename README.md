@@ -36,4 +36,3 @@ gmc_norr.TumorEvolutionSensor            | Sensor that detects new requests to g
 # Known issues
 
 - If a quoted string is entered in the tumor evolution watch file, it will not find the file.
-- If too many arguments are entered in the tumor evolution watch file, an exception is thrown and the sensor container crashes.

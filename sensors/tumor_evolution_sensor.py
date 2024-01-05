@@ -57,7 +57,7 @@ class TumorEvolutionSensor(PollingSensor):
         args = arg_string.split()
 
         if len(args) > 2:
-            raise ValueError("too many arguments")
+            self.logger.warning("too many arguments, ignoring all but first two")
 
         excel_file = args[0]
         sheet = "1"
