@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.1.2...v0.2.0) (2024-01-05)
+
+
+### Features
+
+* ability to submit more than one report request at a time ([72a91d8](https://github.com/gmc-norr/st2-gmc-norr/commit/72a91d81c3e34faa98d89158edaceb561ca27970))
+* add tumor evolution sensor ([#5](https://github.com/gmc-norr/st2-gmc-norr/issues/5)) ([72a91d8](https://github.com/gmc-norr/st2-gmc-norr/commit/72a91d81c3e34faa98d89158edaceb561ca27970))
+
 ## [0.1.2](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.1.1...v0.1.2) (2023-09-19)
 
 
