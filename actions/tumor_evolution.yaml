@@ -7,11 +7,15 @@ entry_point: workflows/tumor_evolution.yaml
 enabled: true
 
 parameters:
-  watch_file:
-    description: The file to watch for new requests
-    required: true
+  excel_file:
+    description: The Excel file containing the data to be included in the report
     type: string
-    default: "{{ config_context.tumor_evolution.watch_file }}"
+    required: true
+  sheet:
+    description: The sheet in the Excel file to use
+    type: string
+    required: true
+    default: "1"
   output_directory:
     required: true
     type: string

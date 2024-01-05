@@ -6,8 +6,7 @@ class TumorEvolutionSensor(PollingSensor):
     def __init__(self, sensor_service, config, poll_interval=60):
         super(TumorEvolutionSensor, self).__init__(sensor_service, config, poll_interval)
         self.logger = self.sensor_service.get_logger(__name__)
-        # self.watch_file = Path(self.config["tumor_evolution"]["watch_file"])
-        self.watch_file = Path("/home/nima18/tmp/test.txt")
+        self.watch_file = Path(self.config["tumor_evolution"]["watch_file"])
         self.watch_file_instructions = self.config["tumor_evolution"]["watch_file_instructions"]
 
     def setup(self):
@@ -28,7 +27,6 @@ class TumorEvolutionSensor(PollingSensor):
                 if line.startswith("#") or len(line.strip()) == 0:
                     continue
                 payload = self._parse_arguments(line)
-                self.logger.debug(f"dispatching payload: {payload}")
                 self.sensor_service.dispatch(
                     trigger="gmc_norr.tumor_evolution_request",
                     payload=payload,
@@ -36,8 +34,10 @@ class TumorEvolutionSensor(PollingSensor):
                 n_dispatched += 1
 
         if n_dispatched == 0:
-            self.logger.debug("watch file empty")
+            self.logger.info("watch file empty")
             return
+
+        self.logger.info(f"dispatched {n_dispatched} request")
 
         self._reset_watch_file()
 

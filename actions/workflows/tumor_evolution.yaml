@@ -3,35 +3,15 @@ version: "1.0"
 description: Workflow for generating a tumor evolution report
 
 input:
-  - watch_file
+  - excel_file
+  - sheet
   - output_directory
   - version
 
 vars:
-  - excel_file: null
-  - sheet: null
   - log: null
 
 tasks:
-  check_request:
-    action: gmc_norr.check_tumor_evolution_request
-    input:
-      watch_file: <% ctx().watch_file %>
-    next:
-      - when: <% succeeded() %>
-        publish:
-          - excel_file: <% result().result.excel_file %>
-          - sheet: <% result().result.sheet %>
-        do: generate_report
-      - when: <% result().result.message = "watch file not found" %>
-        publish:
-          - log: <% result().result.message %>
-        do: cleanup
-      - when: <% result().result.message = "watch file empty" %>
-        publish:
-          - log: <% result().result.message %>
-        do: noop
-
   generate_report:
     action: gmc_norr.generate_tumor_evolution_report
     input:
@@ -43,7 +23,8 @@ tasks:
       - when: <% succeeded() %>
         publish:
           - log: <% result().stderr %>
-        do: cleanup
+        # do: cleanup
+        do: noop
       - when: <% failed() %>
         publish:
           - log: <% result().stderr %>
@@ -55,25 +36,8 @@ tasks:
       path: "<% ctx().output_directory %>/report.TIMESTAMP.error.log"
       text: <% ctx().log %>
     next:
-      - do: cleanup
-
-  cleanup:
-    action: gmc_norr.write_file
-    input:
-      path: <% ctx().watch_file %>
-      text: |-
-        # Generera en rapport genom att lägga till en ny rad med den
-        # fullständiga sökvägen till en Excel-fil (inklusive filändelse) med
-        # det data som ska presenteras. Standardbeteendet är att första
-        # arbetsbladet i dokumentet används. Det är endast sista raden i denna
-        # fil som tas hänsyn till. Eventuella felmeddelanden skrivs ut i filen
-        # report.<tidpunkt>.error.log.
-        #
-        # Ex:
-        # G:\sökväg\till\prov\D23-XXXX.xlsx
+      - do: noop
 
 output:
-  - excel_file: <% ctx().excel_file %>
-  - sheet: <% ctx().sheet %>
   - log: <% ctx().log %>
 

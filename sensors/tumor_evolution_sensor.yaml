@@ -1,7 +1,7 @@
 class_name: TumorEvolutionSensor
 entry_point: tumor_evolution_sensor.py
 description: Sensor that detects new requests to generate tumor evolution reports.
-enabled: false
+enabled: true
 trigger_types:
   - name: tumor_evolution_request
     pack: gmc_norr
