@@ -42,7 +42,7 @@ class SampleSheetValidatorTest(BaseActionTestCase):
             required_data_columns=[]
         )
 
-        assert results[1]["samplesheet"].name == "SampleSheet_v3.csv"
+        assert Path(results[1]["samplesheet"]).name == "SampleSheet_v3.csv"
 
     def test_valid_samplesheet(self):
         latest_samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
@@ -60,7 +60,7 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         )
 
         assert results[0]
-        assert results[1]["samplesheet"].name == "SampleSheet.csv"
+        assert Path(results[1]["samplesheet"]).name == "SampleSheet.csv"
 
     def test_missing_columns(self):
         samplesheet = Path(self.run_directory.name) / "SampleSheet.csv"
@@ -185,4 +185,4 @@ class SampleSheetValidatorTest(BaseActionTestCase):
         )
 
         assert results[0]
-        assert results[1]["samplesheet"].name == "SampleSheet.csv"
+        assert Path(results[1]["samplesheet"]).name == "SampleSheet.csv"

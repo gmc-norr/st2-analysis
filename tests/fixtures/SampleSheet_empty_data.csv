@@ -1,0 +1,8 @@
+[Header]
+FileFormatVersion,2
+RunName,TestRun
+InstrumentPlatform,NextSeq
+InstumentType,NextSeq550
+[Reads]
+Read1Cycles,151
+[Data]
