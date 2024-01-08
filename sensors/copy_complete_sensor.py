@@ -1,67 +1,81 @@
+import json
 from pathlib import Path
+from paramiko.client import SSHClient, AutoAddPolicy
 from st2reactor.sensor.base import PollingSensor
+from typing import Dict, List, Optional, Union
+
+
+class RunDirectoryState:
+    NEW = "new"
+    PROCESSING = "processing"
+    PROCESSED = "processed"
 
 
 class CopyCompleteSensor(PollingSensor):
+    _dispatched_run_directories: List[Dict[str, str]]
+
     def __init__(self, sensor_service, config=None, poll_interval=60):
         super(CopyCompleteSensor, self).__init__(sensor_service, config, poll_interval)
         self._logger = self.sensor_service.get_logger(__name__)
+        self._dispatched_run_directories = []
 
-        self._directories = {}
-        self._processed_run_directories = set()
+        dispatched_run_directories = self.sensor_service.get_value("dispatched_run_directories")
+        if dispatched_run_directories is not None:
+            self._dispatched_run_directories = json.loads(dispatched_run_directories)
 
     def setup(self):
         pass
 
     def poll(self):
-        for d, trigger in self._directories.items():
-            for child in d.iterdir():
-                if child.is_file() or child in self._processed_run_directories:
-                    continue
+        user = self.sensor_service.get_value("service_user", local=False)
+        pwd = self.sensor_service.get_value("service_password", local=False, decrypt=True)
 
-                copycomplete = child / "CopyComplete.txt"
-                if copycomplete.exists():
-                    self._logger.debug(f"found copycomplete file: {copycomplete}")
-                    self._processed_run_directories.add(child)
-                    self.sensor_service.dispatch(
-                        trigger=trigger,
-                        payload={
-                            "run_directory": str(child),
-                        }
-                    )
+        watch_directories = self.config.get("copy_complete", {}).get("watch_directories", [])
+        for wd in watch_directories:
+            self._logger.debug(f"checking watch directory: {wd}")
+
+            host = wd.get("host", "localhost")
+
+            client = SSHClient()
+            client.set_missing_host_key_policy(AutoAddPolicy)
+
+            self._logger.debug(f"connecting to {host} as {user}")
+
+            client.connect(
+                hostname=host,
+                username=user,
+                password=pwd,
+            )
+
+            _, stdout, stderr = client.exec_command(
+                f"find {wd['path']} -maxdepth 2 -mindepth 2 -type f -name CopyComplete.txt"
+            )
+
+            for line in stdout:
+                copycomplete_path = Path(line.strip())
+                run_directory = copycomplete_path.parent
+                self._logger.debug(f"found copycomplete: {host}:{copycomplete_path}")
+                if self._is_dispatched(run_directory, host):
+                    self._logger.debug(f"already dispatched, skipping: {host}:{run_directory}")
+                    continue
+                self._add_run_directory(run_directory, host)
+                self._sensor_service.dispatch(
+                    trigger="gmc_norr.copy_complete",
+                    payload={"run_directory": str(run_directory), "host": host},
+                )
+
+            for line in stderr:
+                self._logger.warning(f"stderr: {line}")
+
+            client.close()
+
+            self._update_datastore()
 
     def cleanup(self):
         pass
 
     def add_trigger(self, trigger):
-        self._logger.debug(f"adding trigger: {trigger}")
-
-        trigger_ref = trigger.get("ref")
-        if trigger_ref is None:
-            self._logger.error("trigger did not contain a ref")
-            raise Exception("trigger did not contain a ref")
-
-        trigger_type = trigger.get("type")
-        if trigger_type != "gmc_norr.copy_complete":
-            self._logger.error(f"trigger not supported: {trigger_type}")
-            raise Exception(f"unsupported trigger type: {trigger_type}")
-
-        config_section = trigger.get("parameters", {}).get("config_section")
-        if config_section is None:
-            self._logger.error("config_section not found in trigger")
-            raise Exception("trigger did not contain a config_section")
-        watch_dir = Path(self._config.get(config_section, {}).get("watch_directory"))
-
-        if watch_dir is None:
-            self._logger.error("trigger did not contain a watch_directory")
-            raise Exception("trigger did not contain a watch_directory")
-        if not watch_dir.exists():
-            self._logger.error(f"watch directory does not exist: {watch_dir}")
-            raise Exception("watch directory does not exist")
-
-        self._directories[watch_dir] = trigger_ref
-
-        self._logger.info(f"watch directory added: {watch_dir.resolve()}")
+        pass
 
     def update_trigger(self, trigger):
         pass
@@ -69,5 +83,18 @@ class CopyCompleteSensor(PollingSensor):
     def remove_trigger(self, trigger):
         pass
 
-    def watched_directories(self):
-        return list(self._directories.keys())
+    def _add_run_directory(self, run_directory: Path, host: str):
+        self._dispatched_run_directories.append({"path": str(run_directory), "host": host})
+
+    def _is_dispatched(self, run_directory: Union[Path, str], host: str):
+        matches = filter(
+            lambda x: x["path"] == str(run_directory) and x["host"] == host,
+            self._dispatched_run_directories,
+        )
+        return len(list(matches)) > 0
+
+    def _update_datastore(self):
+        self.sensor_service.set_value(
+            "dispatched_run_directories",
+            json.dumps(self._dispatched_run_directories)
+        )
