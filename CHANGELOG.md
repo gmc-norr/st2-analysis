@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.1](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.2.0...v0.2.1) (2024-01-08)
+
+
+### Bug Fixes
+
+* fail if the report cannot be generated ([#7](https://github.com/gmc-norr/st2-gmc-norr/issues/7)) ([b2146aa](https://github.com/gmc-norr/st2-gmc-norr/commit/b2146aae65dac49f4e78039b02ce34d425540976))
+
 ## [0.2.0](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.1.2...v0.2.0) (2024-01-05)
 
 
