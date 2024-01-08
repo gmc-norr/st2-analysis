@@ -23,12 +23,13 @@ tasks:
       - when: <% succeeded() %>
         publish:
           - log: <% result().stderr %>
-        # do: cleanup
         do: noop
       - when: <% failed() %>
         publish:
           - log: <% result().stderr %>
-        do: write_log
+        do: 
+          - write_log
+          - fail
 
   write_log:
     action: gmc_norr.write_file
