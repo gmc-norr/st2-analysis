@@ -1,8 +1,36 @@
+from io import StringIO
 import json
+import os
 from pathlib import Path
 from paramiko.client import SSHClient, AutoAddPolicy
+import pwd
 from st2reactor.sensor.base import PollingSensor
+import subprocess
 from typing import Dict, List, Union
+
+
+class LocalHostClient:
+
+    def __init__(self, username):
+        self.hostname = "localhost"
+
+        pw_record = pwd.getpwnam(username)
+        self.user_uid = pw_record.pw_uid
+        self.user_gid = pw_record.pw_gid
+
+    def exec_command(self, cmd):
+        if isinstance(cmd, str):
+            cmd = cmd.split()
+        p = subprocess.run(cmd, preexec_fn=self._preexec, encoding="utf-8",
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        return "", StringIO(p.stdout), StringIO(p.stderr)
+
+    def _preexec(self):
+        os.setgid(self.user_gid)
+        os.setuid(self.user_uid)
+
+    def close(self):
+        pass
 
 
 class RunDirectoryState:
@@ -34,24 +62,12 @@ class RunDirectorySensor(PollingSensor):
         pass
 
     def poll(self):
-        user = self.sensor_service.get_value("service_user", local=False)
-        pwd = self.sensor_service.get_value("service_password", local=False, decrypt=True)
-
         for wd in self._watched_directories:
-            self._logger.debug(f"checking watch directory: {wd}")
+            self._logger.debug(f"checking watch directory: {wd['path']}")
 
             host = wd.get("host", "localhost")
 
-            client = SSHClient()
-            client.set_missing_host_key_policy(AutoAddPolicy)
-
-            self._logger.debug(f"connecting to {host} as {user}")
-
-            client.connect(
-                hostname=host,
-                username=user,
-                password=pwd,
-            )
+            client = self._client(host)
 
             _, stdout, stderr = client.exec_command(
                 f"find {wd['path']} -maxdepth 1 -mindepth 1 -type d"
@@ -100,7 +116,7 @@ class RunDirectorySensor(PollingSensor):
     def remove_trigger(self, trigger):
         pass
 
-    def run_directory_state(self, path: Union[Path, str], client: SSHClient):
+    def run_directory_state(self, path: Union[Path, str], client: Union[SSHClient, LocalHostClient]):
         states = [
             RunDirectoryState.ANALYSISCOMPLETE,
             RunDirectoryState.COPYCOMPLETE,
@@ -117,8 +133,28 @@ class RunDirectorySensor(PollingSensor):
 
         return RunDirectoryState.UNDEFINED
 
+    def _client(self, hostname: str):
+        user = self.sensor_service.get_value("service_user", local=False)
+        pwd = self.sensor_service.get_value("service_password", local=False, decrypt=True)
+
+        self._logger.debug(f"connecting to {hostname} as {user}")
+
+        if hostname == "localhost":
+            client = LocalHostClient(user)
+        else:
+            client = SSHClient()
+            client.set_missing_host_key_policy(AutoAddPolicy)
+
+            client.connect(
+                hostname=hostname,
+                username=user,
+                password=pwd,
+            )
+
+        return client
+
     def _add_run_directory(self, run_directory: Path, host: str, state: str):
-        self._logger.debug(f"adding run directory: {run_directory}")
+        self._logger.debug(f"adding run directory: {host}:{run_directory}")
         self._run_directories.append({
             "path": str(run_directory),
             "host": host,
