@@ -13,6 +13,23 @@ class CopyCompleteSensorTestCase(BaseSensorTestCase):
 
         self.watch_directory = tempfile.TemporaryDirectory()
 
+    def test_invalid_trigger(self):
+        sensor = self.get_sensor_instance(config={
+            "archer": {
+                "watch_directory": self.watch_directory.name,
+            }
+        })
+
+        invalid_trigger = {
+            "ref": "gmc_norr.3af812be3",
+            "type": "gmc_norr.copy_complete",
+            "parameters": {
+                "watch_directory": self.watch_directory.name
+            }
+        }
+
+        self.assertRaises(Exception, sensor.add_trigger, invalid_trigger)
+
     def test_new_copycomplete(self):
         sensor = self.get_sensor_instance(config={
             "archer": {

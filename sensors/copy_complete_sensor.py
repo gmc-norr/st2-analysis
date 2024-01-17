@@ -47,6 +47,9 @@ class CopyCompleteSensor(PollingSensor):
             raise Exception(f"unsupported trigger type: {trigger_type}")
 
         config_section = trigger.get("parameters", {}).get("config_section")
+        if config_section is None:
+            self._logger.error("config_section not found in trigger")
+            raise Exception("trigger did not contain a config_section")
         watch_dir = Path(self._config.get(config_section, {}).get("watch_directory"))
 
         if watch_dir is None:
