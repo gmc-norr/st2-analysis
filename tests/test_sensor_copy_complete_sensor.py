@@ -14,13 +14,18 @@ class CopyCompleteSensorTestCase(BaseSensorTestCase):
         self.watch_directory = tempfile.TemporaryDirectory()
 
     def test_new_copycomplete(self):
-        sensor = self.get_sensor_instance(config={})
+        sensor = self.get_sensor_instance(config={
+            "archer": {
+                "watch_directory": self.watch_directory.name,
+            }
+        })
         sensor.poll()
 
         sensor.add_trigger({
-            "ref": "gmc_norr.copy_complete",
+            "ref": "gmc_norr.3af812be3",
+            "type": "gmc_norr.copy_complete",
             "parameters": {
-                "watch_directory": self.watch_directory.name,
+                "config_section": "archer"
             }
         })
 
@@ -43,7 +48,7 @@ class CopyCompleteSensorTestCase(BaseSensorTestCase):
         sensor.poll()
 
         self.assertTriggerDispatched(
-            trigger="gmc_norr.copy_complete",
+            trigger="gmc_norr.3af812be3",
             payload={
                 "run_directory": str(run_directory),
             }
