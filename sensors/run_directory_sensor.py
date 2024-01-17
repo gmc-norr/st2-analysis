@@ -14,9 +14,13 @@ class LocalHostClient:
     def __init__(self, username):
         self.hostname = "localhost"
 
-        pw_record = pwd.getpwnam(username)
-        self.user_uid = pw_record.pw_uid
-        self.user_gid = pw_record.pw_gid
+        if username is None:
+            self.user_uid = os.getuid()
+            self.user_gid = os.getgid()
+        else:
+            pw_record = pwd.getpwnam(username)
+            self.user_uid = pw_record.pw_uid
+            self.user_gid = pw_record.pw_gid
 
     def exec_command(self, cmd):
         if isinstance(cmd, str):
@@ -66,7 +70,6 @@ class RunDirectorySensor(PollingSensor):
             self._logger.debug(f"checking watch directory: {wd['path']}")
 
             host = wd.get("host", "localhost")
-
             client = self._client(host)
 
             _, stdout, stderr = client.exec_command(
