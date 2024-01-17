@@ -26,7 +26,8 @@ class LocalHostClient:
         if isinstance(cmd, str):
             cmd = cmd.split()
         p = subprocess.run(cmd, preexec_fn=self._preexec, encoding="utf-8",
-                           stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                           stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                           check=True)
         return "", StringIO(p.stdout), StringIO(p.stderr)
 
     def _preexec(self):
@@ -128,7 +129,7 @@ class RunDirectorySensor(PollingSensor):
 
         for state in states:
             _, stdout, _ = client.exec_command(
-                f"find {Path(path) / state}"
+                f"find {str(path)} -name {state}"
             )
 
             if len(stdout.read()) > 0:
