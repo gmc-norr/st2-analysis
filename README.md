@@ -21,6 +21,12 @@ gmc_norr.generate_tumor_evolution_report | Generate a tumor evolution report fro
 gmc_norr.tumor_evolution                 | Workflow for generating a tumor evolution report
 gmc_norr.write_file                      | Write a text string to a file
 
+## Triggers
+
+ref                                      | description
+-----------------------------------------|------------------------------------------
+gmc_norr.copy_complete                   | Triggers when a new copycomplete file is found
+
 ## Rules
 
 ref                                      | description
@@ -32,6 +38,7 @@ gmc_norr.generate_tumor_evolution_report | Generate tumor evolution report
 ref                                      | description
 -----------------------------------------|---------------------------------
 gmc_norr.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+gmc_norr.RunDirectorySensor              | Polling sensor that emits triggers for subdirectories within `config.run_directories` when their state change, e.g. a CopyComplete.txt file is found.
 
 # Known issues
 
