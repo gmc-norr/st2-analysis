@@ -15,30 +15,17 @@ class RunDirectorySensorTestCase(BaseSensorTestCase):
 
     def test_new_copycomplete(self):
         sensor = self.get_sensor_instance(config={
-            "archer": {
-                "watch_directory": self.watch_directory.name,
-            }
+            "run_directories": [
+                {"path": self.watch_directory.name}
+            ]
         })
         sensor.poll()
-
-        sensor.add_trigger({
-            "ref": "gmc_norr.3af812be3",
-            "type": "gmc_norr.copy_complete",
-            "parameters": {
-                "config_section": "archer"
-            }
-        })
-
-        self.assertEqual(len(sensor.watched_directories()), 1)
-        self.assertEqual(
-            sensor.watched_directories()[0],
-            Path(self.watch_directory.name)
-        )
 
         run_directory = Path(self.watch_directory.name) / "run1"
         run_directory.mkdir()
 
         sensor.poll()
+        assert len(self.get_dispatched_triggers()) == 0
 
         copycomplete = run_directory / "CopyComplete.txt"
         copycomplete.touch()
@@ -48,13 +35,14 @@ class RunDirectorySensorTestCase(BaseSensorTestCase):
         sensor.poll()
 
         self.assertTriggerDispatched(
-            trigger="gmc_norr.3af812be3",
+            trigger="gmc_norr.copy_complete",
             payload={
                 "run_directory": str(run_directory),
+                "host": "localhost"
             }
         )
-        self.assertEqual(len(self.sensor_service.dispatched_triggers), 1)
+        self.assertEqual(len(self.get_dispatched_triggers()), 1)
 
         # The trigger should not be emitted for the same directory again
         sensor.poll()
-        self.assertEqual(len(self.sensor_service.dispatched_triggers), 1)
+        self.assertEqual(len(self.get_dispatched_triggers()), 1)
