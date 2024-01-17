@@ -7,23 +7,24 @@ class CopyCompleteSensor(PollingSensor):
         super(CopyCompleteSensor, self).__init__(sensor_service, config, poll_interval)
         self._logger = self.sensor_service.get_logger(__name__)
 
-        self._directories = []
+        self._directories = {}
         self._processed_run_directories = set()
 
     def setup(self):
         pass
 
     def poll(self):
-        for d in self._directories:
+        for d, trigger in self._directories.items():
             for child in d.iterdir():
                 if child.is_file() or child in self._processed_run_directories:
                     continue
 
                 copycomplete = child / "CopyComplete.txt"
                 if copycomplete.exists():
+                    self._logger.debug(f"found copycomplete file: {copycomplete}")
                     self._processed_run_directories.add(child)
                     self.sensor_service.dispatch(
-                        trigger="gmc_norr.copy_complete",
+                        trigger=trigger,
                         payload={
                             "run_directory": str(child),
                         }
@@ -33,10 +34,10 @@ class CopyCompleteSensor(PollingSensor):
         pass
 
     def add_trigger(self, trigger):
-        self._logger.error(f"adding trigger: {trigger}")
+        self._logger.debug(f"adding trigger: {trigger}")
 
-        ref = trigger.get("ref")
-        if ref is None:
+        trigger_ref = trigger.get("ref")
+        if trigger_ref is None:
             self._logger.error("trigger did not contain a ref")
             raise Exception("trigger did not contain a ref")
 
@@ -47,6 +48,7 @@ class CopyCompleteSensor(PollingSensor):
 
         config_section = trigger.get("parameters", {}).get("config_section")
         watch_dir = Path(self._config.get(config_section, {}).get("watch_directory"))
+
         if watch_dir is None:
             self._logger.error("trigger did not contain a watch_directory")
             raise Exception("trigger did not contain a watch_directory")
@@ -54,9 +56,9 @@ class CopyCompleteSensor(PollingSensor):
             self._logger.error(f"watch directory does not exist: {watch_dir}")
             raise Exception("watch directory does not exist")
 
-        self._logger.info(f"watch directory added: {watch_dir.name}")
+        self._directories[watch_dir] = trigger_ref
 
-        self._directories.append(watch_dir)
+        self._logger.info(f"watch directory added: {watch_dir.resolve()}")
 
     def update_trigger(self, trigger):
         pass
