@@ -1,6 +1,6 @@
 ---
 class_name: CopyCompleteSensor
-entry_point: copycomplete_sensor.py
+entry_point: copy_complete_sensor.py
 description: >
   Sensor that emits triggers for subdirectories within a specific directory
   where a new CopyComplete.txt file is written.
