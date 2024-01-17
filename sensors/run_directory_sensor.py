@@ -53,7 +53,7 @@ class RunDirectorySensor(PollingSensor):
         super(RunDirectorySensor, self).__init__(sensor_service, config, poll_interval)
         self._logger = self.sensor_service.get_logger(__name__)
         self._watched_directories = self.config.get("run_directories", [])
-        self._run_directories = []
+        self._run_directories = {}
 
         self._logger.debug("watched directories:")
         for wd in self._watched_directories:
@@ -61,7 +61,8 @@ class RunDirectorySensor(PollingSensor):
 
         run_directories = self.sensor_service.get_value(self._DATASTORE_KEY)
         if run_directories is not None:
-            self._run_directories = json.loads(run_directories)
+            for rd in json.loads(run_directories):
+                self._run_directories[f"{rd['host']}:{rd['path']}"] = rd
 
     def setup(self):
         pass
@@ -77,10 +78,13 @@ class RunDirectorySensor(PollingSensor):
                 f"find {wd['path']} -maxdepth 1 -mindepth 1 -type d"
             )
 
+            existing_run_directories = set()
+
             for line in stdout:
                 run_directory_path = Path(line.strip())
                 run_directory_state = self.run_directory_state(run_directory_path, client)
 
+                existing_run_directories.add(f"{host}:{run_directory_path}")
                 existing_run_directory = self._find_run_directory(run_directory_path, host)
                 state_changed = False
 
@@ -100,6 +104,11 @@ class RunDirectorySensor(PollingSensor):
                                 "host": host
                             },
                         )
+
+            # Remove run directories that no longer exist
+            for k in set(self._run_directories.keys()) - existing_run_directories:
+                self._logger.debug(f"removing run directory: {self._run_directories[k]}")
+                self._run_directories.pop(k)
 
             for line in stderr:
                 self._logger.warning(f"stderr: {line}")
@@ -159,21 +168,17 @@ class RunDirectorySensor(PollingSensor):
 
     def _add_run_directory(self, run_directory: Path, host: str, state: str):
         self._logger.debug(f"adding run directory: {host}:{run_directory}")
-        self._run_directories.append({
+        self._run_directories[f"{host}:{str(run_directory)}"] = {
             "path": str(run_directory),
             "host": host,
             "state": state
-        })
+        }
 
     def _find_run_directory(self, run_directory: Union[Path, str], host: str):
-        matches = filter(
-            lambda x: x["path"] == str(run_directory) and x["host"] == host,
-            self._run_directories,
-        )
-        return next(matches, None)
+        return self._run_directories.get(f"{host}:{str(run_directory)}", None)
 
     def _update_datastore(self):
         self.sensor_service.set_value(
             self._DATASTORE_KEY,
-            json.dumps(self._run_directories)
+            json.dumps(list(self._run_directories.values()))
         )
