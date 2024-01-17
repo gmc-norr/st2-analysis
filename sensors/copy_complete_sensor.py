@@ -40,11 +40,13 @@ class CopyCompleteSensor(PollingSensor):
             self._logger.error("trigger did not contain a ref")
             raise Exception("trigger did not contain a ref")
 
-        if ref != "gmc_norr.copy_complete":
-            self._logger.error(f"trigger not supported: {ref}")
-            raise Exception("unsupported trigger")
+        trigger_type = trigger.get("type")
+        if trigger_type != "gmc_norr.copy_complete":
+            self._logger.error(f"trigger not supported: {trigger_type}")
+            raise Exception(f"unsupported trigger type: {trigger_type}")
 
-        watch_dir = Path(trigger.get("parameters", {}).get("watch_directory"))
+        config_section = trigger.get("parameters", {}).get("config_section")
+        watch_dir = Path(self._config.get(config_section, {}).get("watch_directory"))
         if watch_dir is None:
             self._logger.error("trigger did not contain a watch_directory")
             raise Exception("trigger did not contain a watch_directory")
