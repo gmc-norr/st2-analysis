@@ -17,11 +17,13 @@ There are some config parameters that have to be set for each workflow.
 
 ### Archer
 
-- `archer.watch_directory`: The directory to watch for new sequencing runs
+- `run_directories`: A list of directories to watch for new sequencing runs in
 - `archer.processed_directory`: The directory where to move the data once it has been processed
 - `archer.archer_directory`: The watch directory for Archer Analysis
 - `archer.required_samplesheet_columns`: List of required columns in the Data section of the samplesheet
 - `archer.samplesheet_data_section`: The name of the relevant data section of the samplesheet
+- `archer.analysis_host`: URL of the remote host on which to run the preprocessing
+- `archer.archer_host`: URL of the remote host where Archer Analysis is set up
 
 ## Actions
 
@@ -38,16 +40,6 @@ ref                                      | description
 -----------------------------------------|------------------------------------------
 gmc_norr.copy_complete                   | Triggers when a new copycomplete file is found
 
-## Sensors
-
-ref                                      | description
------------------------------------------|------------------------------------------
-gmc_norr.CopyCompleteSensor              | Sensor that emits triggers for
-                                         | subdirectories within a
-                                         | specific directory where a new
-                                         | CopyComplete.txt file is
-                                         | written.
-
 ## Rules
 
 ref                                      | description
@@ -59,6 +51,7 @@ gmc_norr.generate_tumor_evolution_report | Generate tumor evolution report
 ref                                      | description
 -----------------------------------------|---------------------------------
 gmc_norr.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+gmc_norr.RunDirectorySensor              | Polling sensor that emits triggers for subdirectories within `config.run_directories` when their state change, e.g. a CopyComplete.txt file is found.
 
 # Known issues
 
