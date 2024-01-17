@@ -5,22 +5,18 @@ description: >
   Sensor that emits triggers for subdirectories within a specific directory
   where a new CopyComplete.txt file is written.
 poll_interval: 60
+enabled: false
 trigger_types:
-  - name: "copy_complete"
-    pack: "gmc_norr"
+  - name: copy_complete
+    pack: gmc_norr
     description: >
       Triggers when a new copycomplete file is found
-    parameters_schema:
-      type: object
-      properties:
-        config_section:
-          type: string
-          description: The config section to use for configuring the sensor
-          required: true
     payload_schema:
       type: object
       properties:
         run_directory:
           type: string
           description: The directory in which the copycomplete file was found
-
+        host:
+          type: string
+          description: The host on which the run directory was found
