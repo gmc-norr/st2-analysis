@@ -1,7 +1,7 @@
 ---
-ref: gmc_norr
-name: GMC Norr StackStorm
-description: StackStorm pack for GMC Norr
+ref: gmc_norr_analysis
+name: GMC Norr Analysis
+description: StackStorm pack for automation of GMC Norr downstream analysis
 version: 0.2.1 # x-release-please-version
 python_versions:
   - "3"

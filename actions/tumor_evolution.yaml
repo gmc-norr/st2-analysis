@@ -1,6 +1,6 @@
 ---
 name: tumor_evolution
-pack: gmc_norr
+pack: gmc_norr_analysis
 description: Workflow for generating a tumor evolution report
 runner_type: orquesta
 entry_point: workflows/tumor_evolution.yaml

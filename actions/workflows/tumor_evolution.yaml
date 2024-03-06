@@ -13,7 +13,7 @@ vars:
 
 tasks:
   generate_report:
-    action: gmc_norr.generate_tumor_evolution_report
+    action: gmc_norr_analysis.generate_tumor_evolution_report
     input:
       excel_file: <% ctx().excel_file %>
       sheet: <% ctx().sheet %>
@@ -32,7 +32,7 @@ tasks:
           - fail
 
   write_log:
-    action: gmc_norr.write_file
+    action: gmc_norr_analysis.write_file
     input:
       path: "<% ctx().output_directory %>/report.TIMESTAMP.error.log"
       text: <% ctx().log %>
