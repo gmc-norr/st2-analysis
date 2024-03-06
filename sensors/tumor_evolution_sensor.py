@@ -28,7 +28,7 @@ class TumorEvolutionSensor(PollingSensor):
                     continue
                 payload = self._parse_arguments(line)
                 self.sensor_service.dispatch(
-                    trigger="gmc_norr.tumor_evolution_request",
+                    trigger="gmc_norr_analysis.tumor_evolution_request",
                     payload=payload,
                 )
                 n_dispatched += 1

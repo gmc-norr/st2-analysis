@@ -4,7 +4,7 @@ description: Sensor that detects new requests to generate tumor evolution report
 enabled: true
 trigger_types:
   - name: tumor_evolution_request
-    pack: gmc_norr
+    pack: gmc_norr_analysis
     description: >
       Triggers when there is a new request to generate tumor evolution reports.
     payload_schema:

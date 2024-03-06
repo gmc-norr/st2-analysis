@@ -1,14 +1,14 @@
 ---
 name: generate_tumor_evolution_report
-pack: gmc_norr
+pack: gmc_norr_analysis
 description: Generate tumor evolution report
 enabled: true
 
 trigger:
-  type: gmc_norr.tumor_evolution_request
+  type: gmc_norr_analysis.tumor_evolution_request
 
 action:
-  ref: gmc_norr.tumor_evolution
+  ref: gmc_norr_analysis.tumor_evolution
   parameters:
     excel_file: "{{ trigger.excel_file }}"
     sheet: "{{ trigger.sheet }}"

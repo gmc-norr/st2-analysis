@@ -2,7 +2,7 @@
 name: tumor_evolution.concurrency
 description: Limits the concurrent executions for the tumor evolution report.
 enabled: true
-resource_ref: gmc_norr.tumor_evolution
+resource_ref: gmc_norr_analysis.tumor_evolution
 policy_type: action.concurrency
 parameters:
   action: delay
