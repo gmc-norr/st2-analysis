@@ -19,6 +19,7 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
 
     def _sensor_setup(self):
         self.sensor = self.get_sensor_instance(config={
+            "notification_email": ["me@mail.com"],
             "tumor_evolution": {
                 "output_directory": str(self.output_dir),
                 "watch_file": str(self.watch_file),
@@ -52,7 +53,30 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
 
     def test_missing_mount(self):
         self._sensor_setup()
+        original_func = self.sensor._watch_file_ok
         self.sensor._watch_file_ok = Mock(
             side_effect=OSError(112, "Host is down", str(self.watch_file))
         )
+        original_poll_interval = self.sensor.get_poll_interval()
         self.sensor.poll()
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 2
+        )
+        self.assertTriggerDispatched("gmc_norr_analysis.notification_email")
+        trigger = self.get_dispatched_triggers()[0]
+        self.assertEqual(
+            trigger["payload"]["message"],
+            "Failed to check watch file: [Errno 112] "
+            f"Host is down: '{self.watch_file}'"
+        )
+
+        self.sensor._watch_file_ok = original_func
+
+        # This should create the watch file and reset the polling interval
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 1)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval
+        )

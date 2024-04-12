@@ -5,6 +5,7 @@ from st2reactor.sensor.base import PollingSensor
 class TumorEvolutionSensor(PollingSensor):
     def __init__(self, sensor_service, config, poll_interval=60):
         super(TumorEvolutionSensor, self).__init__(sensor_service, config, poll_interval)
+        self._original_poll_interval = poll_interval
         self.logger = self.sensor_service.get_logger(__name__)
         self.watch_file = Path(self.config["tumor_evolution"]["watch_file"])
         self.watch_file_instructions = self.config["tumor_evolution"]["watch_file_instructions"]
@@ -13,12 +14,31 @@ class TumorEvolutionSensor(PollingSensor):
         pass
 
     def _watch_file_ok(self):
-        return self.watch_file.exists()
+        try:
+            return self.watch_file.exists()
+        except OSError:
+            raise
 
     def poll(self):
         self.logger.debug(f"looking for requests in {self.watch_file}")
 
-        found_watch_file = self._watch_file_ok()
+        try:
+            found_watch_file = self._watch_file_ok()
+        except OSError as e:
+            self.logger.error(f"failed to check watch file: {e}")
+            self.sensor_service.dispatch(
+                trigger="gmc_norr_analysis.notification_email",
+                payload={
+                    "to": self.config["notification_email"],
+                    "subject": "[TumorEvolutionSensor] Failed to "
+                        "check watch file",
+                    "message": "Failed to check watch file: %s" % e
+                }
+            )
+            self.set_poll_interval(self.get_poll_interval() * 2)
+            return
+
+        self.set_poll_interval(self._original_poll_interval)
 
         if not found_watch_file:
             self.logger.warning("watch file not found, creating it")
