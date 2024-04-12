@@ -5,7 +5,8 @@ from st2reactor.sensor.base import PollingSensor
 class TumorEvolutionSensor(PollingSensor):
     def __init__(self, sensor_service, config, poll_interval=60):
         super(TumorEvolutionSensor, self).__init__(sensor_service, config, poll_interval)
-        self._original_poll_interval = poll_interval
+        self._original_poll_interval = self.get_poll_interval()
+        self.max_poll_interval = 1200
         self.logger = self.sensor_service.get_logger(__name__)
         self.watch_file = Path(self.config["tumor_evolution"]["watch_file"])
         self.watch_file_instructions = self.config["tumor_evolution"]["watch_file_instructions"]
@@ -18,6 +19,12 @@ class TumorEvolutionSensor(PollingSensor):
             return self.watch_file.exists()
         except OSError:
             raise
+
+    def _increase_poll_interval(self):
+        self.set_poll_interval(min(
+            self.get_poll_interval() * 2,
+            self.max_poll_interval
+        ))
 
     def poll(self):
         self.logger.debug(f"looking for requests in {self.watch_file}")
@@ -35,15 +42,14 @@ class TumorEvolutionSensor(PollingSensor):
                     "message": "Failed to check watch file: %s" % e
                 }
             )
-            self.set_poll_interval(self.get_poll_interval() * 2)
+            self._increase_poll_interval()
             return
-
-        self.set_poll_interval(self._original_poll_interval)
 
         if not found_watch_file:
             self.logger.warning("watch file not found, creating it")
             try:
                 self._reset_watch_file()
+                self.set_poll_interval(self._original_poll_interval)
             except FileNotFoundError as e:
                 self.logger.error(f"failed to create watch file: {e}")
                 self.sensor_service.dispatch(
@@ -55,7 +61,7 @@ class TumorEvolutionSensor(PollingSensor):
                         "message": "Failed to create watch file: %s" % e
                     }
                 )
-                self.set_poll_interval(self.get_poll_interval() * 2)
+                self._increase_poll_interval()
             return
 
         n_dispatched = 0

@@ -90,10 +90,53 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
 
         self.sensor._watch_file_ok = original_func
 
-        # This should create the watch file and reset the polling interval
+        # This should create the watch file and reset the polling interval,
+        # but no more triggers should be dispatched.
         self.sensor.poll()
+        self.assertTrue(self.watch_file.exists())
         self.assertEqual(len(self.get_dispatched_triggers()), 1)
         self.assertEqual(
             self.sensor.get_poll_interval(),
             original_poll_interval
+        )
+
+    def test_max_polling_interval(self):
+        self.watch_file = Path("/no/such/path/watch.txt")
+        self._sensor_setup()
+
+        original_poll_interval = self.sensor.get_poll_interval()
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 1)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 2
+        )
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 2)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 4
+        )
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 3)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 8
+        )
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 4)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 16
+        )
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 5)
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            self.sensor.max_poll_interval
         )
