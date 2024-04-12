@@ -72,10 +72,11 @@ class TumorEvolutionSensor(PollingSensor):
                 n_dispatched += 1
 
         if n_dispatched == 0:
-            self.logger.info("watch file empty")
+            self.logger.debug("watch file empty")
             return
 
-        self.logger.info(f"dispatched {n_dispatched} request")
+        self.logger.info(f"dispatched {n_dispatched} "
+                         f"request{'' if n_dispatched == 1 else 's'}")
 
         self._reset_watch_file()
 
