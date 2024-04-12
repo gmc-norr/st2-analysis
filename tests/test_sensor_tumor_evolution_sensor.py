@@ -46,9 +46,26 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
         self.assertFalse(
             Path(self.watch_file).exists()
         )
+        original_poll_interval = self.sensor.get_poll_interval()
         self.sensor.poll()
         self.assertFalse(
             Path(self.sensor.config["tumor_evolution"]["watch_file"]).exists()
+        )
+        self.assertTriggerDispatched(
+            trigger="gmc_norr_analysis.notification_email",
+            payload={
+                "to": ["me@mail.com"],
+                "subject": "[TumorEvolutionSensor] Failed to "
+                           "create watch file",
+                "message": "Failed to create watch file: [Errno 2] "
+                           "No such file or directory: "
+                           "'/no/such/path/watch.txt'"
+            }
+        )
+        self.assertFalse(self.watch_file.exists())
+        self.assertEqual(
+            self.sensor.get_poll_interval(),
+            original_poll_interval * 2
         )
 
     def test_missing_mount(self):

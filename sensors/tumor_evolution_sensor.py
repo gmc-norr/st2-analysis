@@ -42,7 +42,20 @@ class TumorEvolutionSensor(PollingSensor):
 
         if not found_watch_file:
             self.logger.warning("watch file not found, creating it")
-            self._reset_watch_file()
+            try:
+                self._reset_watch_file()
+            except FileNotFoundError as e:
+                self.logger.error(f"failed to create watch file: {e}")
+                self.sensor_service.dispatch(
+                    trigger="gmc_norr_analysis.notification_email",
+                    payload={
+                        "to": self.config["notification_email"],
+                        "subject": "[TumorEvolutionSensor] Failed to "
+                            "create watch file",
+                        "message": "Failed to create watch file: %s" % e
+                    }
+                )
+                self.set_poll_interval(self.get_poll_interval() * 2)
             return
 
         n_dispatched = 0
