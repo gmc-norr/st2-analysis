@@ -12,10 +12,15 @@ class TumorEvolutionSensor(PollingSensor):
     def setup(self):
         pass
 
+    def _watch_file_ok(self):
+        return self.watch_file.exists()
+
     def poll(self):
         self.logger.debug(f"looking for requests in {self.watch_file}")
 
-        if not self.watch_file.exists():
+        found_watch_file = self._watch_file_ok()
+
+        if not found_watch_file:
             self.logger.warning("watch file not found, creating it")
             self._reset_watch_file()
             return
