@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.2](https://github.com/gmc-norr/st2-analysis/compare/v0.2.1...v0.2.2) (2024-04-15)
+
+
+### Bug Fixes
+
+* sensor crash when mount is missing ([#15](https://github.com/gmc-norr/st2-analysis/issues/15)) ([671c344](https://github.com/gmc-norr/st2-analysis/commit/671c344ad7d955e2dcd404ffa06f127ebfd1f0fa))
+
 ## [0.2.1](https://github.com/gmc-norr/st2-gmc-norr/compare/v0.2.0...v0.2.1) (2024-01-08)
 
 
