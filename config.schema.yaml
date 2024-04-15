@@ -38,3 +38,12 @@ tumor_evolution:
         the package for valid values: https://github.com/gmc-norr/tumor-evolution/releases
       type: string
       required: true
+
+notification_email:
+  type: array
+  description: Email addresses to send notifications to
+  items:
+    type: string
+    description: An email address
+  default: []
+  required: true

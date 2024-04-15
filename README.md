@@ -12,6 +12,7 @@ The config parameters that need to be defined are:
 - `tumor_evolution.output_directory`: The directory where the evolution reports will be saved.
 - `tumor_evolution.watch_file`: The path to the file that will be watched for new requests to generate reports.
 - `tumor_evolution.version`: The version of the tumor-evolution script to be used.
+- `notification_email`: An array of email addresses where notifications will be sent
 
 ## Actions
 
@@ -26,6 +27,7 @@ gmc_norr_analysis.write_file                      | Write a text string to a fil
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
+gmc_norr_analysis.send_notification_email         | Send a notification email
 
 ## Sensors
 

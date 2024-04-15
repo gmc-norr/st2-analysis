@@ -1,0 +1,18 @@
+---
+name: send_notification_email
+pack: gmc_norr_analysis
+description: >
+  Send a notification email
+enabled: true
+
+trigger:
+  type: gmc_norr_analysis.email_notification
+
+action:
+  ref: email.send_email
+  parameters:
+    account: SMTP-VLL
+    email_from: stackstorm@regionvasterbotten.se
+    email_to: "{{ trigger.to | to_json_string }}"
+    subject: "{{ trigger.subject }}"
+    message: "{{ trigger.message }}"
