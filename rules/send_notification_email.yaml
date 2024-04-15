@@ -2,7 +2,7 @@
 name: send_notification_email
 pack: gmc_norr_analysis
 description: >
-  Triggers when there is a notification to send via email.
+  Send a notification email
 enabled: true
 
 trigger:
