@@ -47,7 +47,7 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
                 "output": "/storage/path/to/excel/file",
             },
         ]
-        
+
         for i, p in enumerate(paths, start=1):
             with open(self.watch_file, "a") as wf:
                 wf.write(p["input"])
