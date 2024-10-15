@@ -38,11 +38,10 @@ jobs:
 
     services:
       mongo:
-        image: mongo:3.4
+        image: mongo:3.6
         ports:
           - 27017:27017
       rabbitmq:
         image: rabbitmq:3
         ports:
           - 5672:5672
-

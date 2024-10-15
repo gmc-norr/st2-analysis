@@ -25,4 +25,3 @@ parameters:
     type: string
     immutable: true
     default: "{{ config_context.tumor_evolution.version }}"
-

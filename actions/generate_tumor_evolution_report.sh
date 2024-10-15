@@ -2,19 +2,9 @@
 
 set -euo pipefail
 
-function win_to_unix() {
-    # Right now this only handles paths on G:. This will likely have to
-    # change in a not too distant future.
-    if [[ "$1" == G:* ]]; then
-        sed -e 's#\\#/#g' -e 's#^G:[\\/]Genetik#/mnt/G-Genetik#' <<< "$1"
-    else
-        echo "$1"
-    fi
-}
-
-INPUTFILE=$(win_to_unix "$1")
+INPUTFILE="$1"
 SHEET=$2
-OUTPUTDIR=$(win_to_unix "$3")
+OUTPUTDIR="$3"
 VERSION=$4
 IMAGE="tumor-evolution:${VERSION}"
 
