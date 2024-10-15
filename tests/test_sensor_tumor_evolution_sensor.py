@@ -23,10 +23,43 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
             "tumor_evolution": {
                 "output_directory": str(self.output_dir),
                 "watch_file": str(self.watch_file),
-                "watch_file_instructions": "test instructions",
+                "watch_file_instructions": "# test instructions\n",
                 "version": "0.5.4"
             }
         })
+
+    def test_excel_paths(self):
+        paths = [
+            {
+                "input": "G:\\path\\to\\a\\file.xlsx",
+                "output": "/mnt/G-Genetik/path/to/a/file.xlsx",
+            },
+            {
+                "input": "K:\\path\\to\\a\\file.xlsx",
+                "output": "/mnt/K-Genetik/path/to/a/file.xlsx",
+            },
+            {
+                "input": "V:\\path\\to\\a\\file.xlsx",
+                "output": "/mnt/V-Genetik/path/to/a/file.xlsx",
+            },
+            {
+                "input": "/storage/path/to/excel/file",
+                "output": "/storage/path/to/excel/file",
+            },
+        ]
+        
+        for i, p in enumerate(paths, start=1):
+            with open(self.watch_file, "a") as wf:
+                wf.write(p["input"])
+            self.sensor.poll()
+            self.assertEqual(len(self.get_dispatched_triggers()), i)
+            self.assertTriggerDispatched(
+                trigger="gmc_norr_analysis.tumor_evolution_request",
+                payload=dict(
+                    excel_file=p["output"],
+                    sheet="1",
+                )
+            )
 
     def test_missing_watch_file(self):
         self.assertFalse(self.watch_file.exists())
