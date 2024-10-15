@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 from st2reactor.sensor.base import PollingSensor
 
 
@@ -98,13 +99,27 @@ class TumorEvolutionSensor(PollingSensor):
     def remove_trigger(self, trigger):
         pass
 
+    def win2unix(self, path: str):
+        """
+        Convert a windows path to a unix path.
+
+        This assumes that any windows drive letter has been mounted
+        at /mnt/<drive-letter>-Genetik. For example, G: should be
+        mounted at /mnt/G-Genetik, K: at /mnt/K-Genetik, and so on.
+        """
+        unix_path = path.replace("\\", "/")
+        winre = re.compile("^([GKV]):")
+        if winre.match(unix_path):
+            unix_path = winre.sub("/mnt/\\1-Genetik", unix_path)
+        return unix_path
+
     def _parse_arguments(self, arg_string):
         args = arg_string.split()
 
         if len(args) > 2:
             self.logger.warning("too many arguments, ignoring all but first two")
 
-        excel_file = args[0]
+        excel_file = self.win2unix(args[0])
         sheet = "1"
 
         if len(args) > 1:

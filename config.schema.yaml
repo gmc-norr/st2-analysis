@@ -6,7 +6,9 @@ tumor_evolution:
       description: >
         Directory where the report should be saved. This can either be an
         absolute path on the StackStorm server, or a Windows path referring
-        to G:.
+        to a drive that has been mounted on the same system where StackStorm
+        is running. E.g., K: should be mounted at /mnt/K-Genetik, G: at
+        /mnt/G-Genetik, etc.
       type: string
       format: uri-reference
       required: true
