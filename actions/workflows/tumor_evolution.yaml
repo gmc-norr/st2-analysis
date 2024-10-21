@@ -27,7 +27,7 @@ tasks:
       - when: <% failed() %>
         publish:
           - log: <% result().stderr %>
-        do: 
+        do:
           - write_log
           - fail
 
@@ -41,4 +41,3 @@ tasks:
 
 output:
   - log: <% ctx().log %>
-
