@@ -2,7 +2,7 @@
 ref: gmc_norr_analysis
 name: GMC Norr Analysis
 description: StackStorm pack for automation of GMC Norr downstream analysis
-version: 0.2.2 # x-release-please-version
+version: 0.2.3 # x-release-please-version
 python_versions:
   - "3"
 author: Niklas Mähler

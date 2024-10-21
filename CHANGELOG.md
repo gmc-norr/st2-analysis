@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.3](https://github.com/gmc-norr/st2-analysis/compare/v0.2.2...v0.2.3) (2024-10-21)
+
+
+### Bug Fixes
+
+* more general support for windows paths ([#19](https://github.com/gmc-norr/st2-analysis/issues/19)) ([413eefb](https://github.com/gmc-norr/st2-analysis/commit/413eefb97babd68fcce9b2f4292eb14686ad151b))
+
 ## [0.2.2](https://github.com/gmc-norr/st2-analysis/compare/v0.2.1...v0.2.2) (2024-04-15)
 
 
