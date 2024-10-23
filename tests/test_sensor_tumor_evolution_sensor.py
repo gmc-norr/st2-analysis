@@ -31,15 +31,15 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
     def test_excel_paths(self):
         paths = [
             {
-                "input": "G:\\path\\to\\a\\file.xlsx",
+                "input": "G:\\Genetik\\path\\to\\a\\file.xlsx",
                 "output": "/mnt/G-Genetik/path/to/a/file.xlsx",
             },
             {
-                "input": "K:\\path\\to\\a\\file.xlsx",
+                "input": "K:\\Genetik\\path\\to\\a\\file.xlsx",
                 "output": "/mnt/K-Genetik/path/to/a/file.xlsx",
             },
             {
-                "input": "V:\\path\\to\\a\\file.xlsx",
+                "input": "V:\\Genetik\\path\\to\\a\\file.xlsx",
                 "output": "/mnt/V-Genetik/path/to/a/file.xlsx",
             },
             {
