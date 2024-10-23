@@ -35,6 +35,10 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
                 "output": "/mnt/G-Genetik/path/to/a/file.xlsx",
             },
             {
+                "input": "\"G:\\Genetik\\path\\to\\another\\file.xlsx\"",
+                "output": "/mnt/G-Genetik/path/to/another/file.xlsx",
+            },
+            {
                 "input": "K:\\Genetik\\path\\to\\a\\file.xlsx",
                 "output": "/mnt/K-Genetik/path/to/a/file.xlsx",
             },
