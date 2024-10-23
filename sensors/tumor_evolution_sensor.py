@@ -107,7 +107,7 @@ class TumorEvolutionSensor(PollingSensor):
         at /mnt/<drive-letter>-Genetik. For example, G: should be
         mounted at /mnt/G-Genetik, K: at /mnt/K-Genetik, and so on.
         """
-        unix_path = path.replace("\\", "/")
+        unix_path = path.strip('"').replace("\\", "/")
         winre = re.compile(r"^([GKV]):/(Genetik)")
         if winre.match(unix_path):
             unix_path = winre.sub("/mnt/\\1-\\2", unix_path)
