@@ -108,9 +108,9 @@ class TumorEvolutionSensor(PollingSensor):
         mounted at /mnt/G-Genetik, K: at /mnt/K-Genetik, and so on.
         """
         unix_path = path.replace("\\", "/")
-        winre = re.compile("^([GKV]):")
+        winre = re.compile(r"^([GKV]):/(Genetik)")
         if winre.match(unix_path):
-            unix_path = winre.sub("/mnt/\\1-Genetik", unix_path)
+            unix_path = winre.sub("/mnt/\\1-\\2", unix_path)
         return unix_path
 
     def _parse_arguments(self, arg_string):
