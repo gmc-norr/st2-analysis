@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.4](https://github.com/gmc-norr/st2-analysis/compare/v0.2.3...v0.2.4) (2024-10-23)
+
+
+### Bug Fixes
+
+* add support for quoted paths ([0b9a978](https://github.com/gmc-norr/st2-analysis/commit/0b9a9782025e0b11f828fc95a01c8198848e1077))
+* bug in excel file paths ([0690231](https://github.com/gmc-norr/st2-analysis/commit/06902316f34503d664f14a6d7886fc529bbb0b4b))
+
 ## [0.2.3](https://github.com/gmc-norr/st2-analysis/compare/v0.2.2...v0.2.3) (2024-10-21)
 
 
