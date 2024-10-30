@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.0](https://github.com/gmc-norr/st2-analysis/compare/v0.2.4...v0.3.0) (2024-10-30)
+
+
+### Features
+
+* more general handling of windows mounts ([#24](https://github.com/gmc-norr/st2-analysis/issues/24)) ([5c8f284](https://github.com/gmc-norr/st2-analysis/commit/5c8f28454582d62a3e5ca0c7792fc2aea6183830))
+
 ## [0.2.4](https://github.com/gmc-norr/st2-analysis/compare/v0.2.3...v0.2.4) (2024-10-23)
 
 
