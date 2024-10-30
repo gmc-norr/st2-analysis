@@ -41,6 +41,24 @@ tumor_evolution:
       type: string
       required: true
 
+mounts:
+  description: >
+    Mappings between windows paths and their mount points on the unix system.
+    If two mounts share a windows path prefix, the longer of them needs to
+    be listed first in order to be properly identified.
+  type: array
+  items:
+    type: object
+    properties:
+      win:
+        description: Windows path that is mounted on the unix system.
+        type: string
+        required: true
+      unix:
+        description: Unix path where the windows path has been mounted.
+        type: string
+        required: true
+
 notification_email:
   type: array
   description: Email addresses to send notifications to
