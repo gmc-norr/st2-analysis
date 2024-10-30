@@ -106,10 +106,9 @@ class TumorEvolutionSensor(PollingSensor):
         matches with the windows path in the config, it will be replaced with the
         corresponding unix path. If no math is found, the input path is returned as-is.
         """
-        path = path.strip('"').replace("\\", "/")
+        inputpath = PureWindowsPath(path.strip('"'))
         for mount_mapping in self.config["mounts"]:
             winpath = PureWindowsPath(mount_mapping["win"])
-            inputpath = PureWindowsPath(path)
             if all([x.lower() == y.lower() for x, y in zip(winpath.parts, inputpath.parts)]):
                 return Path(mount_mapping["unix"], *inputpath.parts[len(winpath.parts):])
         return Path(path)
