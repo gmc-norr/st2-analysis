@@ -1,5 +1,4 @@
-from pathlib import Path
-import re
+from pathlib import Path, PureWindowsPath
 from st2reactor.sensor.base import PollingSensor
 
 
@@ -99,19 +98,21 @@ class TumorEvolutionSensor(PollingSensor):
     def remove_trigger(self, trigger):
         pass
 
-    def win2unix(self, path: str):
+    def win2unix(self, path: str) -> Path:
         """
         Convert a windows path to a unix path.
 
-        This assumes that any windows drive letter has been mounted
-        at /mnt/<drive-letter>-Genetik. For example, G: should be
-        mounted at /mnt/G-Genetik, K: at /mnt/K-Genetik, and so on.
+        This will look at the defined mount points in the config and if the path prefix
+        matches with the windows path in the config, it will be replaced with the
+        corresponding unix path. If no math is found, the input path is returned as-is.
         """
-        unix_path = path.strip('"').replace("\\", "/")
-        winre = re.compile(r"^([GKV]):/(Genetik)")
-        if winre.match(unix_path):
-            unix_path = winre.sub("/mnt/\\1-\\2", unix_path)
-        return unix_path
+        path = path.strip('"').replace("\\", "/")
+        for mount_mapping in self.config["mounts"]:
+            winpath = PureWindowsPath(mount_mapping["win"])
+            inputpath = PureWindowsPath(path)
+            if all([x.lower() == y.lower() for x, y in zip(winpath.parts, inputpath.parts)]):
+                return Path(mount_mapping["unix"], *inputpath.parts[len(winpath.parts):])
+        return Path(path)
 
     def _parse_arguments(self, arg_string):
         args = arg_string.split()
@@ -126,7 +127,7 @@ class TumorEvolutionSensor(PollingSensor):
             sheet = args[1]
 
         return {
-            "excel_file": excel_file,
+            "excel_file": str(excel_file),
             "sheet": sheet,
         }
 

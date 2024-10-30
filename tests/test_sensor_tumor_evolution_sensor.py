@@ -25,7 +25,21 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
                 "watch_file": str(self.watch_file),
                 "watch_file_instructions": "# test instructions\n",
                 "version": "0.5.4"
-            }
+            },
+            "mounts": [
+                {
+                    "win": "G:\\Genetik",
+                    "unix": "/mnt/G-Genetik",
+                },
+                {
+                    "win": "K:\\Genetik",
+                    "unix": "/mnt/testmount",
+                },
+                {
+                    "win": "V:\\Genetik",
+                    "unix": "/mnt/V-Genetik",
+                },
+            ],
         })
 
     def test_excel_paths(self):
@@ -35,12 +49,16 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
                 "output": "/mnt/G-Genetik/path/to/a/file.xlsx",
             },
             {
+                "input": "G:\\Genetik\\path\\To\\A\\CaseSensitiveFile.xlsx",
+                "output": "/mnt/G-Genetik/path/To/A/CaseSensitiveFile.xlsx",
+            },
+            {
                 "input": "\"G:\\Genetik\\path\\to\\another\\file.xlsx\"",
                 "output": "/mnt/G-Genetik/path/to/another/file.xlsx",
             },
             {
                 "input": "K:\\Genetik\\path\\to\\a\\file.xlsx",
-                "output": "/mnt/K-Genetik/path/to/a/file.xlsx",
+                "output": "/mnt/testmount/path/to/a/file.xlsx",
             },
             {
                 "input": "V:\\Genetik\\path\\to\\a\\file.xlsx",
