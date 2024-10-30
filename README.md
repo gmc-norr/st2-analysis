@@ -12,6 +12,8 @@ The config parameters that need to be defined are:
 - `tumor_evolution.output_directory`: The directory where the evolution reports will be saved.
 - `tumor_evolution.watch_file`: The path to the file that will be watched for new requests to generate reports.
 - `tumor_evolution.version`: The version of the tumor-evolution script to be used.
+- `mount_points`: An array of mappings between windows paths and their mount points on the system.
+    - Each entry in the array should be an object with two keys: `win` and `unix`. The value for `win` should be a windows path, and `unix` should be the path where the windows path is mounted.
 - `notification_email`: An array of email addresses where notifications will be sent
 
 ## Actions
@@ -37,4 +39,4 @@ gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requ
 
 # Known issues
 
-- If a quoted string is entered in the tumor evolution watch file, it will not find the file.
+None at the moment.
