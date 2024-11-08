@@ -195,3 +195,16 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
             self.sensor.get_poll_interval(),
             self.sensor.max_poll_interval
         )
+
+    def test_invalid_encoding(self):
+        with open(self.watch_file, "bw") as f:
+            f.write("nedlåst".encode("latin-1"))
+
+        self.sensor.poll()
+        self.assertEqual(len(self.get_dispatched_triggers()), 1)
+        self.assertTriggerDispatched("gmc_norr_analysis.email_notification")
+        trigger = self.get_dispatched_triggers()[0]
+        self.assertEqual(
+            trigger["payload"]["subject"],
+            "[TumorEvolutionSensor] Error reading watch file",
+        )
