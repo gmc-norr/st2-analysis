@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.1](https://github.com/gmc-norr/st2-analysis/compare/v0.3.0...v0.3.1) (2024-11-11)
+
+
+### Bug Fixes
+
+* catch encoding errors when reading watch file ([#27](https://github.com/gmc-norr/st2-analysis/issues/27)) ([24c03a4](https://github.com/gmc-norr/st2-analysis/commit/24c03a4d16aae541534edac05bc828296985d80b))
+* correct trigger name for notification emails ([#30](https://github.com/gmc-norr/st2-analysis/issues/30)) ([ac916c2](https://github.com/gmc-norr/st2-analysis/commit/ac916c2fd0fbbdc3c9cd16088b173fffdf4a1a19))
+
 ## [0.3.0](https://github.com/gmc-norr/st2-analysis/compare/v0.2.4...v0.3.0) (2024-10-30)
 
 
