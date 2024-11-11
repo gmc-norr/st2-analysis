@@ -34,7 +34,7 @@ class TumorEvolutionSensor(PollingSensor):
         except OSError as e:
             self.logger.error(f"failed to check watch file: {e}")
             self.sensor_service.dispatch(
-                trigger="gmc_norr_analysis.notification_email",
+                trigger="gmc_norr_analysis.email_notification",
                 payload={
                     "to": self.config["notification_email"],
                     "subject": "[TumorEvolutionSensor] Failed to "
@@ -53,7 +53,7 @@ class TumorEvolutionSensor(PollingSensor):
             except FileNotFoundError as e:
                 self.logger.error(f"failed to create watch file: {e}")
                 self.sensor_service.dispatch(
-                    trigger="gmc_norr_analysis.notification_email",
+                    trigger="gmc_norr_analysis.email_notification",
                     payload={
                         "to": self.config["notification_email"],
                         "subject": "[TumorEvolutionSensor] Failed to "

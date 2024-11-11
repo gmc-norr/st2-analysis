@@ -107,7 +107,7 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
             Path(self.sensor.config["tumor_evolution"]["watch_file"]).exists()
         )
         self.assertTriggerDispatched(
-            trigger="gmc_norr_analysis.notification_email",
+            trigger="gmc_norr_analysis.email_notification",
             payload={
                 "to": ["me@mail.com"],
                 "subject": "[TumorEvolutionSensor] Failed to "
@@ -135,7 +135,7 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
             self.sensor.get_poll_interval(),
             original_poll_interval * 2
         )
-        self.assertTriggerDispatched("gmc_norr_analysis.notification_email")
+        self.assertTriggerDispatched("gmc_norr_analysis.email_notification")
         trigger = self.get_dispatched_triggers()[0]
         self.assertEqual(
             trigger["payload"]["message"],
