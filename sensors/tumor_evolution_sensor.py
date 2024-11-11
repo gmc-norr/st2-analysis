@@ -66,8 +66,21 @@ class TumorEvolutionSensor(PollingSensor):
 
         n_dispatched = 0
 
-        with open(self.watch_file) as f:
+        with open(self.watch_file, "rb") as f:
             for line in f:
+                try:
+                    line = line.decode("utf-8", errors="strict")
+                except UnicodeDecodeError as e:
+                    self.logger.error("error reading watch file: {}", e)
+                    self.sensor_service.dispatch(
+                        trigger="gmc_norr_analysis.email_notification",
+                        payload={
+                            "to": self.config["notification_email"],
+                            "subject": "[TumorEvolutionSensor] Error reading watch file",
+                            "message": "There was an error reding the watch file: %s" % e
+                        }
+                    )
+                    return
                 if line.startswith("#") or len(line.strip()) == 0:
                     continue
                 payload = self._parse_arguments(line)
