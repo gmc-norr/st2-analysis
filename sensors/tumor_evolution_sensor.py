@@ -17,7 +17,7 @@ class TumorEvolutionSensor(PollingSensor):
     def _watch_file_ok(self):
         try:
             return self.watch_file.exists()
-        except OSError:
+        except (OSError, PermissionError):
             raise
 
     def _increase_poll_interval(self):
@@ -31,7 +31,9 @@ class TumorEvolutionSensor(PollingSensor):
 
         try:
             found_watch_file = self._watch_file_ok()
-        except OSError as e:
+            # Don's reset the polling interval here since things could
+            # be going wrong later on.
+        except (OSError, PermissionError) as e:
             self.logger.error(f"failed to check watch file: {e}")
             self.sensor_service.dispatch(
                 trigger="gmc_norr_analysis.email_notification",
@@ -50,7 +52,7 @@ class TumorEvolutionSensor(PollingSensor):
             try:
                 self._reset_watch_file()
                 self.set_poll_interval(self._original_poll_interval)
-            except FileNotFoundError as e:
+            except (FileNotFoundError, PermissionError) as e:
                 self.logger.error(f"failed to create watch file: {e}")
                 self.sensor_service.dispatch(
                     trigger="gmc_norr_analysis.email_notification",
@@ -64,6 +66,7 @@ class TumorEvolutionSensor(PollingSensor):
                 self._increase_poll_interval()
             return
 
+        self.set_poll_interval(self._original_poll_interval)
         n_dispatched = 0
 
         with open(self.watch_file, "rb") as f:
