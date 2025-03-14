@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 from sensors.tumor_evolution_sensor import TumorEvolutionSensor
 from st2tests.base import BaseSensorTestCase
