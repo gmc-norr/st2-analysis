@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/gmc-norr/st2-analysis/compare/v0.3.1...v0.3.2) (2025-03-14)
+
+
+### Bug Fixes
+
+* properly reset polling intervall on error recovery ([#32](https://github.com/gmc-norr/st2-analysis/issues/32)) ([8552132](https://github.com/gmc-norr/st2-analysis/commit/8552132899e31fd00fe39c0a59b58be18116f610))
+
 ## [0.3.1](https://github.com/gmc-norr/st2-analysis/compare/v0.3.0...v0.3.1) (2024-11-11)
 
 
