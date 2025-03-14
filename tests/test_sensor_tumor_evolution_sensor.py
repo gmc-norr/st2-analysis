@@ -1,5 +1,5 @@
 from pathlib import Path
-from sensors.tumor_evolution_sensor import TumorEvolutionSensor
+from tumor_evolution_sensor import TumorEvolutionSensor
 from st2tests.base import BaseSensorTestCase
 import tempfile
 from unittest.mock import Mock
