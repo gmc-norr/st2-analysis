@@ -1,0 +1,37 @@
+---
+name: plumber_sample_analysis
+pack: gmc_norr_analysis
+description: Workflow to run analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/plumber_sample_analysis.yaml
+enabled: true
+
+parameters:
+  sample:
+    description: run id of the ready sequencing run
+    type: string
+    required: true
+  path:
+    description: path ot sequencing run
+    type: string
+    required: true
+  igene_api_key:
+    description: iGene API api key
+    type: string
+    default: "{{ config_context.igene.api_key }}"
+    secret: true
+  notification_email:
+    description: email
+    default: "{{ config_context.notification_email }}"
+  plumber_config_version:
+    description: Version of 
+    default: "{{ config_context.plumber.config_version}} "
+    required: true
+  plumber_host:
+    description: Version of 
+    default: "{{ config_context.plumber.host}} "
+    required: true
+  plumber_user:
+    description: Version of 
+    default: "{{ config_context.plumber.user}} "
+    required: true

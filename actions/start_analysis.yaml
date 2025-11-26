@@ -1,0 +1,17 @@
+---
+name: start_analysis
+pack: gmc_norr_analysis
+description: Workflow for starting analysis of samples from ready sequencing runs
+runner_type: orquesta
+entry_point: workflows/start_analysis.yaml
+enabled: true
+
+parameters:
+  run_id:
+    description: run id of the ready sequencing run
+    type: string
+    required: true
+  path:
+    description: path to sequencing run
+    type: string
+    required: true
