@@ -1,0 +1,29 @@
+version: "1.0"
+
+description: Start analysis of samples from a ready sequencing run.
+input:
+  - run_id
+  - path
+
+tasks:
+  get_sample_ids:
+    action: cleve.get_samplesheet
+    input:
+      run_id: <% ctx().run_id %>
+    retry:
+      delay: 1
+      count: 3
+    next:
+      - when: <% result().status_code = 200 %>
+        publish: 
+          samplesheet_data={{ result().get("body").get("sections")[3].get("rows")[1:] }}
+          samplesheet_data={{ result().get("body").get("sections")[3].get("rows")[1:] }}
+        do:
+          start_sample_workflow
+
+  start_sample_workflow: 
+    with: sample in <% ctx(samplesheet_data) %> 
+    input:
+      sample: <% item(sample) %>
+      path:  <% ctx().path %>
+    action: gmc_norr_analysis.plumber_sample_analysis

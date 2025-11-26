@@ -1,0 +1,100 @@
+version: "1.0"
+
+description: Run analysis of a sample.
+input:
+  - sample
+  - path
+  - igene_api_key
+  - notification_email
+  - plumber_config_version
+  - plumber_host
+  - plumber_user
+
+tasks:
+  get_sample_data:
+    action: igene.get_sample
+    input:
+      sample: <% ctx().sample %>
+      api_key: <% ctx().igene_api_key %>
+    retry:
+      when: timeout
+      delay: 1
+      count: 3
+    next:
+      - when: <% result().status_code = 200 %> 
+        publish:
+          test_profile={{ result().get("body").get("TestProfile")}}
+          referral_type={{ result().get("body").get("ReferralType")}}
+          sex={{ result().get("body").get("Sex")}}
+          output_dir="<% ctx().path %>/<% ctx().test_profile %>/<% ctx().sample %>"
+        do:
+          prepare_output_folder
+
+  prepare_output_folder:
+    action: core.local
+    input:
+      cmd:  "mkdir -p <% ctx().output_dir %>"
+    next:
+      - when: <% succeeded() %>
+        do:
+          get_plumber_arguments
+
+  get_plumber_arguments:
+    action: gmc_norr_analysis.get_plumber_arguments
+    input:
+       test_profile: "<% ctx().test_profile %>"
+    next:
+      - when: <% succeeded %>
+        publish:
+          pipeline_system={{result().get("result").get("PipelineSystem", None)}}
+          pipeline={{ result().get("result").get("Pipeline", None)}}
+          pipeline_profile={{ result().get("result").get("Profile", None)}}
+          pipeline_version={{ result().get("result").get("Version", None)}}
+        do:
+          make_plumber_cmd
+
+  make_plumber_cmd:
+    action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
+      --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %> 
+      -p <% ctx().pipeline_profile %> | tee plumber.log"
+    next:
+      - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
+        publish:
+          plumber_cmd="{{ result().stdout}}"
+        do:
+          make_rare_disease_input_files
+      - when: "{{ ctx().test_profile != 'WGSRareDisease_1'}}"
+        do:
+          report_failure
+
+  make_rare_disease_input_files:
+    action: gmc_norr_analysis.make_rare_disease_samplesheet
+    input:
+      run_dir: <% ctx().path %>
+      sample: <% ctx().sample %>
+      referral_type: <% ctx().referral_type %>
+      sex: <% ctx().sex %>
+      out_dir: <% ctx().output_dir %>
+    next:
+      - when: <% succeeded() %>
+        do: start_plumber
+      - when: <% failed() %>
+        do: report_failure
+
+  start_plumber:
+    action: core.remote
+    input: 
+      cmd: <% ctx().plumber_cmd %>
+      hosts: <% ctx().plumber_host %>
+      username: <% ctx().plumber_user %>
+
+
+  report_failure:
+    action: email.send_email
+    input:
+      account: SMTP-VLL
+      email_from: stackstorm@regionvasterbotten.se
+      email_to: "{{ctx().notification_email}}"
+      subject: "Failed to analyse sample {{ctx().sample}} 
+        with TestProfile {{ctx().test_profile}}"
+      message: ''
