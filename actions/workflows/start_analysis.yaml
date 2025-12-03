@@ -17,7 +17,6 @@ tasks:
       - when: <% result().status_code = 200 %>
         publish: 
           samplesheet_data={{ result().get("body").get("sections")[3].get("rows")[1:] }}
-          samplesheet_data={{ result().get("body").get("sections")[3].get("rows")[1:] }}
         do:
           start_sample_workflow
 

@@ -5,8 +5,6 @@ input:
   - sample
   - path
   - igene_api_key
-  - notification_email
-  - plumber_config_version
   - plumber_host
   - plumber_user
 
@@ -50,6 +48,16 @@ tasks:
           pipeline={{ result().get("result").get("Pipeline", None)}}
           pipeline_profile={{ result().get("result").get("Profile", None)}}
           pipeline_version={{ result().get("result").get("Version", None)}}
+          plumber_config_version={{ result().get("result").get("ConfigVersion", None)}}
+        do:
+          get_case_id
+
+  get_case_id:
+    action: gmc_norr_analysis.make_case_id
+    next:
+      - when: <% succeeded %>
+        publish:
+          case_id={{result().result}}
         do:
           make_plumber_cmd
 
@@ -72,6 +80,7 @@ tasks:
     input:
       run_dir: <% ctx().path %>
       sample: <% ctx().sample %>
+      case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
       sex: <% ctx().sex %>
       out_dir: <% ctx().output_dir %>
