@@ -4,7 +4,7 @@ description: Run analysis of a sample.
 input:
   - sample
   - path
-  - igene_api_key
+  - notification_email
   - plumber_host
   - plumber_user
 
@@ -13,7 +13,6 @@ tasks:
     action: igene.get_sample
     input:
       sample: <% ctx().sample %>
-      api_key: <% ctx().igene_api_key %>
     retry:
       when: timeout
       delay: 1

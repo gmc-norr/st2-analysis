@@ -59,6 +59,15 @@ mounts:
         type: string
         required: true
 
+notification_email:
+  type: array
+  description: Email addresses to send notifications to
+  items:
+    type: string
+    description: An email address
+  default: []
+  required: true
+
 plumber:
   type: object
   properties:
@@ -66,11 +75,6 @@ plumber:
       type: string
       description: Path to the file that translates TestProfile into a pipeline with version
       required: false
-    
-    config_version:
-      type: string
-      description: The release of the config file repo to use
-      required: true
     
     host:
       type: string
