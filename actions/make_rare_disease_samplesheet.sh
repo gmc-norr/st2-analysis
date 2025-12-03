@@ -21,22 +21,13 @@ function sex_to_int() {
     echo $SEX_CODE
 }
 
-function generate_case_id() {
-    ww=packs.dev/gmc_norr_analysis/lib/wonderwords
-    # Strip whitespace, delete apostrophes, turn hyphens and spaces into underscores
-    CASEID_ADJ=$($ww -w -p adjective | awk '{$1=$1};1' | tr -d "'" | tr -- '- A-Z' '__a-z')
-    CASEID_NOUN=$($ww -w -p noun | awk '{$1=$1};1' | tr -d "'" | tr -- '- A-Z' '__a-z')
-    echo "${CASEID_ADJ}_${CASEID_NOUN}"
-}
-
-
 RUN_DIR="$1"
 SAMPLE_ID="$2"
-TYPE="$3"
-SEX="$4"
-OUT_DIR="$5"
+CASE_ID="$3"
+TYPE="$4"
+SEX="$5"
+OUT_DIR="$6"
 
-CASE_ID=$(generate_case_id)
 SAMPLESHEET="${OUT_DIR}/samplesheet.csv"
 
 if [ -f $SAMPLESHEET ]; then
