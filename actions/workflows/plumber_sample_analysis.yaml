@@ -14,25 +14,31 @@ tasks:
     input:
       sample: <% ctx().sample %>
     retry:
-      when: timeout
+      when: "{{ failed() }}"
       delay: 1
-      count: 3
+      count: 2
     next:
-      - when: <% result().status_code = 200 %> 
+      - when: "{{ succeeded() }}"
         publish:
-          test_profile={{ result().get("body").get("TestProfile")}}
-          referral_type={{ result().get("body").get("ReferralType")}}
-          sex={{ result().get("body").get("Sex")}}
+          test_profile={{ result().get("body", {}).get("TestProfile")}}
+          referral_type={{ result().get("body", {}).get("ReferralType")}}
+          sex={{ result().get("body", {}).get("Sex")}}
           output_dir="<% ctx().path %>/<% ctx().test_profile %>/<% ctx().sample %>"
         do:
           prepare_output_folder
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to reach the iGene API.
+          {{ result() | to_json_string }}" 
+        do:
+          report_failure
 
   prepare_output_folder:
     action: core.local
     input:
       cmd:  "mkdir -p <% ctx().output_dir %>"
     next:
-      - when: <% succeeded() %>
+      - when: "{{ succeeded() }}"
         do:
           get_plumber_arguments
 
@@ -41,7 +47,7 @@ tasks:
     input:
        test_profile: "<% ctx().test_profile %>"
     next:
-      - when: <% succeeded %>
+      - when: "{{ succeeded() }}"
         publish:
           pipeline_system={{result().get("result").get("PipelineSystem", None)}}
           pipeline={{ result().get("result").get("Pipeline", None)}}
@@ -50,15 +56,27 @@ tasks:
           plumber_config_version={{ result().get("result").get("ConfigVersion", None)}}
         do:
           get_case_id
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get configuration from SampleSheetCreator.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
 
   get_case_id:
     action: gmc_norr_analysis.make_case_id
     next:
-      - when: <% succeeded %>
+      - when: "{{ succeeded() }}"
         publish:
           case_id={{result().result}}
         do:
           make_plumber_cmd
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to generate case id. 
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
 
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
@@ -71,6 +89,8 @@ tasks:
         do:
           make_rare_disease_input_files
       - when: "{{ ctx().test_profile != 'WGSRareDisease_1'}}"
+        publish:
+          msg="Unsupported pipeline {{ ctx().test_profile }}"
         do:
           report_failure
 
@@ -84,9 +104,12 @@ tasks:
       sex: <% ctx().sex %>
       out_dir: <% ctx().output_dir %>
     next:
-      - when: <% succeeded() %>
+      - when: "{{ succeeded() }}"
         do: start_plumber
-      - when: <% failed() %>
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to make rare-disease samplesheet. 
+          {{ result() | to_json_string }}"
         do: report_failure
 
   start_plumber:
@@ -95,7 +118,13 @@ tasks:
       cmd: <% ctx().plumber_cmd %>
       hosts: <% ctx().plumber_host %>
       username: <% ctx().plumber_user %>
-
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to start plumber.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
 
   report_failure:
     action: email.send_email
@@ -103,6 +132,5 @@ tasks:
       account: SMTP-VLL
       email_from: stackstorm@regionvasterbotten.se
       email_to: "{{ctx().notification_email}}"
-      subject: "Failed to analyse sample {{ctx().sample}} 
-        with TestProfile {{ctx().test_profile}}"
-      message: ''
+      subject: "Failed to analyse sample {{ctx().sample}}"
+      message: "{{ctx().msg}}" 
