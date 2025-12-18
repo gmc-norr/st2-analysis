@@ -1,0 +1,21 @@
+---
+name: webhook_send_notification_email
+pack: gmc_norr_analysis
+description: >
+  Send a notification email for plumber
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+action:
+  ref: email.send_email
+  parameters:
+    account: SMTP-VLL
+    email_from: stackstorm@regionvasterbotten.se
+    email_to:
+      - "{{ st2kv.system.notification_email_global}}"
+    subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
+    message: "{{ trigger.body.message }}.\n\nError: {{ trigger.body.error }}"
