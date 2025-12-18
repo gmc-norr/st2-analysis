@@ -1,0 +1,36 @@
+---
+name: start_plumber_remote
+runner_type: remote-shell-cmd
+description: Start
+enabled: true
+entry_point: ""
+parameters:
+  cmd: 
+    description: Command to run
+    type: string
+    required: true
+  cwd: 
+    description: >
+      Working directory where the script will be executed in
+    type: string
+  current_api_url:
+    description: fsd
+    type: string
+  hosts:
+    description: Host to run plumber on
+    type: string
+    default: "{{config_context.plumber.host}}"
+    required: true
+  username:
+    description: User to run plumber with
+    type: string
+    default: "{{config_context.plumber.user}}"
+    required: true
+  env:
+    description: environmental variables
+    type: object
+    required: true
+    default:
+      PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
+      PLUMBER_WEBHOOK_API_KEY: "{{st2kv.system.plumber_api_key | decrypt_kv }}"
+      PLUMBER_WEBHOOK_NO_VERIFY: true

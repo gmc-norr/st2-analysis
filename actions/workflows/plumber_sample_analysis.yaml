@@ -5,8 +5,6 @@ input:
   - sample
   - path
   - notification_email
-  - plumber_host
-  - plumber_user
 
 tasks:
   get_sample_data:
@@ -81,7 +79,7 @@ tasks:
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %> 
-      -p <% ctx().pipeline_profile %> | tee plumber.log"
+      -p <% ctx().pipeline_profile %> > plumber.log &"
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
@@ -113,16 +111,15 @@ tasks:
         do: report_failure
 
   start_plumber:
-    action: core.remote
+    action: gmc_norr_analysis.start_plumber_remote
     input: 
       cmd: <% ctx().plumber_cmd %>
-      hosts: <% ctx().plumber_host %>
-      username: <% ctx().plumber_user %>
+      cwd: <% ctx().output_dir %>
     next:
       - when: "{{ failed() }}"
         publish:
           msg="Failed to start plumber.
-          {{ result() | to_json_string }}"
+          {{result() | to_json_string }}"
         do:
           report_failure
 
