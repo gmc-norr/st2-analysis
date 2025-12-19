@@ -64,3 +64,11 @@ plumber:
     config_repo:
       type: string
       description: Link to the raw config-files repo, which has the files that translate TestProfile into a pipeline with arguments
+   
+    host:
+      type: string
+      description: Where to run the analysis with plumber
+
+    user:
+      type: string
+      description: The User to run the analysis with

@@ -26,8 +26,3 @@ parameters:
     type: string
     default: "{{ config_context.plumber.host}} "
     required: true
-  plumber_user:
-    description: User to run plumber with
-    type: string
-    default: "{{ config_context.plumber.user}} "
-    required: true
