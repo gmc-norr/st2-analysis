@@ -71,10 +71,9 @@ notification_email:
 plumber:
   type: object
   properties:
-    testprofile_config_file:
+    test_profile_config:
       type: string
       description: Path to the file that translates TestProfile into a pipeline with version
-      required: false
     
     host:
       type: string

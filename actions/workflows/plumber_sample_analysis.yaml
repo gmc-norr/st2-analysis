@@ -23,22 +23,13 @@ tasks:
           sex={{ result().get("body", {}).get("Sex")}}
           output_dir="<% ctx().path %>/<% ctx().test_profile %>/<% ctx().sample %>"
         do:
-          prepare_output_folder
+          get_plumber_arguments
       - when: "{{ failed() }}"
         publish:
           msg="Failed to reach the iGene API.
           {{ result() | to_json_string }}" 
         do:
           report_failure
-
-  prepare_output_folder:
-    action: core.local
-    input:
-      cmd:  "mkdir -p <% ctx().output_dir %>"
-    next:
-      - when: "{{ succeeded() }}"
-        do:
-          get_plumber_arguments
 
   get_plumber_arguments:
     action: gmc_norr_analysis.get_plumber_arguments
@@ -53,13 +44,22 @@ tasks:
           pipeline_version={{ result().get("result").get("Version", None)}}
           plumber_config_version={{ result().get("result").get("ConfigVersion", None)}}
         do:
-          get_case_id
+          prepare_output_folder
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get configuration from SampleSheetCreator.
+          msg="Failed to get TestProfile configuration.
           {{ result() | to_json_string }}"
         do:
           report_failure
+
+  prepare_output_folder:
+    action: core.local
+    input:
+      cmd:  "mkdir -p <% ctx().output_dir %>"
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          get_case_id
 
   get_case_id:
     action: gmc_norr_analysis.make_case_id
@@ -130,4 +130,4 @@ tasks:
       email_from: stackstorm@regionvasterbotten.se
       email_to: "{{ctx().notification_email}}"
       subject: "Failed to analyse sample {{ctx().sample}}"
-      message: "{{ctx().msg}}" 
+      message: "{{ctx().msg}}"
