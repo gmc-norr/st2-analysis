@@ -1,6 +1,6 @@
 import os
-
 import yaml
+import requests
 from st2common.runners.base_action import Action
 
 supported_applications = ["NfCoreRareDisease", "NfCoreRareDiseaseResearch"]
@@ -14,13 +14,12 @@ def get_supported_analysis(test_analyses):
 
 class GetPlumberArgumentsAction(Action):
     def run(self, config_path, test_profile):
-        test_profile_file = os.path.join(config_path, "test_profiles/", 
+        test_profile_path = os.path.join(config_path, "test-profile-config/test_profiles/", 
                                          f"{test_profile}.yaml")
-        if not os.path.isfile(test_profile_file):
-            return (False, f"Error: TestProfile file {test_profile_file} not found")
-        with open(test_profile_file, "r") as ymlfile:
-            test_config = yaml.safe_load(ymlfile)
-
+        r = requests.get(test_profile_path)    
+        if not r.status_code == 200:
+            return (False, f"Error: TestProfile file {test_profile_path} not found")
+        test_config = yaml.safe_load(r.text)
         test_analyses = test_config.get("TestApplicationProfiles", {}
                                         ).get("DownstreamAnalysis")
         if test_analyses is None:
@@ -31,13 +30,13 @@ class GetPlumberArgumentsAction(Action):
         if app_profile is None:
             return (False, "Error: Unsupported DownstreamAnalysis")
 
-        app_profile_file = os.path.join(config_path, "application_profiles",
-                                        f"{app_profile}.yaml")
-        if not os.path.isfile(app_profile_file):
-            return (False, "Error: ApplicationProfile file not found")
+        app_profile_path = os.path.join(config_path, "test-profile-config/application_profiles/", 
+                                         f"{app_profile}.yaml")
+        r = requests.get(app_profile_path)    
+        if not r.status_code == 200:
+            return (False, f"Error: APplicationProfile file {app_profile_path} not found")
+        app_config = yaml.safe_load(r.text)
 
-        with open(app_profile_file, "r") as ymlfile:
-            app_config = yaml.safe_load(ymlfile)
         if app_config["ApplicationProfileVersion"] != app_profile_v:
             return (False, "Error: ApplicationProfileVersions don't match.")
 
