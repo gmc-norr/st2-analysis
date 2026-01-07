@@ -71,9 +71,9 @@ notification_email:
 plumber:
   type: object
   properties:
-    test_profile_config:
+    config_repo_raw:
       type: string
-      description: Path to the file that translates TestProfile into a pipeline with version
+      description: Link to the raw config-files repo which has the files that translate TestProfile into a pipeline with version
     
     host:
       type: string

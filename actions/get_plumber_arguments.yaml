@@ -11,7 +11,7 @@ parameters:
     description: Path to the directory with the config files for TestProfiles
     type: string
     required: true
-    default: "{{ config_context.plumber.test_profile_config}}"
+    default: "{{ config_context.plumber.config_repo_raw}}"
     position: 0
   test_profile:
     description: Testprofile
