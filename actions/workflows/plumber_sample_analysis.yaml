@@ -79,7 +79,7 @@ tasks:
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %> 
-      -p <% ctx().pipeline_profile %> > plumber.log &"
+      -p <% ctx().pipeline_profile %> > plumber.log & echo \$!"
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
@@ -116,10 +116,35 @@ tasks:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
     next:
-      - when: "{{ failed() }}"
+      - when: "{{ result().get((result().keys() | list | first)).get('stderr') == '' }}"
+        publish:
+          pid="{{ result().get((result().keys() | list | first)).get('stdout') }}""
+        do: 
+          pause
+      - when: "{{ result().get((result().keys() | list | first)).get('stderr') != '' }}"
         publish:
           msg="Failed to start plumber.
           {{result() | to_json_string }}"
+        do:
+          report_failure
+
+  pause:
+    action: core.pause max_pause=30
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          check_progress
+
+  check_progress:
+    action: gmc_norr_analysis.check_plumber_progress
+    input:
+      cmd: "ps --no-headers --pid {{ctx().pid}}"
+      cwd: <% ctx().output_dir %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Plumber crashed running {{ ctx().pipeline }}
+          in {{ctx().output_dir}}."
         do:
           report_failure
 

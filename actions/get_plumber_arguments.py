@@ -18,7 +18,7 @@ class GetPlumberArgumentsAction(Action):
                                          f"{test_profile}.yaml")
         r = requests.get(test_profile_path)    
         if not r.status_code == 200:
-            return (False, f"Error: TestProfile file {test_profile_path} not found")
+            return (False, f"Request for TestProfile file {test_profile_path} failed, status={r.status_code}")
         test_config = yaml.safe_load(r.text)
         test_analyses = test_config.get("TestApplicationProfiles", {}
                                         ).get("DownstreamAnalysis")
@@ -34,7 +34,7 @@ class GetPlumberArgumentsAction(Action):
                                          f"{app_profile}.yaml")
         r = requests.get(app_profile_path)    
         if not r.status_code == 200:
-            return (False, f"Error: APplicationProfile file {app_profile_path} not found")
+            return (False, f"Request for ApplicationProfile file {app_profile_path} failed, status={r.status_code}")
         app_config = yaml.safe_load(r.text)
 
         if app_config["ApplicationProfileVersion"] != app_profile_v:
