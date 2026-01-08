@@ -1,5 +1,5 @@
 ---
-name: start_plumber_remote
+name: check_plumber_progress
 runner_type: remote-shell-cmd
 description: Start
 enabled: true
@@ -23,11 +23,3 @@ parameters:
     type: string
     default: "{{config_context.plumber.user}}"
     required: true
-  env:
-    description: environmental variables
-    type: object
-    required: true
-    default:
-      PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
-      PLUMBER_WEBHOOK_API_KEY: "{{st2kv.system.plumber_api_key | decrypt_kv }}"
-      PLUMBER_WEBHOOK_NO_VERIFY: "true"

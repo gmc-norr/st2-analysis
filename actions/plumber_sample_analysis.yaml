@@ -21,8 +21,3 @@ parameters:
       type: string
       description: "Email address to send notification to"  
     default: "{{ config_context.notification_email | to_json_string }}"
-  plumber_host:
-    description: Host to run plumber on
-    type: string
-    default: "{{ config_context.plumber.host}} "
-    required: true
