@@ -59,15 +59,6 @@ mounts:
         type: string
         required: true
 
-notification_email:
-  type: array
-  description: Email addresses to send notifications to
-  items:
-    type: string
-    description: An email address
-  default: []
-  required: true
-
 plumber:
   type: object
   properties:

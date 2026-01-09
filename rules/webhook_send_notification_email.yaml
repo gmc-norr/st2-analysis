@@ -10,12 +10,15 @@ trigger:
   parameters:
     url: "plumber"
 
+criteria:
+  trigger.body['message_type']:
+    type: equals
+    pattern: end
+
 action:
-  ref: email.send_email
-  parameters:
-    account: SMTP-VLL
-    email_from: stackstorm@regionvasterbotten.se
-    email_to:
-      - "{{ st2kv.system.notification_email_global}}"
-    subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
-    message: "{{ trigger.body.message }}.\n\nError: {{ trigger.body.error }}"
+  ref: core.inject_trigger
+  parameters: 
+    trigger_name: gmc_norr_analysis.email_notification 
+    payload:
+      subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
+      message: "{{ trigger.body.message }}.\n\nError: {{ trigger.body.error }}"

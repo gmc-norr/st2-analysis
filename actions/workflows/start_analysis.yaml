@@ -11,14 +11,21 @@ tasks:
     input:
       run_id: <% ctx().run_id %>
     retry:
+      when: "{{ failed() }}"
       delay: 1
       count: 3
     next:
-      - when: <% result().status_code = 200 %>
+      - when: "{{ succeeded() }}"
         publish: 
           samplesheet_data={{ result().get("body").get("sections")[3].get("rows")[1:] }}
         do:
           start_sample_workflow
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get samplesheet data from Cleve.
+          {{ result() | to_json_string }}" 
+        do:
+          report_failure
 
   start_sample_workflow: 
     with: sample in <% ctx(samplesheet_data) %> 
@@ -26,3 +33,12 @@ tasks:
       sample: <% item(sample) %>
       path:  <% ctx().path %>
     action: gmc_norr_analysis.plumber_sample_analysis
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification 
+      payload:
+        subject: "Failed to start analysis for run 
+          {{ctx().run_id}} in {{ctx().path}}"
+        message: "{{ctx().msg}}"
