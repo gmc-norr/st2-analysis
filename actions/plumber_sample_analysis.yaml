@@ -8,16 +8,10 @@ enabled: true
 
 parameters:
   sample:
-    description: run id of the ready sequencing run
+    description: Run id for the ready sequencing run
     type: string
     required: true
   path:
-    description: path ot sequencing run
+    description: Path to sequencing run
     type: string
     required: true
-  notification_email:
-    type: array
-    items:
-      type: string
-      description: "Email address to send notification to"  
-    default: "{{ config_context.notification_email | to_json_string }}"

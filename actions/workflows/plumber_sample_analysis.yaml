@@ -4,7 +4,6 @@ description: Run analysis of a sample.
 input:
   - sample
   - path
-  - notification_email
 
 tasks:
   get_sample_data:
@@ -26,7 +25,7 @@ tasks:
           get_plumber_arguments
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to reach the iGene API.
+          msg="Failed to get sample data from the iGene API.
           {{ result() | to_json_string }}" 
         do:
           report_failure
@@ -149,10 +148,9 @@ tasks:
           report_failure
 
   report_failure:
-    action: email.send_email
+    action: core.inject_trigger
     input:
-      account: SMTP-VLL
-      email_from: stackstorm@regionvasterbotten.se
-      email_to: "{{ctx().notification_email}}"
-      subject: "Failed to analyse sample {{ctx().sample}}"
-      message: "{{ctx().msg}}"
+      trigger_name: gmc_norr_analysis.email_notification 
+      payload:
+        subject: "Failed to analyse sample {{ctx().sample }}"
+        message: "{{ctx().msg}}"

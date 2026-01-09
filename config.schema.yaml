@@ -58,6 +58,7 @@ mounts:
         description: Unix path where the windows path has been mounted.
         type: string
         required: true
+
 plumber:
   type: object
   properties:
