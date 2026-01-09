@@ -11,7 +11,7 @@ trigger:
     url: "plumber"
 
 criteria:
-  trigger.body['message_type']:
+  trigger.body.message_type:
     type: equals
     pattern: end
 
@@ -21,4 +21,4 @@ action:
     trigger_name: gmc_norr_analysis.email_notification 
     payload:
       subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
-      message: "{{ trigger.body.message }}.\n\nError: {{ trigger.body.error }}"
+      message: "{{ trigger.body.message }}.\nSuccess: {{trigger.body.success}}\nError: {{ trigger.body.error }}"
