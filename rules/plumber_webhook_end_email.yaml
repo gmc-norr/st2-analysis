@@ -1,5 +1,5 @@
 ---
-name: webhook_send_notification_email
+name: plumber_webhook_end_email
 pack: gmc_norr_analysis
 description: >
   Send a notification email for plumber
