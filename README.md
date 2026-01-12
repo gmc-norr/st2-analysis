@@ -24,10 +24,19 @@ Furthermore, the following parameters needs to be defined in the datastore servi
 ref                                               | description
 --------------------------------------------------|------------------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate a tumor evolution report from an Excel file
-gmc_norr_analysis.tumor_evolution                 | Workflow for generating a tumor evolution report
 gmc_norr_analysis.write_file                      | Write a text string to a file
 gmc_norr_analysis.make_case_id                    | Make a case id of random words and a hash of sample ids
 gmc_norr_analysis.make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
+gmc_norr_analysis.get_plumber_arguments           | From a TestProfile get which pipeline, versions and configs to run plumber with
+
+
+## Workflows
+
+ref                                               | description
+--------------------------------------------------|------------------------------------------
+gmc_norr_analysis.tumor_evolution                 | Generate a tumor evolution report
+gmc_norr_analysis.start_analysis                  | Start the plumber_sample_analyis workflow for all samples belonging to a sequencing run
+gmc_norr_analysis.plumber_sample_analyis          | Run an analysis with plumber for a sample
 
 ## Rules
 
@@ -35,12 +44,20 @@ ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
+gmc_norr_analyis.plumber_webhook_end_email        | Trigger the notification_email trigger when receiving a plumber webhook of messagetype "end"
+gmc_norr_analysis.start_analysis                  | Start the start_analysis workflow from a cleve.analysis_state_update trigger with state "ready"
 
 ## Sensors
 
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+
+##Policies
+
+ref                                               | description
+--------------------------------------------------|------------------------------------
+gmc_norr_analyis.tumor_evolution_report           | Limits the concurrent executions for the tumor evolution report to 1 
 
 # Known issues
 
