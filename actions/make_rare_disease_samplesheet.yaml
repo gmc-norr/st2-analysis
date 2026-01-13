@@ -7,7 +7,7 @@ entry_point: make_rare_disease_samplesheet.sh
 enabled: true
 
 parameters:
-  run_dir:
+  analysis_dir:
     description: Run directory
     type: string
     required: true
@@ -25,12 +25,12 @@ parameters:
   referral_type:
     description: Referral type
     type: string
-    required: false
+    required: true
     position: 3
   sex:
     description: sex of sample
     type: string
-    required: false
+    required: true
     position: 4
   out_dir:
     description: Directory where the pipeline output for the sample will be 

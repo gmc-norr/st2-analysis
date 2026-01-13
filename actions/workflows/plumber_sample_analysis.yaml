@@ -20,8 +20,8 @@ tasks:
           test_profile={{ result().get("body", {}).get("TestProfile")}}
           referral_type={{ result().get("body", {}).get("ReferralType")}}
           sex={{ result().get("body", {}).get("Sex")}}
-          output_dir="<% ctx().path %>/<% ctx().test_profile %>/<% ctx().sample %>"
-        do:
+          output_dir="{{ ctx().path.split('/Analysis')[0] }}/{{ctx().test_profile }}/{{ ctx().sample }}"
+        do: # Assuming Novaseq analysis
           get_plumber_arguments
       - when: "{{ failed() }}"
         publish:
@@ -94,7 +94,7 @@ tasks:
   make_rare_disease_input_files:
     action: gmc_norr_analysis.make_rare_disease_samplesheet
     input:
-      run_dir: <% ctx().path %>
+      analysis_dir: <% ctx().path %>
       sample: <% ctx().sample %>
       case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
