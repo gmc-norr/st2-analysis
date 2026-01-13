@@ -1,0 +1,21 @@
+name: start_analysis
+description: Rule for starting analysis for a NovaSeq sequencing run
+pack: gmc_norr_analysis
+enabled: true
+
+trigger:
+  type: cleve.analysis_state_update
+
+criteria:
+  trigger.state:
+    type: equals
+    pattern: ready
+  trigger.platform:
+    type: equals
+    pattern: "NovaSeq X Plus"
+
+action:
+  ref: gmc_norr_analysis.start_analysis
+  parameters:
+    path: "{{ trigger.path }}"
+    run_id: "{{ trigger.analysis_id }}"
