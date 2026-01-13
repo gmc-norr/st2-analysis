@@ -2,37 +2,39 @@ version: "1.0"
 
 description: Start analysis of samples from a ready sequencing run.
 input:
-  - analysis_id
+  - run_id
   - path
 
 tasks:
-  get_run_id:
-    action: cleve.get_analyses
+  get_sample_ids:
+    action: cleve.get_samplesheet
     input:
-      analysis_id: <% ctx().analysis_id %>
+      run_id: <% ctx(run_id) %>
+      section: Data
+      column: Sample_ID
     retry:
       when: "{{ failed() }}"
       delay: 1
       count: 3
     next:
       - when: "{{ succeeded() }}"
-        publish:
-          run_ids={{ result().get("result").get("body").get('runs') }}
+        publish: 
+          sample_ids={{ result().get("result").get("body").get("Sample_ID") }}
         do:
-          start_sample_analysis_workflow
+          start_sample_workflow
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get run id from Cleve.
+          msg="Failed to get samplesheet data from Cleve.
           {{ result() | to_json_string }}" 
         do:
           report_failure
 
-  start_sample_analysis_workflow:
-    with: run_id in <% ctx(run_ids) %> 
-    action: gmc_norr_analysis.start_sample_analysis
+  start_sample_workflow: 
+    with: sample in <% ctx(sample_ids) %> 
     input:
-      run_id: <% item(run_id) %>
-      path: <% ctx(path) %>
+      sample: <% item(sample) %>
+      path:  <% ctx().path %>
+    action: gmc_norr_analysis.plumber_sample_analysis
 
   report_failure:
     action: core.inject_trigger
@@ -40,5 +42,5 @@ tasks:
       trigger_name: gmc_norr_analysis.email_notification 
       payload:
         subject: "Failed to start analysis for  
-          {{ctx().analysis_id}} in {{ctx().path}}"
+          {{ctx().run_id}} in {{ctx().path}}"
         message: "{{ctx().msg}}"
