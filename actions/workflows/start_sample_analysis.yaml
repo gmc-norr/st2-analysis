@@ -10,7 +10,7 @@ tasks:
     action: cleve.get_samplesheet
     input:
       run_id: <% ctx(run_id) %>
-      section: Data
+      section: BCLConvert_Data
       column: Sample_ID
     retry:
       when: "{{ failed() }}"
