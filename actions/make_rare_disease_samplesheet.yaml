@@ -12,7 +12,7 @@ parameters:
     type: string
     required: true
     position: 0
-  sample:
+  sample_id:
     description: Sample id
     type: string
     required: true

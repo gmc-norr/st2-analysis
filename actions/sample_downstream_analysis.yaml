@@ -1,0 +1,17 @@
+---
+name: sample_downstream_analysis
+pack: gmc_norr_analysis
+description: Workflow to run downstream analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/sample_downstream_analysis.yaml
+enabled: true
+
+parameters:
+  sample_id:
+    description: The ID of the sample to analyze 
+    type: string
+    required: true
+  analysis_path:
+    description: The path to the analysis
+    type: string
+    required: true
