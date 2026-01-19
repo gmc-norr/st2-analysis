@@ -35,8 +35,9 @@ gmc_norr_analysis.get_plumber_arguments           | From a TestProfile get which
 ref                                               | description
 --------------------------------------------------|------------------------------------------
 gmc_norr_analysis.tumor_evolution                 | Generate a tumor evolution report
-gmc_norr_analysis.start_analysis                  | Start the plumber_sample_analyis workflow for all samples belonging to a sequencing run
-gmc_norr_analysis.plumber_sample_analyis          | Run an analysis with plumber for a sample
+gmc_norr_analysis.start_downstream_analysis       | For all runs belonging to an analysis, start the start_sample_downstream analysis workflow
+gmc_norr_analysis.start_sample_downstream_analysis| For all samples belongin to a run, start the sample_downstream_analysis workflow
+gmc_norr_analysis.sample_downstream_analysis      | Run a downstream analysis with plumber on a sample
 
 ## Rules
 
@@ -45,7 +46,7 @@ ref                                               | description
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
 gmc_norr_analyis.plumber_webhook_end_email        | Trigger the notification_email trigger when receiving a plumber webhook of messagetype "end"
-gmc_norr_analysis.start_analysis                  | Start the start_analysis workflow from a cleve.analysis_state_update trigger with state "ready"
+gmc_norr_analysis.start_downstream_analysis       | Start the start_downstream_analysis workflow for an analysis with state "ready" (uses the trigger cleve.analysis_state_update)
 
 ## Sensors
 

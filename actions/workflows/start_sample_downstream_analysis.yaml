@@ -1,9 +1,11 @@
 version: "1.0"
 
-description: Start analysis of samples from a ready sequencing run.
+description: For a Novaseq sequencing run, find its sample ids and 
+  start a workflow to perform a downstream analysis.
+
 input:
   - run_id
-  - path
+  - analysis_path
 
 tasks:
   get_sample_ids:
@@ -30,17 +32,17 @@ tasks:
           report_failure
 
   start_sample_workflow: 
-    with: sample in <% ctx(sample_ids) %> 
+    with: sample_id in <% ctx(sample_ids) %> 
     input:
-      sample: <% item(sample) %>
-      path:  <% ctx().path %>
-    action: gmc_norr_analysis.plumber_sample_analysis
+      sample_id: <% item(sample_id) %>
+      analysis_path:  <% ctx().analysis_path %>
+    action: gmc_norr_analysis.sample_downstream_analysis
 
   report_failure:
     action: core.inject_trigger
     input:
       trigger_name: gmc_norr_analysis.email_notification 
       payload:
-        subject: "Failed to start analysis for  
-          {{ctx().run_id}} in {{ctx().path}}"
+        subject: "Failed to start downstream analysis for  
+          {{ctx().run_id}} in {{ctx().analysis_path}}"
         message: "{{ctx().msg}}"

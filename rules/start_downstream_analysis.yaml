@@ -1,4 +1,4 @@
-name: start_analysis
+name: start_downstream_analysis
 description: Rule for starting analysis for a NovaSeq sequencing run
 pack: gmc_norr_analysis
 enabled: true
@@ -15,7 +15,7 @@ criteria:
     pattern: "NovaSeq X Plus"
 
 action:
-  ref: gmc_norr_analysis.start_analysis
+  ref: gmc_norr_analysis.start_downstream_analysis
   parameters:
     path: "{{ trigger.path }}"
-    run_id: "{{ trigger.analysis_id }}"
+    analysis_id: "{{ trigger.analysis_id }}"
