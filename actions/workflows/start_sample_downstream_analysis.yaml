@@ -23,10 +23,27 @@ tasks:
         publish: 
           sample_ids={{ result().get("result").get("body").get("Sample_ID") }}
         do:
-          start_sample_workflow
+          get_run_path
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get samplesheet data from Cleve.
+          {{ result() | to_json_string }}" 
+        do:
+          report_failure
+
+  get_run_path:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish: 
+          run_path={{ result().get("result").get("body").get("runs") | map(attribute='path') | first  }}
+        do:
+          start_sample_workflow
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get run path from Cleve.
           {{ result() | to_json_string }}" 
         do:
           report_failure
@@ -35,6 +52,7 @@ tasks:
     with: sample_id in <% ctx(sample_ids) %> 
     input:
       sample_id: <% item(sample_id) %>
+      run_path: <% ctx().run_path %>
       analysis_path:  <% ctx().analysis_path %>
     action: gmc_norr_analysis.sample_downstream_analysis
 
