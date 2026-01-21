@@ -10,9 +10,6 @@ criteria:
   trigger.state:
     type: equals
     pattern: ready
-  trigger.platform:
-    type: equals
-    pattern: "NovaSeq X Plus"
 
 action:
   ref: gmc_norr_analysis.start_downstream_analysis
