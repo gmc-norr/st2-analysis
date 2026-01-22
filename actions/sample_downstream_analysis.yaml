@@ -8,7 +8,7 @@ enabled: true
 
 parameters:
   sample_id:
-    description: The ID of the sample to analyze 
+    description: The ID of the sample to analyze
     type: string
     required: true
   run_path:

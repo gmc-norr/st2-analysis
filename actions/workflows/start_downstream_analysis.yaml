@@ -2,7 +2,7 @@ version: "1.0"
 
 description: The initial workflow for starting downstream analyses for a ready analysis.
   Finds run ids and starts a workflow to find their respective samples for each.
- 
+
 input:
   - analysis_id
   - path
@@ -25,12 +25,12 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get run id from Cleve.
-          {{ result() | to_json_string }}" 
+          {{ result() | to_json_string }}"
         do:
           report_failure
 
   start_run_workflow:
-    with: run_id in <% ctx(run_ids) %> 
+    with: run_id in <% ctx(run_ids) %>
     action: gmc_norr_analysis.start_sample_downstream_analysis
     input:
       run_id: <% item(run_id) %>
@@ -39,8 +39,8 @@ tasks:
   report_failure:
     action: core.inject_trigger
     input:
-      trigger_name: gmc_norr_analysis.email_notification 
+      trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to start downstream analysis for  
+        subject: "Failed to start downstream analysis for
           {{ctx().analysis_id}} in {{ctx().path}}"
         message: "{{ctx().msg}}"
