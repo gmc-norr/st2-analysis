@@ -64,7 +64,7 @@ gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requ
 
 ref                                               | description
 --------------------------------------------------|------------------------------------
-gmc_norr_analyis.tumor_evolution_report           | Limits the concurrent executions for the tumor evolution report to 1 
+gmc_norr_analyis.tumor_evolution_report           | Limits the concurrent executions for the tumor evolution report to 1
 
 # Known issues
 

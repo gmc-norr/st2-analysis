@@ -27,7 +27,7 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get sample data from the iGene API.
-          {{ result() | to_json_string }}" 
+          {{ result() | to_json_string }}"
         do:
           report_failure
 
@@ -71,14 +71,14 @@ tasks:
           make_plumber_cmd
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to generate case id. 
+          msg="Failed to generate case id.
           {{ result() | to_json_string }}"
         do:
           report_failure
 
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
-      --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %> 
+      --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
       -p <% ctx().pipeline_profile %> > plumber.log & echo \$!"
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
@@ -106,20 +106,20 @@ tasks:
         do: start_plumber
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to make rare-disease samplesheet. 
+          msg="Failed to make rare-disease samplesheet.
           {{ result() | to_json_string }}"
         do: report_failure
 
   start_plumber:
     action: gmc_norr_analysis.start_plumber_remote
-    input: 
+    input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
     next:
       - when: "{{ result().get((result().keys() | list | first)).get('stderr') == '' }}"
         publish:
           pid="{{ result().get((result().keys() | list | first)).get('stdout') }}""
-        do: 
+        do:
           pause
       - when: "{{ result().get((result().keys() | list | first)).get('stderr') != '' }}"
         publish:
@@ -151,7 +151,7 @@ tasks:
   report_failure:
     action: core.inject_trigger
     input:
-      trigger_name: gmc_norr_analysis.email_notification 
+      trigger_name: gmc_norr_analysis.email_notification
       payload:
         subject: "Failed to analyse sample {{ctx().sample_id}}"
         message: "{{ctx().msg}}"

@@ -5,11 +5,11 @@ description: Start
 enabled: true
 entry_point: ""
 parameters:
-  cmd: 
+  cmd:
     description: Command to run
     type: string
     required: true
-  cwd: 
+  cwd:
     description: >
       Working directory where the script will be executed in
     type: string

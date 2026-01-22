@@ -33,7 +33,7 @@ parameters:
     required: true
     position: 4
   out_dir:
-    description: Directory where the pipeline output for the sample will be 
+    description: Directory where the pipeline output for the sample will be
     type: string
     required: true
     position: 5

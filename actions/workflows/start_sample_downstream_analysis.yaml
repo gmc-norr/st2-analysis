@@ -1,6 +1,6 @@
 version: "1.0"
 
-description: For a Novaseq sequencing run, find its sample ids and 
+description: For a Novaseq sequencing run, find its sample ids and
   start a workflow to perform a downstream analysis.
 
 input:
@@ -20,14 +20,14 @@ tasks:
       count: 3
     next:
       - when: "{{ succeeded() }}"
-        publish: 
+        publish:
           sample_ids={{ result().get("result").get("body").get("Sample_ID") }}
         do:
           get_run_path
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get samplesheet data from Cleve.
-          {{ result() | to_json_string }}" 
+          {{ result() | to_json_string }}"
         do:
           report_failure
 
@@ -37,19 +37,19 @@ tasks:
       run_id: <% ctx(run_id) %>
     next:
       - when: "{{ succeeded() }}"
-        publish: 
+        publish:
           run_path={{ result().get("result").get("body").get("runs") | map(attribute='path') | first  }}
         do:
           start_sample_workflow
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get run path from Cleve.
-          {{ result() | to_json_string }}" 
+          {{ result() | to_json_string }}"
         do:
           report_failure
 
-  start_sample_workflow: 
-    with: sample_id in <% ctx(sample_ids) %> 
+  start_sample_workflow:
+    with: sample_id in <% ctx(sample_ids) %>
     input:
       sample_id: <% item(sample_id) %>
       run_path: <% ctx().run_path %>
@@ -59,8 +59,8 @@ tasks:
   report_failure:
     action: core.inject_trigger
     input:
-      trigger_name: gmc_norr_analysis.email_notification 
+      trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to start downstream analysis for  
+        subject: "Failed to start downstream analysis for
           {{ctx().run_id}} in {{ctx().analysis_path}}"
         message: "{{ctx().msg}}"

@@ -65,7 +65,7 @@ plumber:
     config_repo_raw:
       type: string
       description: Link to the raw config-files repo which has the files that translate TestProfile into a pipeline with version
-    
+
     host:
       type: string
       description: Where to run the analysis with plumber
