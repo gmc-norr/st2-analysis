@@ -51,8 +51,7 @@ ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
-gmc_norr_analyis.plumber_webhook_end_email        | Trigger the notification_email trigger when receiving a plumber webhook of messagetype "end"
-gmc_norr_analysis.start_downstream_analysis       | Start the start_downstream_analysis workflow for an analysis with state "ready" (uses the trigger cleve.analysis_state_update)
+gmc_norr_analysis.start_downstream_analysis       | Start the start_downstream_analysis workflow for an analysis with state "ready" and software BCLConvert
 
 ## Sensors
 
