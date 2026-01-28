@@ -11,7 +11,7 @@ parameters:
     description: Id of a sequencing run
     type: string
     required: true
-  analysis_path:
-    description: Path to the analysis of the sequencing run
+  analysis_id:
+    description: Id of the analysis that triggered the workflow
     type: string
     required: true

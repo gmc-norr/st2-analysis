@@ -4,7 +4,7 @@ description: Run downstream analysis of a sample with plumber.
 input:
   - sample_id
   - run_path
-  - analysis_path
+  - analysis_id
 
 tasks:
   get_sample_data:
@@ -21,7 +21,7 @@ tasks:
           test_profile={{ result().get("body", {}).get("TestProfile")}}
           referral_type={{ result().get("body", {}).get("ReferralType")}}
           sex={{ result().get("body", {}).get("Sex")}}
-          output_dir="{{ ctx().run_path }}/{{ctx().test_profile }}/{{ ctx().sample_id }}"
+          output_dir="{{ ctx().run_path }}{{ctx().test_profile }}/{{ ctx().sample_id }}"
         do:
           get_plumber_arguments
       - when: "{{ failed() }}"
@@ -68,10 +68,31 @@ tasks:
         publish:
           case_id={{result().result}}
         do:
-          make_plumber_cmd
+          get_fastq_files
       - when: "{{ failed() }}"
         publish:
           msg="Failed to generate case id.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_fastq_files:
+    action: cleve.get_analysis_files
+    input:
+      analysis_id: "<% ctx().analysis_id %>"
+      type: "fastq"
+      level: "sample"
+      parent_id: "<% ctx().sample_id %>"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($).join(',')  %>
+          fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($).join(',')  %>
+        do:
+          make_plumber_cmd
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get fastq files from Cleve.
           {{ result() | to_json_string }}"
         do:
           report_failure
@@ -95,11 +116,12 @@ tasks:
   make_rare_disease_input_files:
     action: gmc_norr_analysis.make_rare_disease_samplesheet
     input:
-      analysis_dir: <% ctx().analysis_path %>
       sample_id: <% ctx().sample_id %>
       case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
       sex: <% ctx().sex %>
+      fastq_r1: <% ctx().fastq_r1 %>
+      fastq_r2: <% ctx().fastq_r2 %>
       out_dir: <% ctx().output_dir %>
     next:
       - when: "{{ succeeded() }}"
@@ -115,7 +137,7 @@ tasks:
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
-    next:
+    next: # doesn't catch an outright failure
       - when: "{{ result().get((result().keys() | list | first)).get('stderr') == '' }}"
         publish:
           pid="{{ result().get((result().keys() | list | first)).get('stdout') }}""

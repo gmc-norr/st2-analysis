@@ -34,7 +34,7 @@ tasks:
     action: gmc_norr_analysis.start_sample_downstream_analysis
     input:
       run_id: <% item(run_id) %>
-      analysis_path: <% ctx(path) %>
+      analysis_id: <% ctx(analysis_id) %>
 
   report_failure:
     action: core.inject_trigger

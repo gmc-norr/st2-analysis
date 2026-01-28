@@ -15,7 +15,7 @@ parameters:
     description: The path to the sequencing run
     type: string
     required: true
-  analysis_path:
-    description: The path to the analysis
+  analysis_id:
+    description: Id of the analysis that generated the sample's fastq files
     type: string
     required: true
