@@ -5,7 +5,7 @@ description: For a Novaseq sequencing run, find its sample ids and
 
 input:
   - run_id
-  - analysis_path
+  - analysis_id
 
 tasks:
   get_sample_ids:
@@ -53,7 +53,7 @@ tasks:
     input:
       sample_id: <% item(sample_id) %>
       run_path: <% ctx().run_path %>
-      analysis_path:  <% ctx().analysis_path %>
+      analysis_id:  <% ctx().analysis_id %>
     action: gmc_norr_analysis.sample_downstream_analysis
 
   report_failure:
@@ -62,5 +62,5 @@ tasks:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
         subject: "Failed to start downstream analysis for
-          {{ctx().run_id}} in {{ctx().analysis_path}}"
+          {{ctx().run_id}}"
         message: "{{ctx().msg}}"
