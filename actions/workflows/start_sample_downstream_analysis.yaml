@@ -52,8 +52,9 @@ tasks:
     with: sample_id in <% ctx(sample_ids) %>
     input:
       sample_id: <% item(sample_id) %>
+      run_id: <% ctx(run_id) %>
       run_path: <% ctx().run_path %>
-      analysis_id:  <% ctx().analysis_id %>
+      analysis_id: <% ctx().analysis_id %>
     action: gmc_norr_analysis.sample_downstream_analysis
 
   report_failure:
