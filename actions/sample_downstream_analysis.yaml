@@ -11,6 +11,10 @@ parameters:
     description: The ID of the sample to analyze
     type: string
     required: true
+  run_id:
+    description: The ID of the run the sample belongs to
+    type: string
+    required: true
   run_path:
     description: The path to the sequencing run
     type: string

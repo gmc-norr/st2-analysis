@@ -3,6 +3,7 @@ version: "1.0"
 description: Run downstream analysis of a sample with plumber.
 input:
   - sample_id
+  - run_id
   - run_path
   - analysis_id
 
@@ -137,7 +138,10 @@ tasks:
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
-    next: # doesn't catch an outright failure
+    next: # doesn't catch an outright failure. Adding  - when: "{{ failed() }}" doesn't help, becuase it tries to evaluate the other whens...
+      - when: "{{ failed() }}"
+        do:
+          report_failure
       - when: "{{ result().get((result().keys() | list | first)).get('stderr') == '' }}"
         publish:
           pid="{{ result().get((result().keys() | list | first)).get('stdout') }}""
@@ -163,10 +167,32 @@ tasks:
       cmd: "ps --no-headers --pid {{ctx().pid}}"
       cwd: <% ctx().output_dir %>
     next:
+      - when: "{{ succeeded() }}"
+        do:
+          trigger_add_plumber_analysis
       - when: "{{ failed() }}"
         publish:
           msg="Plumber crashed running {{ ctx().pipeline }}
           in {{ctx().output_dir}}."
+        do:
+          report_failure
+
+  trigger_add_plumber_analysis:
+    action: core.inject_trigger
+    input: # we trigger it here so we can connect it to the run ID
+      trigger_name: gmc_norr_analysis.add_plumber_analysis
+      payload:
+        run_id: "{{ctx().run_id}}"
+        sample_id: "{{ctx().sample_id}}"
+        pipeline: "{{ctx().pipeline}}"
+        pipeline_version: "{{ctx().pipeline_version}}"
+        workdir: "{{ctx().output_dir}}"
+        fastq_files: "{{ctx().fastq_r1}},{{ctx().fastq_r2}}"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Couldn't inject add_plumber_analysis trigger
+          {{result() | to_json_string }}"
         do:
           report_failure
 
