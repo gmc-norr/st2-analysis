@@ -1,0 +1,21 @@
+---
+name: update_incomplete_plumber_analysis
+pack: gmc_norr_analysis
+description: Workflow to update an incomplete plumber analysis in Cleve
+runner_type: orquesta
+entry_point: workflows/update_incomplete_plumber_analysis.yaml
+enabled: true
+
+parameters:
+  pipeline:
+    description: The pipeline the analysis is performed with
+    type: string
+    required: true
+  pipeline_version:
+    description: The verison of the pipeline
+    type: string
+    required: true
+  workdir:
+    description: The path to the directory where the analysis is run py plumber
+    type: string
+    required: true
