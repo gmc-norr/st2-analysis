@@ -1,0 +1,21 @@
+---
+name: make_plumber_analysis_id
+pack: gmc_norr_analysis
+description: Make an analysis ID for Cleve from the information available in plumber webhooks
+runner_type: python-script
+entry_point: make_plumber_analysis_id.py
+enabled: true
+
+parameters:
+  workdir:
+    description: The path to the plumber work directory
+    type: string
+    required: true
+  pipeline:
+    description: The pipeline run with plumber
+    type: string
+    required: true
+  pipeline_version:
+    description: The verison of the pipeline
+    type: string
+    required: true
