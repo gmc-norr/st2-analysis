@@ -1,0 +1,27 @@
+---
+name: email_plumber_end
+pack: gmc_norr_analysis
+description: >
+  Send a notification email for plumber when a run ends
+  (both in success and failure)
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type:
+    type: equals
+    pattern: end
+
+action:
+  ref: core.inject_trigger
+  parameters:
+    trigger_name: gmc_norr_analysis.email_notification
+    payload:
+      subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
+      message: "{{ trigger.body.message }}\n\n
+        Success: {{ trigger.body.success }}\n\n
+        Error: {{ trigger.body.error }}"
