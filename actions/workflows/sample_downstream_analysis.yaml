@@ -179,6 +179,7 @@ tasks:
     input: # we trigger it here so we can connect it to the run ID
       trigger_name: gmc_norr_analysis.add_plumber_analysis
       payload:
+        prev_analysis_id: "{{ctx().analysis_id}}"
         run_id: "{{ctx().run_id}}"
         sample_id: "{{ctx().sample_id}}"
         pipeline: "{{ctx().pipeline}}"
