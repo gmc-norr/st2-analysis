@@ -1,0 +1,27 @@
+---
+name: update_complete_plumber_analysis
+pack: gmc_norr_analysis
+description: >
+  Update a nf-core/raredisease analysis run by plumber to state ready
+  and add output files in Cleve
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type:
+    type: equals
+    pattern: end
+  trigger.body.success:
+    type: equals
+    pattern: true
+
+action:
+  ref: gmc_norr_analysis.update_complete_plumber_analysis
+  parameters:
+    pipeline: "{{ trigger.body.pipeline }}"
+    pipeline_version: "{{ trigger.body.pipeline_version }}"
+    workdir: "{{trigger.body.workdir}}"
