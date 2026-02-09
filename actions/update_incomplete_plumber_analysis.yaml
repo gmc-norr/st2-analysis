@@ -12,10 +12,10 @@ parameters:
     type: string
     required: true
   pipeline_version:
-    description: The verison of the pipeline
+    description: The version of the pipeline
     type: string
     required: true
   workdir:
-    description: The path to the directory where the analysis is run py plumber
+    description: The path to the work directory where the analysis was run by plumber
     type: string
     required: true

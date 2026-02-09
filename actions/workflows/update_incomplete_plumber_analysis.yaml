@@ -1,7 +1,7 @@
 version: 1.0
 name: update_incomplete_plumber_analysis
 description: >
-  Workflow updating a successful plumber analysis in Cleve
+  Workflow to update an incomplete plumber analysis in Cleve
 
 input:
   - pipeline
