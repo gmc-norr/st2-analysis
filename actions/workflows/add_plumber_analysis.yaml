@@ -28,14 +28,14 @@ tasks:
         publish:
           analysis_id="{{result().result}}"
         do:
-          divide_pipeline_taks
+          divide_pipeline_tasks
       - when: "{{ failed() }}"
         publish:
           - msg: "{{ result() }}"
         do:
           - report_failure
 
-  divide_pipeline_taks:
+  divide_pipeline_tasks:
     action: core.noop
     next: # Add more here when adding more to sample_downstream_analysis
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
