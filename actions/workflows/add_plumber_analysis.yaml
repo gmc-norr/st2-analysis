@@ -53,7 +53,7 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - input_files:
-              "[{% for file in ctx().fastq_files.split(',') %}
+              "[{% for file in ctx().fastq_files %}
               {'analysis_id':'{{ctx().prev_analysis_id}}', 'name':'{{file.split('/')[-1]}}',
               'level':'sample', 'type':'fastq', 'parent_id':'{{ctx().sample_id}}'},
               {% endfor %}

@@ -24,5 +24,5 @@ payload_schema:
       type: string
       description: Path to the directory where plumber was started
     fastq_files:
-      type: string
-      description: Comma-separated list of fastq files used in the pipeline
+      type: array
+      description:  An array with the fastq files used as input

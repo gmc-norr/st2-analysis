@@ -32,6 +32,6 @@ parameters:
     type: string
     required: true
   fastq_files:
-    description: A string lsiting comma-separated fastq files used in the analysis
-    type: string
+    description: An array with the fastq files used in the analysis
+    type: array
     required: true
