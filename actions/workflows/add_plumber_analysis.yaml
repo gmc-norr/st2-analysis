@@ -1,0 +1,94 @@
+version: 1.0
+name: add_plumber_analysis
+description: >
+  Workflow adding a started plumber analysis to Cleve
+
+input:
+  - prev_analysis_id
+  - run_id
+  - sample_id
+  - pipeline
+  - pipeline_version
+  - workdir
+  - fastq_files
+
+vars:
+  - msg:
+  - input_files:
+
+tasks:
+  make_analyis_id:
+    action: gmc_norr_analysis.make_plumber_analysis_id
+    input:
+      workdir: "{{ctx().workdir}}"
+      pipeline: "{{ctx().pipeline}}"
+      pipeline_version: "{{ctx().pipeline_version}}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          analysis_id="{{result().result}}"
+        do:
+          divide_pipeline_taks
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  divide_pipeline_taks:
+    action: core.noop
+    next: # Add more here when adding more to sample_downstream_analysis
+      - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
+        do:
+          format_rd_input_files
+      - when: "{{ ctx().pipeline != 'nf-core/raredisease' }}"
+        publish:
+          msg="Unsupported pipeline {{ ctx().pipeline }}"
+        do:
+          report_failure
+
+  format_rd_input_files:
+    action: core.noop
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - input_files:
+              "[{% for file in ctx().fastq_files.split(',') %}
+              {'analysis_id':'{{ctx().prev_analysis_id}}', 'name':'{{file.split('/')[-1]}}',
+              'level':'sample', 'type':'fastq', 'parent_id':'{{ctx().sample_id}}'},
+              {% endfor %}
+              {'analysis_id':'{{ctx().analysis_id}}', 'parent_id':'{{ctx().sample_id}}',
+              'level':'sample', 'type':'text', 'name':'samplesheet.csv'}]"
+        do: add_to_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  add_to_cleve:
+    action: cleve.add_analysis
+    input:
+      analysis_id: "{{ ctx().analysis_id }}"
+      run_id: "{{ ctx().run_id }}"
+      state: pending
+      path: "{{ ctx().workdir }}"
+      software: "{{ ctx().pipeline}}"
+      software_version: "{{ ctx().pipeline_version }}"
+      input_files: "{{ctx().input_files }}"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: >
+          Failed to add plumber analysis of sample "{{ ctx().sample_id }}"
+          with "{{ ctx().pipeline }}" to Cleve
+        message: "{{ ctx().msg }}"

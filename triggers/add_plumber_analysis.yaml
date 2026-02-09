@@ -1,0 +1,28 @@
+---
+name: add_plumber_analysis
+pack: gmc_norr_analysis
+description: A trigger that gets emitted when Stackstorm starts a plumber analysis
+payload_schema:
+  type: object
+  properties:
+    prev_analysis_id:
+      type: string
+      description: ID of the analysis that generated the fastq_files
+    run_id:
+      type: string
+      description: Run ID
+    sample_id:
+      type: string
+      description: Sample ID
+    pipeline:
+      type: string
+      description: The pipeline started
+    pipeline_version:
+      type: string
+      description: The version of the pipeline started
+    workdir:
+      type: string
+      description: Path to the directory where plumber was started
+    fastq_files:
+      type: string
+      description: Comma-separated list of fastq files used in the pipeline

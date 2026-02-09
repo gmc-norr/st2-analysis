@@ -1,0 +1,20 @@
+---
+name: add_plumber_analysis
+pack: gmc_norr_analysis
+description: >
+  Add a plumber analysis to Cleve
+enabled: true
+
+trigger:
+  type: gmc_norr_analysis.add_plumber_analysis
+
+action:
+  ref: gmc_norr_analysis.add_plumber_analysis
+  parameters:
+    prev_analysis_id: "{{ trigger.prev_analysis_id }}"
+    run_id: "{{ trigger.run_id }}"
+    sample_id: "{{ trigger.sample_id }}"
+    pipeline: "{{ trigger.pipeline }}"
+    pipeline_version: "{{ trigger.pipeline_version }}"
+    workdir: "{{ trigger.workdir }}"
+    fastq_files: "{{ trigger.fastq_files }}"

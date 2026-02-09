@@ -1,0 +1,37 @@
+---
+name: add_plumber_analysis
+pack: gmc_norr_analysis
+description: Workflow to update a complete plumber analysis in Cleve
+runner_type: orquesta
+entry_point: workflows/add_plumber_analysis.yaml
+enabled: true
+
+parameters:
+  prev_analysis_id:
+    description: The ID of the analysis that generated the fastq_files
+    type: string
+    required: true
+  run_id:
+    description: The ID of the run the sample was sequenced in
+    type: string
+    required: true
+  sample_id:
+    description: The ID of the sample to analyze
+    type: string
+    required: true
+  pipeline:
+    description: The pipeline the plumber analysis is performed with
+    type: string
+    required: true
+  pipeline_version:
+    description: The version of the pipeline
+    type: string
+    required: true
+  workdir:
+    description: The path to the directory where the analysis is run py plumber
+    type: string
+    required: true
+  fastq_files:
+    description: A string lsiting comma-separated fastq files used in the analysis
+    type: string
+    required: true
