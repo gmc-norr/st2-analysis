@@ -31,10 +31,10 @@ OUT_DIR="$7"
 
 SAMPLESHEET="${OUT_DIR}/samplesheet.csv"
 
-#if [ -f $SAMPLESHEET ]; then
-#    echo >&2 "warning: samplesheet already exists for sample ${SAMPLE_ID}, delete it if you want to recreate it: ${SAMPLESHEET}"
-#    exit 1
-#fi
+if [ -f $SAMPLESHEET ]; then
+    echo >&2 "warning: samplesheet already exists for sample ${SAMPLE_ID}, delete it if you want to recreate it: ${SAMPLESHEET}"
+    exit 1
+fi
 
 if [ "$TYPE" != "Konstitutionell" ]; then
     echo >&2 "warning: invalid referral type for $SAMPLE_ID: $TYPE, skipping"

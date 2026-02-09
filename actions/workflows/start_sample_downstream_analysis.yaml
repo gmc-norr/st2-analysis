@@ -7,6 +7,11 @@ input:
   - run_id
   - analysis_id
 
+vars:
+  - msg:
+  - sample_ids:
+  - run_path:
+
 tasks:
   get_sample_ids:
     action: cleve.get_samplesheet

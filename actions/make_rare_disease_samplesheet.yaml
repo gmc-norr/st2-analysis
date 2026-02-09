@@ -29,12 +29,12 @@ parameters:
     position: 3
   fastq_r1:
     description: R1 fastq files of sample (divided by ',')
-    type: string
+    type: array
     required: true
     position: 4
   fastq_r2:
     description: R2 fastq files of sample (divided by ',')
-    type: string
+    type: array
     required: true
     position: 5
   out_dir:
