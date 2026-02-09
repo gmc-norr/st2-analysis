@@ -7,6 +7,23 @@ input:
   - run_path
   - analysis_id
 
+vars:
+  - msg:
+  - test_profile:
+  - referral_type:
+  - sex:
+  - output_dir:
+  - pipeline_system:
+  - pipeline:
+  - pipeline_version:
+  - pipeline_profile:
+  - plumber_config_version:
+  - plumber_cmd:
+  - case_id:
+  - fastq_r1:
+  - fastq_r2:
+  - pid:
+
 tasks:
   get_sample_data:
     action: igene.get_sample
@@ -87,8 +104,8 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($).join(',')  %>
-          fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($).join(',')  %>
+          fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
+          fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
         do:
           make_plumber_cmd
       - when: "{{ failed() }}"
@@ -185,7 +202,7 @@ tasks:
         pipeline: "{{ctx().pipeline}}"
         pipeline_version: "{{ctx().pipeline_version}}"
         workdir: "{{ctx().output_dir}}"
-        fastq_files: "{{ctx().fastq_r1}},{{ctx().fastq_r2}}"
+        fastq_files: "{{ctx().fastq_r1 + ctx().fastq_r2}}"
     next:
       - when: "{{ failed() }}"
         publish:

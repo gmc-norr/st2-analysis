@@ -7,6 +7,10 @@ input:
   - analysis_id
   - path
 
+vars:
+  - msg:
+  - run_ids:
+
 tasks:
   get_run_id:
     action: cleve.get_analyses
