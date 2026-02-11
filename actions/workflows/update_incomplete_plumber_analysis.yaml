@@ -4,33 +4,15 @@ description: >
   Workflow to update an incomplete plumber analysis in Cleve
 
 input:
+  - analysis_id
   - pipeline
   - pipeline_version
   - workdir
 
 vars:
   - msg:
-  - analysis_id:
 
 tasks:
-  make_analyis_id:
-    action: gmc_norr_analysis.make_plumber_analysis_id
-    input:
-      workdir: "{{ ctx().workdir }}"
-      pipeline: "{{ ctx().pipeline }}"
-      pipeline_version: "{{ ctx().pipeline_version }}"
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          analysis_id="{{ result().result }}"
-        do:
-          update_in_cleve
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "{{ result() }}"
-        do:
-          - report_failure
-
   update_in_cleve:
     action: cleve.update_analysis
     input:
