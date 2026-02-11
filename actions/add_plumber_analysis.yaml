@@ -34,4 +34,7 @@ parameters:
   fastq_files:
     description: An array with the fastq files used in the analysis
     type: array
-    required: true
+    items:
+      type: string
+      description: A fastq file
+      required: true
