@@ -4,36 +4,17 @@ description: >
   Workflow updating a successful plumber analysis in Cleve
 
 input:
+  - analysis_id
   - pipeline
-  - pipeline_version
   - workdir
 
 vars:
   - msg:
   - sample_id:
-  - analysis_id:
   - result_path:
   - output_files:
 
 tasks:
-  make_analysis_id:
-    action: gmc_norr_analysis.make_plumber_analysis_id
-    input:
-      workdir: "{{ctx().workdir}}"
-      pipeline: "{{ctx().pipeline}}"
-      pipeline_version: "{{ctx().pipeline_version}}"
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          analysis_id="{{result().result}}"
-        do:
-          get_sample_id
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "{{ result() }}"
-        do:
-          - report_failure
-
   get_sample_id:
     action: core.local
     input:
@@ -53,12 +34,10 @@ tasks:
   divide_pipeline_tasks:
     action: core.noop
     next: # Should be the only possible one until we add more to sample_downstream_analysis
-      - when: "{{ ctx().pipeline == 'nf-core/raredisease'}}"
-        publish:
-          result_path="{{ctx().workdir}}/raredisease_results"
+      - when: "{{ ctx().pipeline == 'nf-core-raredisease'}}"
         do:
           get_case_id
-      - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
+      - when: "{{ ctx().pipeline != 'nf-core-raredisease'}}"
         publish:
           msg="Unsupported pipeline {{ ctx().pipeline }}"
         do:
@@ -91,33 +70,14 @@ tasks:
           - report_failure
 
   format_rd_output_files:
-    action: core.noop
+    action: gmc_norr_analysis.get_rd_output_files
+    input:
+      case_id: "{{ ctx().case_id }}"
+      sample_id: "{{ ctx().sample_id }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - output_files:
-              "[{'path':'multiqc/multiqc_report.html',
-              'level':'sample', 'type':'text', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'peddy/{{ctx().case_id}}.peddy.ped',
-              'level':'sample', 'type':'text', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'peddy/{{ctx().case_id}}.sex_check.csv',
-              'level':'sample', 'type':'text', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'peddy/{{ctx().case_id}}.ped_check.csv',
-              'level':'sample', 'type':'text', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'alignment/{{ctx().sample_id}}_sorted_md.bam',
-              'level':'sample', 'type':'bam', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'qc_bam/{{ctx().sample_id}}_mosdepth.per-base.d4',
-              'level':'sample', 'type':'d4', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'annotate_snv/genome/{{ctx().sample_id}}_rhocallviz_autozyg_chromograph/{{ctx().sample_id}}_rhocallviz_chr*.png',
-              'level':'sample', 'type':'png', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'qc_bam/{{ctx().sample_id}}_chromographcov/{{ctx().sample_id}}_tidditcov_chr*.png',
-              'level':'sample', 'type':'png', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'smncopynumbercaller/out/{{ctx().case_id}}_smncopynumbercaller.tsv',
-              'level':'sample', 'type':'text', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'rank_and_filter/{{ctx().case_id}}_snv_ranked_clinical.vcf.gz',
-              'level':'sample', 'type':'vcf_snv', 'parent_id':'{{ctx().sample_id}}'},
-              {'path':'rank_and_filter/{{ctx().case_id}}_snv_ranked_research.vcf.gz',
-              'level':'sample', 'type':'vcf_snv', 'parent_id':'{{ctx().sample_id}}'}]"
+          output_files="{{ result().get('result') }}"
         do: update_in_cleve
       - when: "{{ failed() }}"
         publish:
@@ -130,7 +90,7 @@ tasks:
     input:
       analysis_id: "{{ ctx().analysis_id}}"
       state: ready
-      files: "{{ ctx().output_files}}"
+      files: "{{ ctx().output_files }}"
     next:
       - when: "{{ failed() }}"
         publish:

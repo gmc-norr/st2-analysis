@@ -2,8 +2,8 @@
 name: update_complete_plumber_analysis
 pack: gmc_norr_analysis
 description: >
-  Update a nf-core/raredisease analysis run by plumber to state ready
-  and add output files in Cleve
+  Update a plumber analysis in Cleve to state ready
+  and add output files
 enabled: true
 
 trigger:
@@ -22,6 +22,7 @@ criteria:
 action:
   ref: gmc_norr_analysis.update_complete_plumber_analysis
   parameters:
+    analysis_id: "{{ trigger.body.analysis_id }}"
     pipeline: "{{ trigger.body.pipeline }}"
     pipeline_version: "{{ trigger.body.pipeline_version }}"
-    workdir: "{{trigger.body.workdir}}"
+    workdir: "{{ trigger.body.workdir }}"

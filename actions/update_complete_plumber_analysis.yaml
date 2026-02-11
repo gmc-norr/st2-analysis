@@ -7,12 +7,12 @@ entry_point: workflows/update_complete_plumber_analysis.yaml
 enabled: true
 
 parameters:
-  pipeline:
-    description: The pipeline the analysis was performed with
+  analysis_id:
+    description: The ID of the plumber analysis
     type: string
     required: true
-  pipeline_version:
-    description: The version of the pipeline
+  pipeline:
+    description: The pipeline the analysis was performed with
     type: string
     required: true
   workdir:
