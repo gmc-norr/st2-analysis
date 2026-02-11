@@ -19,9 +19,7 @@ criteria:
     pattern: false
 
 action:
-  ref: gmc_norr_analysis.update_incomplete_plumber_analysis
+  ref: cleve.update_analysis
   parameters:
     analysis_id: "{{ trigger.body.analysis_id }}"
-    pipeline: "{{ trigger.body.pipeline }}"
-    pipeline_version: "{{ trigger.body.pipeline_version }}"
-    workdir: "{{trigger.body.workdir}}"
+    state: incomplete
