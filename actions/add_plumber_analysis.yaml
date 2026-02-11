@@ -7,6 +7,10 @@ entry_point: workflows/add_plumber_analysis.yaml
 enabled: true
 
 parameters:
+  analysis_id:
+    description: The ID of the plumber analysis
+    type: string
+    required: true
   prev_analysis_id:
     description: The ID of the analysis that generated the fastq_files
     type: string

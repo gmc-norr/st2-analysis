@@ -11,6 +11,7 @@ trigger:
 action:
   ref: gmc_norr_analysis.add_plumber_analysis
   parameters:
+    analysis_id: "{{ trigger.analysis_id }}"
     prev_analysis_id: "{{ trigger.prev_analysis_id }}"
     run_id: "{{ trigger.run_id }}"
     sample_id: "{{ trigger.sample_id }}"

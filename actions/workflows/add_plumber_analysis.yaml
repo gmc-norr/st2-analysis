@@ -4,6 +4,7 @@ description: >
   Workflow adding a started plumber analysis to Cleve
 
 input:
+  - analysis_id
   - prev_analysis_id
   - run_id
   - sample_id
@@ -17,24 +18,6 @@ vars:
   - input_files:
 
 tasks:
-  make_analyis_id:
-    action: gmc_norr_analysis.make_plumber_analysis_id
-    input:
-      workdir: "{{ctx().workdir}}"
-      pipeline: "{{ctx().pipeline}}"
-      pipeline_version: "{{ctx().pipeline_version}}"
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          analysis_id="{{result().result}}"
-        do:
-          divide_pipeline_tasks
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "{{ result() }}"
-        do:
-          - report_failure
-
   divide_pipeline_tasks:
     action: core.noop
     next: # Add more here when adding more to sample_downstream_analysis
