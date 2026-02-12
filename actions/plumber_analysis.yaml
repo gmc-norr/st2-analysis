@@ -1,9 +1,9 @@
 ---
-name: sample_downstream_analysis
+name: plumber_analysis
 pack: gmc_norr_analysis
 description: Workflow to run downstream analysis of a sample with plumber
 runner_type: orquesta
-entry_point: workflows/sample_downstream_analysis.yaml
+entry_point: workflows/plumber_analysis.yaml
 enabled: true
 
 parameters:
@@ -20,6 +20,6 @@ parameters:
     type: string
     required: true
   analysis_id:
-    description: Id of the analysis that generated the sample's fastq files
+    description: The ID of the analysis that generated the sample's fastq files
     type: string
     required: true

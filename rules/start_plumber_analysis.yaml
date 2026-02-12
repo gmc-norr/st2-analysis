@@ -1,5 +1,7 @@
-name: start_downstream_analysis
-description: Rule for starting analysis for a NovaSeq sequencing run
+name: start_plumber_analysis
+description: >
+  Rule for starting downstream analysis with plumber
+  when BCLConvert has readied the fastq files
 pack: gmc_norr_analysis
 enabled: true
 
@@ -15,7 +17,7 @@ criteria:
     pattern: BCLConvert
 
 action:
-  ref: gmc_norr_analysis.start_downstream_analysis
+  ref: gmc_norr_analysis.start_plumber_workflows
   parameters:
     path: "{{ trigger.path }}"
     analysis_id: "{{ trigger.analysis_id }}"
