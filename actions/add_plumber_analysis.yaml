@@ -1,14 +1,14 @@
 ---
 name: add_plumber_analysis
 pack: gmc_norr_analysis
-description: Workflow to update a complete plumber analysis in Cleve
+description: Workflow to add a new plumber analysis to Cleve
 runner_type: orquesta
 entry_point: workflows/add_plumber_analysis.yaml
 enabled: true
 
 parameters:
   analysis_id:
-    description: The ID of the plumber analysis
+    description: The ID of the plumber analysis to be added to Cleve
     type: string
     required: true
   prev_analysis_id:
@@ -20,11 +20,11 @@ parameters:
     type: string
     required: true
   sample_id:
-    description: The ID of the sample to analyze
+    description: The ID of the sample that is being analysed
     type: string
     required: true
   pipeline:
-    description: The pipeline the plumber analysis is performed with
+    description: The pipeline that plumber is running
     type: string
     required: true
   pipeline_version:
