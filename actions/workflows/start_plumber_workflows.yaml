@@ -1,7 +1,9 @@
 version: "1.0"
 
-description: The initial workflow for starting downstream analyses for a ready analysis.
-  Finds run ids and starts a workflow to find their respective samples for each.
+description: The initial workflow for starting downstream analyses
+  with plumber from a ready BCLConvert analysis. Finds run IDs and starts another
+  workflow which find their respective samples and start the final plumber workflow
+  of te chain.
 
 input:
   - analysis_id
@@ -35,7 +37,7 @@ tasks:
 
   start_run_workflow:
     with: run_id in <% ctx(run_ids) %>
-    action: gmc_norr_analysis.start_sample_downstream_analysis
+    action: gmc_norr_analysis.get_samples_for_plumber
     input:
       run_id: <% item(run_id) %>
       analysis_id: <% ctx(analysis_id) %>
