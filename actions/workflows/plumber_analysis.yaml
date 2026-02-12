@@ -22,6 +22,8 @@ vars:
   - case_id:
   - fastq_r1:
   - fastq_r2:
+  - remote_stdout:
+  - remote_stderr:
   - pid:
 
 tasks:
@@ -155,16 +157,31 @@ tasks:
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
-    next: # doesn't catch an outright failure. Adding  - when: "{{ failed() }}" doesn't help, becuase it tries to evaluate the other whens...
-      - when: "{{ result().get((result().keys() | list | first)).get('stderr') == '' }}"
+    next:
+      - when: "{{ failed() }}"
         publish:
-          pid="{{ result().get((result().keys() | list | first)).get('stdout') }}""
+          msg="Failed to connect to remote to start plumber.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+      - when: "{{ succeeded() }}"
+        publish:
+          remote_stderr="{{ result().get((result().keys() | list | first)).get('stderr') }}"
+          remote_stdout="{{ result().get((result().keys() | list | first)).get('stdout') }}"
+        do: check_remote_output
+
+  check_remote_output: # if connecting to the remote works but the command fails the action still "succeeded"
+    action: core.noop # so we need to check if the stderr is empty
+    next:
+      - when: "{{ ctx().remote_stderr == '' }}"
+        publish:
+          pid="{{ ctx().remote_stdout }}""
         do:
           pause
-      - when: "{{ result().get((result().keys() | list | first)).get('stderr') != '' }}"
+      - when: "{{ ctx().remote_stderr != '' }}"
         publish:
           msg="Failed to start plumber.
-          {{result() | to_json_string }}"
+          {{ ctx().remote_stderr }}"
         do:
           report_failure
 
@@ -196,6 +213,7 @@ tasks:
     input: # we trigger it here so we can connect it to the run ID
       trigger_name: gmc_norr_analysis.add_plumber_analysis
       payload:
+        analysis_id: "something?????" #TODO
         prev_analysis_id: "{{ctx().analysis_id}}"
         run_id: "{{ctx().run_id}}"
         sample_id: "{{ctx().sample_id}}"
