@@ -11,7 +11,7 @@ input:
 vars:
   - msg:
   - sample_id:
-  - result_path:
+  - case_id:
   - output_files:
 
 tasks:
@@ -104,6 +104,6 @@ tasks:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
         subject: >
-          Failed to update successful plumber analysis of sample {{ctx().sample_id}}
-          with {{ctx().pipeline}} in Cleve
+          Failed to update successful plumber analysis of sample {{ ctx().sample_id }}
+          in {{ ctx().workdir }} with {{ ctx().pipeline }} in Cleve
         message: "{{ctx().msg}}"
