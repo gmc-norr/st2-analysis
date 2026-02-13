@@ -30,7 +30,7 @@ tasks:
   get_sample_data:
     action: igene.get_sample
     input:
-      sample: <% ctx().sample_id %>
+      sample_id: <% ctx().sample_id %>
     retry:
       when: "{{ failed() }}"
       delay: 1
