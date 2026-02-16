@@ -96,7 +96,7 @@ tasks:
         do:
           report_failure
 
-  get_fastq_files:
+  get_fastq_files: #i it's a trio or something with normal/tumor, we will need more...
     action: cleve.get_analysis_files
     input:
       analysis_id: "<% ctx().analysis_id %>"
@@ -109,7 +109,7 @@ tasks:
           fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
           fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
         do:
-          make_plumber_cmd
+          add_plumber_analysis_to_cleve
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get fastq files from Cleve.
@@ -117,7 +117,30 @@ tasks:
         do:
           report_failure
 
-  make_plumber_cmd:
+  add_plumber_analysis_to_cleve:
+    action: gmc_norr_analysis.add_plumber_analysis
+    input:
+      prev_analysis_id: "{{ctx().analysis_id}}"
+      run_id: "{{ctx().run_id}}"
+      sample_id: "{{ctx().sample_id}}"
+      pipeline: "{{ctx().pipeline}}"
+      pipeline_version: "{{ctx().pipeline_version}}"
+      workdir: "{{ctx().output_dir}}"
+      fastq_files: "{{ctx().fastq_r1 + ctx().fastq_r2}}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          plumber_analysis_id="{{ result().result.analysis_id }}"
+        do:
+          make_plumber_cmd
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to add plumber analysis to Cleve
+          {{result() | to_json_string }}"
+        do:
+          report_failure
+
+  make_plumber_cmd: # add plumber_analysis_id somehow
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
       -p <% ctx().pipeline_profile %> > plumber.log & echo \$!"
@@ -205,27 +228,6 @@ tasks:
         publish:
           msg="Plumber crashed running {{ ctx().pipeline }}
           in {{ctx().output_dir}}."
-        do:
-          report_failure
-
-  trigger_add_plumber_analysis:
-    action: core.inject_trigger
-    input: # we trigger it here so we can connect it to the run ID
-      trigger_name: gmc_norr_analysis.add_plumber_analysis
-      payload:
-        analysis_id: "something?????" #TODO
-        prev_analysis_id: "{{ctx().analysis_id}}"
-        run_id: "{{ctx().run_id}}"
-        sample_id: "{{ctx().sample_id}}"
-        pipeline: "{{ctx().pipeline}}"
-        pipeline_version: "{{ctx().pipeline_version}}"
-        workdir: "{{ctx().output_dir}}"
-        fastq_files: "{{ctx().fastq_r1 + ctx().fastq_r2}}"
-    next:
-      - when: "{{ failed() }}"
-        publish:
-          msg="Couldn't inject add_plumber_analysis trigger
-          {{result() | to_json_string }}"
         do:
           report_failure
 
