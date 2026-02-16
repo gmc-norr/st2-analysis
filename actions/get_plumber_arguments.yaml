@@ -1,0 +1,20 @@
+---
+name: get_plumber_arguments
+pack: gmc_norr_analysis
+description: Get the pipeline and configuration parameters for the TestProfile from teh config file repo
+runner_type: python-script
+entry_point: get_plumber_arguments.py
+enabled: true
+
+parameters:
+  config_path:
+    description: URL to the (raw) config file repo
+    type: string
+    required: true
+    default: "{{ config_context.plumber.config_repo}}"
+    position: 0
+  test_profile:
+    description: The iGene TestProfile to get the corresponding settings for
+    type: string
+    required: true
+    position: 1

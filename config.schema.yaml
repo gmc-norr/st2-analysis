@@ -67,3 +67,10 @@ notification_email:
     description: An email address
   default: []
   required: true
+
+plumber:
+  type: object
+  properties:
+    config_repo:
+      type: string
+      description: Link to the raw config-files repo, which has the files that translate TestProfile into a pipeline with arguments
