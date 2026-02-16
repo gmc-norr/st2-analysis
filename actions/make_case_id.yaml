@@ -1,0 +1,7 @@
+---
+name: make_case_id
+pack: gmc_norr_analysis
+description: Generate a case id (random combination of words)
+runner_type: python-script
+entry_point: make_case_id.py
+enabled: true
