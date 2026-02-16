@@ -6,7 +6,6 @@ from st2common.runners.base_action import Action
 supported_applications = ["NfCoreRareDisease"]
 
 
-
 def get_supported_analysis(test_analyses):
     for analysis in test_analyses:
         if analysis["ApplicationProfileName"] in supported_applications:
