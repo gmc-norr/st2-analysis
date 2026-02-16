@@ -35,17 +35,16 @@ gmc_norr_analysis.get_plumber_arguments           | From a TestProfile get which
 ref                                               | description
 --------------------------------------------------|------------------------------------------
 gmc_norr_analysis.tumor_evolution                 | Generate a tumor evolution report
-gmc_norr_analysis.start_plumber_workflows       | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
-gmc_norr_analysis.get_samples_for_plumber| For all samples belongin to a run, start the plumber_nalysis workflow
-gmc_norr_analysis.plumber_analysis      | Run a downstream analysis with plumber on a sample
+gmc_norr_analysis.start_plumber_workflows         | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
+gmc_norr_analysis.get_samples_for_plumber         | For all samples belongin to a run, start the plumber_nalysis workflow
+gmc_norr_analysis.plumber_analysis                | Run a downstream analysis with plumber on a sample
 
 ## Rules
 
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
-gmc_norr_analysis.send_notification_email         | Send a notification email
-gmc_norr_analysis.start_plumber_analysis       |  Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
+gmc_norr_analysis.start_plumber_analysis          |  Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
 
 ## Sensors
 

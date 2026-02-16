@@ -6,6 +6,10 @@ input:
   - run_id
   - run_path
   - analysis_id
+  - plumber_host
+  - plumber_user
+  - plumber_api_key
+  - plumber_webhook_url
 
 vars:
   - msg:
@@ -180,6 +184,13 @@ tasks:
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
+      username: "{{ ctx().plumber_user }}"
+      hosts:
+        - "{{ ctx().plumber_host}}"
+      env:
+        - PLUMBER_WEBHOOK_URL: "{{ ctx().plumber_webhook_url}}"
+        - PLUMBER_WEBHOOK_API_KEY: "{{ ctx().plumber_api_key }}"
+        - PLUMBER_WEBHOOK_NO_VERIFY: "true"
     next:
       - when: "{{ failed() }}"
         publish:
@@ -216,10 +227,13 @@ tasks:
           check_progress
 
   check_progress:
-    action: gmc_norr_analysis.check_plumber_progress
+    action: core.remote
     input:
       cmd: "ps --no-headers --pid {{ctx().pid}}"
       cwd: <% ctx().output_dir %>
+      username: "{{ ctx().plumber_user }}"
+      hosts:
+        - "{{ ctx().plumber_host}}"
     next:
       - when: "{{ succeeded() }}"
         do:
