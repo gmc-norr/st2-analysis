@@ -16,7 +16,6 @@ The config parameters that need to be defined are:
     - Each entry in the array should be an object with two keys: `win` and `unix`. The value for `win` should be a windows path, and `unix` should be the path where the windows path is mounted.
 - `plumber.user`: The user to run plumber with
 - `plumber.host`: THe host to run plumber on.
-- `plumber.config_repo_raw`: Path to the github repo of GMC Norr config files (raw).
 
 Furthermore, the following parameters needs to be defined in the datastore service:
 - `notification_email`: The email address where notifications will be sent
