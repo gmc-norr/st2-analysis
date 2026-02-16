@@ -1,17 +1,18 @@
 ---
 name: start_plumber_remote
 runner_type: remote-shell-cmd
-description: Start
+description: >
+  Start plumber on a remote and set up Stackstorm webhook environmental variables
 enabled: true
 entry_point: ""
 parameters:
   cmd:
-    description: Command to run
+    description: Plumber command to run
     type: string
     required: true
   cwd:
     description: >
-      Working directory where the script will be executed in
+      Plumber working directory
     type: string
   hosts:
     description: Host to run plumber on
@@ -24,7 +25,7 @@ parameters:
     default: "{{config_context.plumber.user}}"
     required: true
   env:
-    description: environmental variables
+    description: Environmental variables to set up the plumber webhooks
     type: object
     required: true
     default:
