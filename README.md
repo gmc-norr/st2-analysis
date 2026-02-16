@@ -15,6 +15,8 @@ The config parameters that need to be defined are:
 - `mount_points`: An array of mappings between windows paths and their mount points on the system.
     - Each entry in the array should be an object with two keys: `win` and `unix`. The value for `win` should be a windows path, and `unix` should be the path where the windows path is mounted.
 - `plumber.config_repo`: The URL to the GMC-Norr config-repo that contains the pipeline settings corresponding to the TestProfiles from iGene
+- `plumber.user`: The user to run plumber with
+- `plumber.host`: THe host to run plumber on.
 
 Furthermore, the following parameters needs to be defined in the datastore service:
 - `notification_email`: The email address where notifications will be sent
