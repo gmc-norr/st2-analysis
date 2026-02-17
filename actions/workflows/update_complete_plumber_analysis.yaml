@@ -24,10 +24,43 @@ tasks:
         publish:
           sample_id="{{result().stdout}}"
         do:
-          divide_pipeline_tasks
+          get_destination
       - when: "{{ failed() }}"
         publish:
           - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  get_destination:
+    action: gmc_norr_seqdata.get_data_destination
+    input:
+      platform: <% ctx(platform) %>
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: "failed to get destination from gmc_norr_seqdata's pack config"
+        do: fail
+      - when: <% succeeded() and result().result = null %>
+        publish:
+          - msg: "destination not defined for platform: <% ctx(platform) %>"
+        do: fail
+      - when: <% succeeded() and result().result != null %>
+        publish:
+          - destination: <% result().result %>
+        do: rsync_output
+
+  rsync_output:
+    action: linux.rsync
+    input:
+      source: "{{ctx().workdir}}" #is a trailing slash going to be a problem?
+      destination: "{{ctx().destination}}" # do we need the run directory?
+      args: "-avz"
+    next:
+      - when: "{{ succeeded() }}"
+        do: divide_pipeline_tasks
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result() %>
         do:
           - report_failure
 
