@@ -13,6 +13,7 @@ action:
   parameters:
     account: SMTP-VLL
     email_from: stackstorm@regionvasterbotten.se
-    email_to: "{{ trigger.to | to_json_string }}"
+    email_to:
+      - "{{ st2kv.system.notification_email}}"
     subject: "{{ trigger.subject }}"
     message: "{{ trigger.message }}"
