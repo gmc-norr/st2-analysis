@@ -44,6 +44,7 @@ gmc_norr_analysis.plumber_analysis                | Run a downstream analysis wi
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
+gmc_norr_analysis.send_notification_email         | Send a notification email
 gmc_norr_analysis.start_plumber_analysis          |  Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
 
 ## Sensors
@@ -51,12 +52,6 @@ gmc_norr_analysis.start_plumber_analysis          |  Runs start_plumber_workflow
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
-
-##Policies
-
-ref                                               | description
---------------------------------------------------|------------------------------------
-gmc_norr_analyis.tumor_evolution_report           | Limits the concurrent executions for the tumor evolution report to 1
 
 # Known issues
 
