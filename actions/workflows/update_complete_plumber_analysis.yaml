@@ -18,18 +18,39 @@ tasks:
   get_sample_id:
     action: core.local
     input:
-      cmd: 'basename "{{ctx().workdir}}"'
+      cmd: basename "{{ctx().workdir}}"
     next:
       - when: "{{ succeeded() }}"
         publish:
           sample_id="{{result().stdout}}"
         do:
-          get_destination
+          get_run_id
       - when: "{{ failed() }}"
         publish:
           - msg: "{{ result() }}"
         do:
           - report_failure
+
+  get_run_id:
+    action: cleve.get_analyses
+    input:
+      analysis_id: <% ctx().analysis_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 3
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          run_id={{ result().get("result").get("body").get("analyses") | map(attribute='runs') | first }}
+        do:
+          get_destination
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get run id from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
 
   get_destination:
     action: gmc_norr_seqdata.get_data_destination
@@ -46,14 +67,27 @@ tasks:
         do: fail
       - when: <% succeeded() and result().result != null %>
         publish:
-          - destination: <% result().result %>
+          - destination: "{{ result().result }}/{{ctx().run_id}}/{{ctx().pipeline}}"
+        do: make_destination
+
+  make_destination:
+    action: core.local
+    input:
+      cmd: mkdir -p "{{ ctx().destination }}"
+    next:
+      - when: "{{ succeeded() }}"
         do: rsync_output
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
 
   rsync_output:
     action: linux.rsync
     input:
-      source: "{{ctx().workdir}}" #is a trailing slash going to be a problem?
-      destination: "{{ctx().destination}}" # do we need the run directory?
+      source: "{{ctx().workdir }}"
+      destination: "{{ ctx().destination }}"
       args: "-avz"
     next:
       - when: "{{ succeeded() }}"
