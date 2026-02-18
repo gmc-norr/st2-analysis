@@ -1,0 +1,25 @@
+---
+name: update_incomplete_plumber_analysis
+pack: gmc_norr_analysis
+description: >
+  Update an incomplete plumber analysis in Cleve
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type:
+    type: equals
+    pattern: end
+  trigger.body.success:
+    type: equals
+    pattern: false
+
+action:
+  ref: cleve.update_analysis
+  parameters:
+    analysis_id: "{{ trigger.body.analysis_id }}"
+    state: incomplete
