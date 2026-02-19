@@ -8,8 +8,7 @@ input:
   - analysis_id
   - plumber_host
   - plumber_user
-  - plumber_api_key
-  - plumber_webhook_url
+  - plumber_env
 
 vars:
   - msg:
@@ -83,9 +82,9 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         do:
-          get_case_id
+          make_case_id
 
-  get_case_id:
+  make_case_id:
     action: gmc_norr_analysis.make_case_id
     next:
       - when: "{{ succeeded() }}"
@@ -113,7 +112,7 @@ tasks:
           fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
           fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
         do:
-          add_plumber_analysis_to_cleve
+          format_cleve_input_files
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get fastq files from Cleve.
@@ -121,16 +120,36 @@ tasks:
         do:
           report_failure
 
-  add_plumber_analysis_to_cleve:
-    action: gmc_norr_analysis.add_plumber_analysis
+  format_cleve_input_files:
+    action: gmc_norr_analysis.format_pipeline_input_files
     input:
-      prev_analysis_id: "{{ctx().analysis_id}}"
-      run_id: "{{ctx().run_id}}"
-      sample_id: "{{ctx().sample_id}}"
-      pipeline: "{{ctx().pipeline}}"
-      pipeline_version: "{{ctx().pipeline_version}}"
-      workdir: "{{ctx().output_dir}}"
-      fastq_files: "{{ctx().fastq_r1 + ctx().fastq_r2}}"
+      pipeline: "{{ ctx().pipeline }}"
+      fastq_files: "{{ ctx().fastq_r1 + ctx().fastq_r2 }}"
+      analysis_id: "{{ ctx().analysis_id }}"
+      sample_id: "{{ ctx().sample_id }}"
+      sample_files:
+        "{{ ctx().sample_id }}": "{{ ctx().fastq_r1 + ctx().fastq_r2 }}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          input_files="{{ result().result }}"
+        do:
+          add_plumber_analysis_to_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  add_plumber_analysis_to_cleve:
+    action: cleve.add_analysis
+    input:
+      run_id: "{{ ctx().run_id }}"
+      state: pending
+      path: "{{ ctx().output_dir }}"
+      software: "{{ ctx().pipeline}}"
+      software_version: "{{ ctx().pipeline_version }}"
+      input_files: "{{ ctx().input_files }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -139,15 +158,14 @@ tasks:
           make_plumber_cmd
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to add plumber analysis to Cleve
-          {{result() | to_json_string }}"
+          - msg: <% result().stderr %>
         do:
-          report_failure
+          - report_failure
 
-  make_plumber_cmd: # add plumber_analysis_id somehow
+  make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-      -p <% ctx().pipeline_profile %> > plumber.log & echo \$!"
+      -p <% ctx().pipeline_profile %> > plumber.log & echo \$!" #--analysis_id <% ctx().plumber_analysis_id %>
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
@@ -180,17 +198,13 @@ tasks:
         do: report_failure
 
   start_plumber:
-    action: gmc_norr_analysis.start_plumber_remote
+    action: core.remote
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
       username: "{{ ctx().plumber_user }}"
-      hosts:
-        - "{{ ctx().plumber_host}}"
-      env:
-        - PLUMBER_WEBHOOK_URL: "{{ ctx().plumber_webhook_url}}"
-        - PLUMBER_WEBHOOK_API_KEY: "{{ ctx().plumber_api_key }}"
-        - PLUMBER_WEBHOOK_NO_VERIFY: "true"
+      hosts: "{{ ctx().plumber_host}}"
+      env: <% ctx().plumber_env %>
     next:
       - when: "{{ failed() }}"
         publish:
@@ -232,12 +246,8 @@ tasks:
       cmd: "ps --no-headers --pid {{ctx().pid}}"
       cwd: <% ctx().output_dir %>
       username: "{{ ctx().plumber_user }}"
-      hosts:
-        - "{{ ctx().plumber_host}}"
+      hosts: "{{ ctx().plumber_host}}"
     next:
-      - when: "{{ succeeded() }}"
-        do:
-          trigger_add_plumber_analysis
       - when: "{{ failed() }}"
         publish:
           msg="Plumber crashed running {{ ctx().pipeline }}
