@@ -51,8 +51,11 @@ SEX_CODE=$(sex_to_int "$SEX")
 IFS=',' read -r -a FQ1 <<< "$FQ_R1"
 IFS=',' read -r -a FQ2 <<< "$FQ_R2"
 
+FQ1_SORT=( $(IFS=$'\n'; echo "${FQ1[*]}" | sort))
+FQ2_SORT=( $(IFS=$'\n'; echo "${FQ2[*]}" | sort))
+
 echo "sample,lane,fastq_1,fastq_2,sex,phenotype,paternal_id,maternal_id,case_id" > ${SAMPLESHEET}
-for N in $(seq 0 $((${#FQ1[@]} - 1))); do
-    LANE=$(echo ${FQ1[$N]} | grep -Po '(?<=_)L\d{3}(?=_)')
-    echo ${SAMPLE_ID},${LANE},${FQ1[$N]},${FQ2[$N]},${SEX_CODE},2,,,$CASE_ID >> ${SAMPLESHEET}
+for N in $(seq 0 $((${#FQ1_SORT[@]} - 1))); do
+    LANE=$(echo ${FQ1_SORT[$N]} | grep -Po '(?<=_)L\d{3}(?=_)')
+    echo ${SAMPLE_ID},${LANE},${FQ1_SORT[$N]},${FQ2_SORT[$N]},${SEX_CODE},2,,,$CASE_ID >> ${SAMPLESHEET}
 done
