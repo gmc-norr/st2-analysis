@@ -27,18 +27,23 @@ parameters:
     type: string
     required: true
     position: 3
+  panels:
+    description: The panels of the analysis
+    type: array
+    required: true
+    position: 4
   fastq_r1:
     description: The sample's fastq R1 files
     type: array
     required: true
-    position: 4
+    position: 5
   fastq_r2:
     description: The sample's fastq R2 files
     type: array
     required: true
-    position: 5
+    position: 6
   out_dir:
     description: Output directory to save the samplesheet in.
     type: string
     required: true
-    position: 6
+    position: 7

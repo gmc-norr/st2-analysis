@@ -25,9 +25,10 @@ SAMPLE_ID="$1"
 CASE_ID="$2"
 TYPE="$3"
 SEX="$4"
-FQ_R1="$5"
-FQ_R2="$6"
-OUT_DIR="$7"
+PANELS="$5"
+FQ_R1="$6"
+FQ_R2="$7"
+OUT_DIR="$8"
 
 SAMPLESHEET="${OUT_DIR}/samplesheet.csv"
 
@@ -37,7 +38,12 @@ if [ -f $SAMPLESHEET ]; then
 fi
 
 if [ "$TYPE" != "Konstitutionell" ]; then
-    echo >&2 "warning: invalid referral type for $SAMPLE_ID: $TYPE, skipping"
+    echo >&2 "warning: invalid referral type for $SAMPLE_ID: $TYPE"
+    exit 1
+fi
+
+if ! echo "$PANELS" | grep -q "HTAD_PAN_WGS_v.1.0"; then
+    echo >&2 "warning: HTAD panel not found among panels on worksheet for ${SAMPLE_ID}"
     exit 1
 fi
 
