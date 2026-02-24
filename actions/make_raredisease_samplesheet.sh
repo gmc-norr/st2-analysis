@@ -15,8 +15,7 @@ function sex_to_int() {
         female | Female | FEMALE | F | f)
             SEX_CODE=2;;
         *)
-            echo >&2 "error: invalid sex: ${SEX}"
-            exit 1;;
+            SEX_CODE=0;;
     esac
     echo $SEX_CODE
 }
