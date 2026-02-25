@@ -1,0 +1,49 @@
+---
+name: make_raredisease_samplesheet
+pack: gmc_norr_analysis
+description: Make samplesheet for nf-core/raredisease pipeline
+runner_type: local-shell-script
+entry_point: make_raredisease_samplesheet.sh
+enabled: true
+
+parameters:
+  sample_id:
+    description: Sample id
+    type: string
+    required: true
+    position: 0
+  case_id:
+    description: Case id
+    type: string
+    required: true
+    position: 1
+  referral_type:
+    description: Referral type
+    type: string
+    required: true
+    position: 2
+  sex:
+    description: Sex of sample
+    type: string
+    required: true
+    position: 3
+  panels:
+    description: The panels of the analysis
+    type: array
+    required: true
+    position: 4
+  fastq_r1:
+    description: The sample's fastq R1 files
+    type: array
+    required: true
+    position: 5
+  fastq_r2:
+    description: The sample's fastq R2 files
+    type: array
+    required: true
+    position: 6
+  out_dir:
+    description: Output directory to save the samplesheet in.
+    type: string
+    required: true
+    position: 7
