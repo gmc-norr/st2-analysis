@@ -22,12 +22,6 @@ trigger_types:
     payload_schema:
       type: object
       properties:
-        to:
-          type: array
-          items:
-            type: string
-            description: "Email address to send notification to"
-          default: []
         subject:
           type: string
           description: "Email subject"
