@@ -38,7 +38,6 @@ class TumorEvolutionSensor(PollingSensor):
             self.sensor_service.dispatch(
                 trigger="gmc_norr_analysis.email_notification",
                 payload={
-                    "to": self.config["notification_email"],
                     "subject": "[TumorEvolutionSensor] Failed to "
                         "check watch file",
                     "message": "Failed to check watch file: %s" % e
@@ -57,7 +56,6 @@ class TumorEvolutionSensor(PollingSensor):
                 self.sensor_service.dispatch(
                     trigger="gmc_norr_analysis.email_notification",
                     payload={
-                        "to": self.config["notification_email"],
                         "subject": "[TumorEvolutionSensor] Failed to "
                             "create watch file",
                         "message": "Failed to create watch file: %s" % e
@@ -78,7 +76,6 @@ class TumorEvolutionSensor(PollingSensor):
                     self.sensor_service.dispatch(
                         trigger="gmc_norr_analysis.email_notification",
                         payload={
-                            "to": self.config["notification_email"],
                             "subject": "[TumorEvolutionSensor] Error reading watch file",
                             "message": "There was an error reding the watch file: %s" % e
                         }
