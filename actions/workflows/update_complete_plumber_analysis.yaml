@@ -52,19 +52,38 @@ tasks:
         do:
           report_failure
 
+  get_run_platform:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    next:
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        publish:
+          - error: "run not found"
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        publish:
+          - error: "more than one run found"
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - platform: <% result().result.body.runs.first().platform %>
+        do: get_destination
+
   get_destination:
-    action: gmc_norr_seqdata.get_data_destination
+    action: gmc_norr_seqdata.get_file_destination
     input:
       platform: <% ctx(platform) %>
+      type: run
     next:
       - when: <% failed() %>
         publish:
           - msg: "failed to get destination from gmc_norr_seqdata's pack config"
-        do: fail
+        do: report_failure
       - when: <% succeeded() and result().result = null %>
         publish:
           - msg: "destination not defined for platform: <% ctx(platform) %>"
-        do: fail
+        do: report_failure
       - when: <% succeeded() and result().result != null %>
         publish:
           - destination: "{{ result().result }}/{{ctx().run_id}}/{{ctx().pipeline}}"
@@ -100,7 +119,7 @@ tasks:
 
   divide_pipeline_tasks:
     action: core.noop
-    next: # Should be the only possible one until we add more to sample_downstream_analysis
+    next: # Note that this needs to match what plumber calls them
       - when: "{{ ctx().pipeline == 'nf-core-raredisease'}}"
         do:
           get_case_id
