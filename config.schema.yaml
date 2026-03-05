@@ -58,12 +58,9 @@ mounts:
         description: Unix path where the windows path has been mounted.
         type: string
         required: true
-
-notification_email:
-  type: array
-  description: Email addresses to send notifications to
-  items:
-    type: string
-    description: An email address
-  default: []
-  required: true
+plumber:
+  type: object
+  properties:
+    config_repo:
+      type: string
+      description: Link to the raw config-files repo, which has the files that translate TestProfile into a pipeline with arguments
