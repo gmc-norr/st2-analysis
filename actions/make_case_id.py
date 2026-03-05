@@ -13,7 +13,7 @@ class MakeCaseID(Action):
         case_id = f"{case_id_adj}_{case_id_noun}".replace(
             "'", "").replace("-", "_").replace(" ", "_")
 
-        sample_bytes = bytes(" ".join(samples), "utf-8")
+        sample_bytes = bytes(" ".join(sorted(samples)), "utf-8")
         hash_id = hashlib.md5(sample_bytes).hexdigest()[:8]
 
         return (True,  case_id + "_" + hash_id)
