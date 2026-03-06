@@ -1,7 +1,8 @@
 version: 1.0
 name: update_complete_plumber_analysis
 description: >
-  Workflow updating a successful plumber analysis in Cleve
+  Workflow handling a finished plumber ananlysis: First moving the output,
+  then updating the analysis in Cleve (state and output files)
 
 input:
   - analysis_id
@@ -18,11 +19,11 @@ tasks:
   get_sample_id:
     action: core.local
     input:
-      cmd: basename "{{ctx().workdir}}"
+      cmd: basename <% ctx().workdir %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          sample_id="{{result().stdout}}"
+          - sample_id: <% result().stdout %>
         do:
           get_run_id
       - when: "{{ failed() }}"
@@ -38,33 +39,39 @@ tasks:
     retry:
       when: "{{ failed() }}"
       delay: 1
-      count: 3
+      count: 2
     next:
-      - when: "{{ succeeded() }}"
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
-          run_id={{ result().get("result").get("body").get("analyses") | map(attribute='runs') | first }}
-        do:
-          get_destination
-      - when: "{{ failed() }}"
+          - msg: analysis <% ctx().analysis_id %> not found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
         publish:
-          msg="Failed to get run id from Cleve.
-          {{ result() | to_json_string }}"
+          - msg: more than one analysis with ID <% ctx().analysis_id %> found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - platform: <% result().result.body.analyses.first().runs %>
         do:
-          report_failure
+          get_run_platform
 
   get_run_platform:
     action: cleve.get_runs
     input:
       run_id: <% ctx(run_id) %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
     next:
       - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
-          - error: "run not found"
-        do: fail
+          - error: "run <% ctx(run_id) %> not found in Cleve"
+        do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count > 1 %>
         publish:
-          - error: "more than one run found"
-        do: fail
+          - error: "more than one run with ID <% ctx(run_id) %> found in Cleve"
+        do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 1 %>
         publish:
           - platform: <% result().result.body.runs.first().platform %>
@@ -105,8 +112,8 @@ tasks:
   rsync_output:
     action: linux.rsync
     input:
-      source: "{{ctx().workdir }}"
-      destination: "{{ ctx().destination }}"
+      source: <% ctx().workdir %>
+      destination: <% ctx().destination %>
       args: "-avz"
     next:
       - when: "{{ succeeded() }}"
@@ -125,7 +132,7 @@ tasks:
           get_case_id
       - when: "{{ ctx().pipeline != 'nf-core-raredisease'}}"
         publish:
-          msg="Unsupported pipeline {{ ctx().pipeline }}"
+          - msg: "Unsupported pipeline {{ ctx().pipeline }}"
         do:
           report_failure
 
@@ -136,7 +143,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          case_id="{{result().stdout}}"
+          - case_id: <% result().stdout %>
         do: check_case_id
       - when: "{{ failed() }}"
         publish:
@@ -163,7 +170,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          output_files="{{ result().get('result') }}"
+          - output_files: <% result().result %>
         do: update_in_cleve
       - when: "{{ failed() }}"
         publish:
@@ -174,9 +181,9 @@ tasks:
   update_in_cleve:
     action: cleve.update_analysis
     input:
-      analysis_id: "{{ ctx().analysis_id}}"
+      analysis_id: <% ctx().analysis_id %>
       state: ready
-      files: "{{ ctx().output_files }}"
+      files: <% ctx().output_files %>
     next:
       - when: "{{ failed() }}"
         publish:
@@ -192,4 +199,7 @@ tasks:
         subject: >
           Failed to update successful plumber analysis of sample {{ ctx().sample_id }}
           in {{ ctx().workdir }} with {{ ctx().pipeline }} in Cleve
-        message: "{{ctx().msg}}"
+        message: <% ctx().msg %>
+    next:
+      - when: "{{ succeeded() }}"
+        do: fail
