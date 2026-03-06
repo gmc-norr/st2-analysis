@@ -26,6 +26,7 @@ ref                                               | description
 gmc_norr_analysis.generate_tumor_evolution_report | Generate a tumor evolution report from an Excel file
 gmc_norr_analysis.tumor_evolution                 | Workflow for generating a tumor evolution report
 gmc_norr_analysis.write_file                      | Write a text string to a file
+gmc_norr_analysis.make_case_id                    | Make a case id of random words and a hash of sample ids
 gmc_norr_analysis.make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
 
 ## Rules
