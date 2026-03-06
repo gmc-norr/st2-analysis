@@ -23,6 +23,14 @@ parameters:
     description: The ID of the analysis that generated the sample's fastq files
     type: string
     required: true
+  plumber_env:
+    type: object
+    secret: true
+    required: true
+    default:
+      PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
+      PLUMBER_WEBHOOK_API_KEY: "{{ st2kv.system.plumber_api_key | decrypt_kv }}"
+      PLUMBER_WEBHOOK_NO_VERIFY: true
   plumber_host:
     description: Host to run plumber on
     type: string
@@ -31,10 +39,3 @@ parameters:
     description: User to run plumber with
     type: string
     default: "{{config_context.plumber.user}}"
-  plumber_api_key:
-    type: string
-    default: "{{ st2kv.system.plumber_api_key | decrypt_kv }}"
-    secret: true
-  plumber_webhook_url:
-    type: string
-    default: "{{st2kv.system.api_url}}/webhooks/plumber"
