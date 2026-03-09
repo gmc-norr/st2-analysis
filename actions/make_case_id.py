@@ -4,7 +4,6 @@ from st2common.runners.base_action import Action
 from wonderwords import RandomWord
 
 
-
 class MakeCaseID(Action):
     def run(self, samples):
         word_generator = RandomWord()
