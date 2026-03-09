@@ -18,15 +18,16 @@ vars:
   - father_sample_id:
   - sex:
   - output_dir:
-  - pipeline_system:
   - pipeline:
+  - pipeline_system:
   - pipeline_version:
   - pipeline_profile:
   - plumber_config_version:
   - plumber_cmd:
   - case_id:
-  - fastq_r1:
-  - fastq_r2:
+  - fastq_files:
+  - analysis_ids:
+  - input_files:
   - remote_stdout:
   - remote_stderr:
   - pid:
@@ -65,10 +66,10 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - pipeline_system: <% result().result.PipelineSystem%>
           - pipeline: <% result().result.Pipeline %>
-          - pipeline_profile: <% result().result.Profile %>
+          - pipeline_system: <% result().result.PipelineSystem%>
           - pipeline_version: <% result().result.Version %>
+          - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
         do:
           prepare_output_folder
@@ -108,7 +109,7 @@ tasks:
         do:
           report_failure
 
-  get_fastq_files: #if it's a trio or something with normal/tumor, we will need more...
+  get_fastq_files: #if it's a trio or something with normal/tumor, we will fastq files for all. Make a new action at that point?
     action: cleve.get_analysis_files
     input:
       analysis_id: "<% ctx().analysis_id %>"
@@ -118,8 +119,12 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - fastq_r1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
-          - fastq_r2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
+          fastq_files:
+            <% ctx().sample_id %>:
+              R1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
+              R2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
+          analysis_ids:
+            "{{ ctx().sample_id }}": "{{ ctx().analysis_id }}"
         do:
           format_cleve_input_files
       - when: "{{ failed() }}"
@@ -132,12 +137,10 @@ tasks:
   format_cleve_input_files:
     action: gmc_norr_analysis.get_pipeline_input_files
     input:
-      pipeline: "{{ ctx().pipeline }}"
-      fastq_files: "{{ ctx().fastq_r1 + ctx().fastq_r2 }}"
-      analysis_id: "{{ ctx().analysis_id }}"
-      sample_id: "{{ ctx().sample_id }}"
-      sample_files:
-        "{{ ctx().sample_id }}": "{{ ctx().fastq_r1 + ctx().fastq_r2 }}"
+      pipeline: <% ctx().pipeline %>
+      sample_id: <% ctx().sample_id %>
+      fastq_files: <% ctx().fastq_files %>
+      analysis_ids: <% ctx().analysis_ids %>
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -194,8 +197,8 @@ tasks:
       case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
       sex: <% ctx().sex %>
-      fastq_r1: <% ctx().fastq_r1 %>
-      fastq_r2: <% ctx().fastq_r2 %>
+      fastq_r1: "{{ ctx().fastq_files.get(ctx().sample_id).R1 }}"
+      fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
       out_dir: <% ctx().output_dir %>
     next:
       - when: "{{ succeeded() }}"
