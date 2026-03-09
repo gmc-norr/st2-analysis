@@ -16,10 +16,12 @@ The config parameters that need to be defined are:
     - Each entry in the array should be an object with two keys: `win` and `unix`. The value for `win` should be a windows path, and `unix` should be the path where the windows path is mounted.
 - `plumber.config_repo`: The URL to the GMC-Norr config-repo that contains the pipeline settings corresponding to the TestProfiles from iGene
 - `plumber.user`: The user to run plumber with
-- `plumber.host`: THe host to run plumber on.
+- `plumber.host`: The host to run plumber on.
 
 Furthermore, the following parameters needs to be defined in the datastore service:
-- `notification_email`: The email address where notifications will be sent
+- `notification_email`: The email address where notifications will be sent.
+- `plumber_api_key`: An API key for plumber webhooks. Should be encrypted.
+- `api_url`: The URL to Stackstorm's API. Used in the `plumber_analysis` workflow, to set up plumber's webhooks.
 
 ## Actions
 
@@ -30,7 +32,6 @@ gmc_norr_analysis.write_file                      | Write a text string to a fil
 gmc_norr_analysis.make_case_id                    | Make a case id of random words and a hash of sample ids
 gmc_norr_analysis.make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
 gmc_norr_analysis.get_plumber_arguments           | From a TestProfile get which pipeline, versions and configs to run plumber with
-
 
 ## Workflows
 
@@ -47,7 +48,7 @@ ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
-gmc_norr_analysis.start_plumber_analysis          |  Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
+gmc_norr_analysis.start_plumber_analysis          | Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
 
 ## Sensors
 
