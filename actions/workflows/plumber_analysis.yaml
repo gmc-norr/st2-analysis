@@ -14,6 +14,8 @@ vars:
   - msg:
   - test_profile:
   - referral_type:
+  - mother_sample_id:
+  - father_sample_id:
   - sex:
   - output_dir:
   - pipeline_system:
@@ -41,10 +43,12 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          test_profile={{ result().get("body", {}).get("TestProfile")}}
-          referral_type={{ result().get("body", {}).get("ReferralType")}}
-          sex={{ result().get("body", {}).get("Sex")}}
-          output_dir="{{ ctx().run_path }}/{{ctx().test_profile }}/{{ ctx().sample_id }}"
+          - test_profile: <% result().body.TestProfile %>
+          - referral_type: <% result().body.ReferralType %>
+          - mother_sample_id: <% result().body.Mother %>
+          - father_sample_id: <% result().body.Father %>
+          - sex: <% result().body.Sex %>
+          - output_dir: "<% ctx().run_path %>/<% ctx().test_profile %>/<% ctx().sample_id %>"
         do:
           get_plumber_arguments
       - when: "{{ failed() }}"
@@ -57,15 +61,15 @@ tasks:
   get_plumber_arguments:
     action: gmc_norr_analysis.get_plumber_arguments
     input:
-       test_profile: "<% ctx().test_profile %>"
+       test_profile: <% ctx().test_profile %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          pipeline_system={{result().get("result").get("PipelineSystem", None)}}
-          pipeline={{ result().get("result").get("Pipeline", None)}}
-          pipeline_profile={{ result().get("result").get("Profile", None)}}
-          pipeline_version={{ result().get("result").get("Version", None)}}
-          plumber_config_version={{ result().get("result").get("ConfigVersion", None)}}
+          - pipeline_system: <% result().result.PipelineSystem%>
+          - pipeline: <% result().result.Pipeline %>
+          - pipeline_profile: <% result().result.Profile %>
+          - pipeline_version: <% result().result.Version %>
+          - plumber_config_version: <% result().result.ConfigVersion %>
         do:
           prepare_output_folder
       - when: "{{ failed() }}"
@@ -86,10 +90,15 @@ tasks:
 
   make_case_id:
     action: gmc_norr_analysis.make_case_id
+    input:
+      samples:
+        - <% ctx().sample_id %>
+        - <% ctx().mother_sample_id %>
+        - <% ctx().father_sample_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          case_id={{result().result}}
+          - case_id: <% result().result %>
         do:
           get_fastq_files
       - when: "{{ failed() }}"
@@ -99,7 +108,7 @@ tasks:
         do:
           report_failure
 
-  get_fastq_files: #i it's a trio or something with normal/tumor, we will need more...
+  get_fastq_files: #if it's a trio or something with normal/tumor, we will need more...
     action: cleve.get_analysis_files
     input:
       analysis_id: "<% ctx().analysis_id %>"
@@ -109,8 +118,8 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          fastq_r1=<% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
-          fastq_r2=<% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
+          - fastq_r1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
+          - fastq_r2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
         do:
           format_cleve_input_files
       - when: "{{ failed() }}"
@@ -121,7 +130,7 @@ tasks:
           report_failure
 
   format_cleve_input_files:
-    action: gmc_norr_analysis.format_pipeline_input_files
+    action: gmc_norr_analysis.get_pipeline_input_files
     input:
       pipeline: "{{ ctx().pipeline }}"
       fastq_files: "{{ ctx().fastq_r1 + ctx().fastq_r2 }}"
@@ -144,16 +153,16 @@ tasks:
   add_plumber_analysis_to_cleve:
     action: cleve.add_analysis
     input:
-      run_id: "{{ ctx().run_id }}"
+      run_id: <% ctx().run_id %>
       state: pending
-      path: "{{ ctx().output_dir }}"
-      software: "{{ ctx().pipeline}}"
-      software_version: "{{ ctx().pipeline_version }}"
-      input_files: "{{ ctx().input_files }}"
+      path: <% ctx().output_dir %>
+      software: <% ctx().pipeline %>
+      software_version: <% ctx().pipeline_version %>
+      input_files: <% ctx().input_files %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          plumber_analysis_id="{{ result().result.analysis_id }}"
+          - plumber_analysis_id: <% result().result.analysis_id %>
         do:
           make_plumber_cmd
       - when: "{{ failed() }}"
@@ -165,11 +174,11 @@ tasks:
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-      -p <% ctx().pipeline_profile %> > plumber.log & echo \$!" #--analysis_id <% ctx().plumber_analysis_id %>
+      -p <% ctx().pipeline_profile %> --analysis_id <% ctx().plumber_analysis_id %> > plumber.log & echo \$!"
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
-          plumber_cmd="{{ result().stdout}}"
+          plumber_cmd: <% result().stdout %>
         do:
           make_rare_disease_input_files
       - when: "{{ ctx().test_profile != 'WGSRareDisease_1'}}"
@@ -202,8 +211,8 @@ tasks:
     input:
       cmd: <% ctx().plumber_cmd %>
       cwd: <% ctx().output_dir %>
-      username: "{{ ctx().plumber_user }}"
-      hosts: "{{ ctx().plumber_host}}"
+      username: <% ctx().plumber_user %>
+      hosts: <% ctx().plumber_host %>
       env: <% ctx().plumber_env %>
     next:
       - when: "{{ failed() }}"
@@ -214,8 +223,8 @@ tasks:
           report_failure
       - when: "{{ succeeded() }}"
         publish:
-          remote_stderr="{{ result().get((result().keys() | list | first)).get('stderr') }}"
-          remote_stdout="{{ result().get((result().keys() | list | first)).get('stdout') }}"
+          - remote_stderr: "{{ result().get((result().keys() | list | first)).get('stderr') }}"
+          - remote_stdout: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
         do: check_remote_output
 
   check_remote_output: # if connecting to the remote works but the command fails the action still "succeeded"
@@ -223,7 +232,7 @@ tasks:
     next:
       - when: "{{ ctx().remote_stderr == '' }}"
         publish:
-          pid="{{ ctx().remote_stdout }}""
+          - pid: <% ctx().remote_stdout %>
         do:
           pause
       - when: "{{ ctx().remote_stderr != '' }}"
@@ -243,15 +252,15 @@ tasks:
   check_progress:
     action: core.remote
     input:
-      cmd: "ps --no-headers --pid {{ctx().pid}}"
+      cmd: "ps --no-headers --pid <% ctx().pid %>"
       cwd: <% ctx().output_dir %>
-      username: "{{ ctx().plumber_user }}"
-      hosts: "{{ ctx().plumber_host}}"
+      username: <% ctx().plumber_user %>
+      hosts: <% ctx().plumber_host %>
     next:
       - when: "{{ failed() }}"
         publish:
           msg="Plumber crashed running {{ ctx().pipeline }}
-          in {{ctx().output_dir}}."
+          in {{ ctx().output_dir }}."
         do:
           report_failure
 
@@ -260,5 +269,5 @@ tasks:
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to analyse sample {{ctx().sample_id}}"
-        message: "{{ctx().msg}}"
+        subject: "Failed to analyse sample <% ctx().sample_id %>"
+        message: <% ctx().msg %>
