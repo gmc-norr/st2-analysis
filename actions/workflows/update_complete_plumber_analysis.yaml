@@ -51,7 +51,7 @@ tasks:
         do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 1 %>
         publish:
-          - run_id: <% result().result.body.analyses.first().runs.first() %> # should probably check if there is more than one run
+          - run_id: <% result().result.body.analyses.first().runs.first() %>
         do:
           get_run_platform
 
@@ -198,8 +198,8 @@ tasks:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
         subject: >
-          Failed to update successful plumber analysis of sample {{ ctx().sample_id }}
-          in {{ ctx().workdir }} with {{ ctx().pipeline }} in Cleve
+          Failed to move or update successful {{ ctx().pipeline }} analysis of sample {{ ctx().sample_id }}
+          in {{ ctx().workdir }} in Cleve
         message: <% ctx().msg %>
     next:
       - when: "{{ succeeded() }}"
