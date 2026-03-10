@@ -28,7 +28,7 @@ gmc_norr_analysis.write_file                      | Write a text string to a fil
 ref                                               | description
 --------------------------------------------------|------------------------------------------
 gmc_norr_analysis.tumor_evolution                 | Workflow for generating a tumor evolution report
-gmc_norr_analysis.update_complete_pumbler_ananysis| Move output files and update the analysis in Cleve
+gmc_norr_analysis.update_complete_pumbler_analysis| Move output files and update the analysis in Cleve
 
 ## Rules
 
