@@ -1,5 +1,4 @@
 from st2common.runners.base_action import Action
-import json
 
 
 def get_rd_output_files(sample_id, case_id):
@@ -29,7 +28,7 @@ def get_rd_output_files(sample_id, case_id):
         {'path': f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_research.vcf.gz',
          'level': 'sample', 'type': 'vcf_snv', 'parent_id': sample_id}
          ]
-    return json.dumps(output_files)
+    return output_files
 
 
 class GetPipelineOutputFiles(Action):
@@ -38,4 +37,4 @@ class GetPipelineOutputFiles(Action):
             output_files = get_rd_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
-        return (True,  output_files.replace('"', '@').replace("'", '"').replace("@", "'"))
+        return (True,  output_files)
