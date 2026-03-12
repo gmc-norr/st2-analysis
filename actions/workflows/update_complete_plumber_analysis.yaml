@@ -41,6 +41,10 @@ tasks:
       delay: 1
       count: 2
     next:
+      - when: <% failed() %>
+        publish:
+          - msg: Cleve not reachable
+        do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
           - msg: analysis <% ctx().analysis_id %> not found in Cleve
@@ -64,6 +68,10 @@ tasks:
       delay: 1
       count: 2
     next:
+      - when: <% failed() %>
+        publish:
+          - msg: Cleve not reachable
+        do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
           - msg: "run <% ctx(run_id) %> not found in Cleve"
