@@ -1,0 +1,9 @@
+---
+name: update_complete_plumber_analysis.concurrency
+description: Limits the concurrent executions for the update complete plumber analysis workflow.
+enabled: true
+resource_ref: gmc_norr_analysis.update_complete_plumber_analysis
+policy_type: action.concurrency
+parameters:
+  action: delay
+  threshold: 2
