@@ -1,0 +1,276 @@
+version: "1.0"
+
+description: Run downstream analysis of a sample with plumber.
+input:
+  - sample_id
+  - run_id
+  - run_path
+  - analysis_id
+  - plumber_host
+  - plumber_user
+  - plumber_env
+
+vars:
+  - msg:
+  - test_profile:
+  - referral_type:
+  - mother_sample_id:
+  - father_sample_id:
+  - sex:
+  - output_dir:
+  - pipeline:
+  - pipeline_system:
+  - pipeline_version:
+  - pipeline_profile:
+  - plumber_config_version:
+  - plumber_cmd:
+  - case_id:
+  - fastq_files:
+  - analysis_ids:
+  - input_files:
+  - remote_stdout:
+  - remote_stderr:
+  - pid:
+
+tasks:
+  get_sample_data:
+    action: igene.get_sample
+    input:
+      sample_id: <% ctx().sample_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - test_profile: <% result().body.TestProfile %>
+          - referral_type: <% result().body.ReferralType %>
+          - mother_sample_id: <% result().body.Mother %>
+          - father_sample_id: <% result().body.Father %>
+          - sex: <% result().body.Sex %>
+          - output_dir: "<% ctx().run_path %>/<% ctx().test_profile %>/<% ctx().sample_id %>"
+        do:
+          get_plumber_arguments
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get sample data from the iGene API.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_plumber_arguments:
+    action: gmc_norr_analysis.get_plumber_arguments
+    input:
+       test_profile: <% ctx().test_profile %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - pipeline: <% result().result.Pipeline %>
+          - pipeline_system: <% result().result.PipelineSystem%>
+          - pipeline_version: <% result().result.Version %>
+          - pipeline_profile: <% result().result.Profile %>
+          - plumber_config_version: <% result().result.ConfigVersion %>
+        do:
+          prepare_output_folder
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get TestProfile configuration.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  prepare_output_folder:
+    action: core.local
+    input:
+      cmd:  "mkdir -p <% ctx().output_dir %>"
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          make_case_id
+
+  make_case_id:
+    action: gmc_norr_analysis.make_case_id
+    input:
+      samples:
+        - <% ctx().sample_id %>
+        - <% ctx().mother_sample_id %>
+        - <% ctx().father_sample_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - case_id: <% result().result %>
+        do:
+          get_fastq_files
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to generate case id.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_fastq_files: #if it's a trio or something with normal/tumor, we will fastq files for all. Make a new action at that point?
+    action: cleve.get_analysis_files
+    input:
+      analysis_id: "<% ctx().analysis_id %>"
+      type: "fastq"
+      level: "sample"
+      parent_id: "<% ctx().sample_id %>"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          fastq_files:
+            <% ctx().sample_id %>:
+              R1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
+              R2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
+          analysis_ids:
+            "{{ ctx().sample_id }}": "{{ ctx().analysis_id }}"
+        do:
+          format_cleve_input_files
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get fastq files from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  format_cleve_input_files:
+    action: gmc_norr_analysis.get_pipeline_input_files
+    input:
+      pipeline: <% ctx().pipeline %>
+      sample_id: <% ctx().sample_id %>
+      fastq_files: <% ctx().fastq_files %>
+      analysis_ids: <% ctx().analysis_ids %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          input_files="{{ result().result }}"
+        do:
+          add_plumber_analysis_to_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  add_plumber_analysis_to_cleve:
+    action: cleve.add_analysis
+    input:
+      run_id: <% ctx().run_id %>
+      state: pending
+      path: <% ctx().output_dir %>
+      software: <% ctx().pipeline %>
+      software_version: <% ctx().pipeline_version %>
+      input_files: <% ctx().input_files %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - plumber_analysis_id: <% result().result.analysis_id %>
+        do:
+          make_plumber_cmd
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  make_plumber_cmd:
+    action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
+      --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
+      -p <% ctx().pipeline_profile %> --analysis_id <% ctx().plumber_analysis_id %> > plumber.log & echo \$!"
+    next:
+      - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
+        publish:
+          plumber_cmd: <% result().stdout %>
+        do:
+          make_rare_disease_input_files
+      - when: "{{ ctx().test_profile != 'WGSRareDisease_1'}}"
+        publish:
+          msg="Unsupported pipeline {{ ctx().test_profile }}"
+        do:
+          report_failure
+
+  make_rare_disease_input_files:
+    action: gmc_norr_analysis.make_rare_disease_samplesheet
+    input:
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+      referral_type: <% ctx().referral_type %>
+      sex: <% ctx().sex %>
+      fastq_r1: "{{ ctx().fastq_files.get(ctx().sample_id).R1 }}"
+      fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
+      out_dir: <% ctx().output_dir %>
+    next:
+      - when: "{{ succeeded() }}"
+        do: start_plumber
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to make rare-disease samplesheet.
+          {{ result() | to_json_string }}"
+        do: report_failure
+
+  start_plumber:
+    action: core.remote
+    input:
+      cmd: <% ctx().plumber_cmd %>
+      cwd: <% ctx().output_dir %>
+      username: <% ctx().plumber_user %>
+      hosts: <% ctx().plumber_host %>
+      env: <% ctx().plumber_env %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to connect to remote to start plumber.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+      - when: "{{ succeeded() }}"
+        publish:
+          - remote_stderr: "{{ result().get((result().keys() | list | first)).get('stderr') }}"
+          - remote_stdout: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
+        do: check_remote_output
+
+  check_remote_output: # if connecting to the remote works but the command fails the action still "succeeded"
+    action: core.noop # so we need to check if the stderr is empty
+    next:
+      - when: "{{ ctx().remote_stderr == '' }}"
+        publish:
+          - pid: <% ctx().remote_stdout %>
+        do:
+          pause
+      - when: "{{ ctx().remote_stderr != '' }}"
+        publish:
+          msg="Failed to start plumber.
+          {{ ctx().remote_stderr }}"
+        do:
+          report_failure
+
+  pause:
+    action: core.pause max_pause=30
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          check_progress
+
+  check_progress:
+    action: core.remote
+    input:
+      cmd: "ps --no-headers --pid <% ctx().pid %>"
+      cwd: <% ctx().output_dir %>
+      username: <% ctx().plumber_user %>
+      hosts: <% ctx().plumber_host %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Plumber crashed running {{ ctx().pipeline }}
+          in {{ ctx().output_dir }}."
+        do:
+          report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed to analyse sample <% ctx().sample_id %>"
+        message: <% ctx().msg %>
