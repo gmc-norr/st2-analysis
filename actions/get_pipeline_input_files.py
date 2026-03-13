@@ -1,0 +1,22 @@
+from st2common.runners.base_action import Action
+
+
+def get_rd_input_files(sample_id, analysis_id, fastq_files):
+    input_files = []
+    for file in fastq_files["R1"] + fastq_files["R2"]:
+        input_files.append({'analysis_id': analysis_id, 'name':  file.split('/')[-1],
+                            'level': 'sample', 'type': 'fastq', 'parent_id': sample_id})
+    input_files.append({'analysis_id': analysis_id, 'parent_id': sample_id, 'level': 'sample',
+                        'type': 'text', 'name': 'samplesheet.csv'})
+    return input_files
+
+
+class GetPipelineInputFilesAction(Action):
+    def run(self, pipeline, fastq_files, analysis_ids, sample_id, normal_sample_id,
+            mother_sample_id, father_sample_id):
+        if pipeline == "nf-core/raredisease":
+            input_files = get_rd_input_files(sample_id, analysis_ids[sample_id],
+                                             fastq_files[sample_id])
+        else:
+            return (False, f"Pipeline not supported: {pipeline}")
+        return (True, input_files)
