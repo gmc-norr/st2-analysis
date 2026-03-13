@@ -1,0 +1,28 @@
+name: get_pipeline_input_files
+pack: gmc_norr_analysis
+description: Give the input files for a downstream analysis in a format that Cleve can accept
+runner_type: python-script
+entry_point: get_pipeline_input_files.py
+enabled: true
+
+parameters:
+  pipeline:
+    description: The pipeline to generate input files for Cleve for
+    type: string
+    required: true
+    position: 0
+  fastq_files:
+    description: An object of the fastq files used as input, with the sample IDs as keys
+    type: object
+    required: true
+    position: 1
+  analysis_ids:
+    description: The ID of the analysis that generated the fastq files of the respective samples
+    type: object
+    required: true
+    position: 2
+  sample_id:
+    description: The ID of the main sample (the only sample, tumor sample or proband)
+    type: string
+    required: true
+    position: 3
