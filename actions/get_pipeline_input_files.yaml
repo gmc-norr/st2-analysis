@@ -26,18 +26,3 @@ parameters:
     type: string
     required: true
     position: 3
-  normal_sample_id:
-    description: The ID of the normal sample
-    type: string
-    required: false
-    position: 4
-  mother_sample_id:
-    description: The ID of the mother sample (in case of a trio)
-    type: string
-    required: false
-    position: 5
-  father_sample_id:
-    description: The ID of the father sample (in case of a trio)
-    type: string
-    required: false
-    position: 6

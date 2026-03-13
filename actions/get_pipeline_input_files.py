@@ -12,8 +12,7 @@ def get_rd_input_files(sample_id, analysis_id, fastq_files):
 
 
 class GetPipelineInputFilesAction(Action):
-    def run(self, pipeline, fastq_files, analysis_ids, sample_id, normal_sample_id,
-            mother_sample_id, father_sample_id):
+    def run(self, pipeline, fastq_files, analysis_ids, sample_id):
         if pipeline == "nf-core/raredisease":
             input_files = get_rd_input_files(sample_id, analysis_ids[sample_id],
                                              fastq_files[sample_id])
