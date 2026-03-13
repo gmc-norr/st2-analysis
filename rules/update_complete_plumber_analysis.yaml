@@ -1,0 +1,27 @@
+---
+name: update_complete_plumber_analysis
+pack: gmc_norr_analysis
+description: >
+  Move a plumber analysis and update it in Cleve to state ready
+  and add output files
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type:
+    type: equals
+    pattern: end
+  trigger.body.success:
+    type: equals
+    pattern: true
+
+action:
+  ref: gmc_norr_analysis.update_complete_plumber_analysis
+  parameters:
+    analysis_id: "{{ trigger.body.analysis_id }}"
+    pipeline: "{{ trigger.body.pipeline }}"
+    workdir: "{{ trigger.body.workdir }}"
