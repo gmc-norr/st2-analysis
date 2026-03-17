@@ -6,8 +6,6 @@ def get_rd_input_files(sample_id, analysis_id, fastq_files):
     for file in fastq_files["R1"] + fastq_files["R2"]:
         input_files.append({'analysis_id': analysis_id, 'name':  file.split('/')[-1],
                             'level': 'sample', 'type': 'fastq', 'parent_id': sample_id})
-    input_files.append({'analysis_id': analysis_id, 'parent_id': sample_id, 'level': 'sample',
-                        'type': 'text', 'name': 'samplesheet.csv'})
     return input_files
 
 

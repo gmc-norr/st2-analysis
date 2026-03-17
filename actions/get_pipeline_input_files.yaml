@@ -22,7 +22,7 @@ parameters:
     required: true
     position: 2
   sample_id:
-    description: The ID of the main sample (the only sample, tumor sample or proband)
+    description: The ID of the main sample
     type: string
     required: true
     position: 3
