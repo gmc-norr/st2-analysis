@@ -55,11 +55,8 @@ ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
-<<<<<<< rare-disease-plumber-workflow
 gmc_norr_analysis.start_plumber_analysis          | Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
-=======
 gmc_norr_analysis.update_complete_plumber_analysis| Trigger workflow of same name by successful ended plumber webhook
->>>>>>> main
 
 ## Sensors
 
