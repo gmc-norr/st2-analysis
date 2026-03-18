@@ -42,13 +42,24 @@ gmc_norr_analysis.start_plumber_workflows         | For all runs belonging to an
 gmc_norr_analysis.get_samples_for_plumber         | For all samples belongin to a run, start the plumber_nalysis workflow
 gmc_norr_analysis.plumber_analysis                | Run a downstream analysis with plumber on a sample
 
+## Workflows
+
+ref                                               | description
+--------------------------------------------------|------------------------------------------
+gmc_norr_analysis.tumor_evolution                 | Workflow for generating a tumor evolution report
+gmc_norr_analysis.update_complete_pumbler_analysis| Move output files and update the analysis in Cleve
+
 ## Rules
 
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
 gmc_norr_analysis.send_notification_email         | Send a notification email
+<<<<<<< rare-disease-plumber-workflow
 gmc_norr_analysis.start_plumber_analysis          | Runs start_plumber_workflows for an analysis with state "ready" and software BCLConvert
+=======
+gmc_norr_analysis.update_complete_plumber_analysis| Trigger workflow of same name by successful ended plumber webhook
+>>>>>>> main
 
 ## Sensors
 

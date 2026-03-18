@@ -1,0 +1,214 @@
+version: 1.0
+name: update_complete_plumber_analysis
+description: >
+  Workflow handling a finished plumber analysis: First moving the output,
+  then updating the analysis in Cleve (state, path, and output files)
+
+input:
+  - analysis_id
+  - pipeline
+  - workdir
+
+vars:
+  - msg:
+  - sample_id:
+  - case_id:
+  - output_files:
+
+tasks:
+  get_sample_id:
+    action: core.local
+    input:
+      cmd: basename <% ctx().workdir %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - sample_id: <% result().stdout %>
+        do:
+          get_run_id
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  get_run_id:
+    action: cleve.get_analyses
+    input:
+      analysis_id: <% ctx().analysis_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: Cleve not reachable
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        publish:
+          - msg: analysis <% ctx().analysis_id %> not found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        publish:
+          - msg: more than one analysis with ID <% ctx().analysis_id %> found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - run_id: <% result().result.body.analyses.first().runs.first() %>
+        do:
+          get_run_platform
+
+  get_run_platform:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: Cleve not reachable
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        publish:
+          - msg: "run <% ctx(run_id) %> not found in Cleve"
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        publish:
+          - msg: "more than one run with ID <% ctx(run_id) %> found in Cleve"
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - platform: <% result().result.body.runs.first().platform %>
+        do: get_destination
+
+  get_destination:
+    action: gmc_norr_seqdata.get_file_destination
+    input:
+      platform: <% ctx(platform) %>
+      type: run
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: "failed to get destination from gmc_norr_seqdata's pack config"
+        do: report_failure
+      - when: <% succeeded() and result().result = null %>
+        publish:
+          - msg: "destination not defined for platform: <% ctx(platform) %>"
+        do: report_failure
+      - when: <% succeeded() and result().result != null %>
+        publish:
+          - destination: "{{ result().result }}/{{ctx().run_id}}/{{ctx().pipeline}}"
+        do: make_destination
+
+  make_destination:
+    action: core.local
+    input:
+      cmd: mkdir -p "{{ ctx().destination }}"
+    next:
+      - when: "{{ succeeded() }}"
+        do: rsync_output
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
+
+  rsync_output:
+    action: core.local
+    input:
+      cmd: "rsync -avz <% ctx().workdir %> <% ctx().destination %>"
+      timeout: 5000
+    next:
+      - when: "{{ succeeded() }}"
+        do: divide_pipeline_tasks
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
+
+  divide_pipeline_tasks:
+    action: core.noop
+    next: # Note that this needs to match what plumber calls them
+      - when: "{{ ctx().pipeline == 'nf-core-raredisease'}}"
+        do:
+          get_case_id
+      - when: "{{ ctx().pipeline != 'nf-core-raredisease'}}"
+        publish:
+          - msg: "Unsupported pipeline {{ ctx().pipeline }}"
+        do:
+          report_failure
+
+  get_case_id:
+    action: core.local
+    input:
+      cmd: 'cut -d "," -f 9 "{{ ctx().workdir }}/samplesheet.csv" | tail -n 1'
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - case_id: <% result().stdout %>
+        do: check_case_id
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  check_case_id:
+    action: core.noop
+    next:
+      - when: "{{ ctx().case_id != '' }}"
+        do: format_rd_output_files
+      - when: "{{ ctx().case_id == '' }}"
+        publish:
+          - msg: "Failed to parse the case ID from the samplesheet."
+        do:
+          - report_failure
+
+  format_rd_output_files:
+    action: gmc_norr_analysis.get_pipeline_output_files
+    input:
+      pipeline: "{{ ctx().pipeline }}"
+      case_id: "{{ ctx().case_id }}"
+      sample_id: "{{ ctx().sample_id }}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - output_files: <% result().result %>
+        do: update_in_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  update_in_cleve:
+    action: cleve.update_analysis
+    input:
+      analysis_id: <% ctx().analysis_id %>
+      path: <% ctx().destination %>/<% ctx().sample_id %>
+      state: ready
+      files: <% ctx().output_files %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: >
+          Failed to move or update successful {{ ctx().pipeline }} analysis of sample {{ ctx().sample_id }}
+          in {{ ctx().workdir }} in Cleve
+        message: <% ctx().msg %>
+    next:
+      - when: "{{ succeeded() }}"
+        do: fail

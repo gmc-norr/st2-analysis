@@ -1,0 +1,21 @@
+---
+name: get_pipeline_output_files
+pack: gmc_norr_analysis
+description: Format the output files for different pipelines for Cleve
+runner_type: python-script
+entry_point: get_pipeline_output_files.py
+enabled: true
+
+parameters:
+  pipeline:
+    description: The pipeline name (in plumber formatting)
+    type: string
+    required: true
+  sample_id:
+    description: The ID of the sample
+    type: string
+    required: true
+  case_id:
+    description: The case ID
+    type: string
+    required: true
