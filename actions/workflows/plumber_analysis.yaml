@@ -13,6 +13,7 @@ input:
 vars:
   - msg:
   - test_profile:
+  - panels:
   - referral_type:
   - mother_sample_id:
   - father_sample_id:
@@ -45,6 +46,7 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - test_profile: <% result().body.TestProfile %>
+          - panels: <% result().body.Panels %>
           - referral_type: <% result().body.ReferralType %>
           - mother_sample_id: <% result().body.Mother %>
           - father_sample_id: <% result().body.Father %>
@@ -94,8 +96,8 @@ tasks:
     input:
       samples:
         - <% ctx().sample_id %>
-        - <% ctx().mother_sample_id %>
-        - <% ctx().father_sample_id %>
+        - "{% if ctx().mother_sample_id is not none %}{{ ctx().mother_sample_id }}{% endif %}"
+        - "{% if ctx().father_sample_id is not none %}{{ ctx().father_sample_id }}{% endif %}"
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -112,19 +114,17 @@ tasks:
   get_fastq_files: #if it's a trio or something with normal/tumor, we will fastq files for all. Make a new action at that point?
     action: cleve.get_analysis_files
     input:
-      analysis_id: "<% ctx().analysis_id %>"
+      analysis_id: <% ctx().analysis_id %>
       type: "fastq"
       level: "sample"
-      parent_id: "<% ctx().sample_id %>"
+      parent_id: <% ctx().sample_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          fastq_files:
-            <% ctx().sample_id %>:
-              R1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($)  %>
-              R2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($)  %>
-          analysis_ids:
-            "{{ ctx().sample_id }}": "{{ ctx().analysis_id }}"
+          - fastq_files:
+              <% ctx().sample_id %>:
+                R1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($) %>
+                R2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($) %>
         do:
           format_cleve_input_files
       - when: "{{ failed() }}"
@@ -140,7 +140,8 @@ tasks:
       pipeline: <% ctx().pipeline %>
       sample_id: <% ctx().sample_id %>
       fastq_files: <% ctx().fastq_files %>
-      analysis_ids: <% ctx().analysis_ids %>
+      analysis_ids:
+        "{{ ctx().sample_id }}": "{{ ctx().analysis_id }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -181,7 +182,7 @@ tasks:
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
-          plumber_cmd: <% result().stdout %>
+          - plumber_cmd: <% result().stdout %>
         do:
           make_rare_disease_input_files
       - when: "{{ ctx().test_profile != 'WGSRareDisease_1'}}"
@@ -191,11 +192,12 @@ tasks:
           report_failure
 
   make_rare_disease_input_files:
-    action: gmc_norr_analysis.make_rare_disease_samplesheet
+    action: gmc_norr_analysis.make_raredisease_samplesheet
     input:
       sample_id: <% ctx().sample_id %>
       case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
+      panels: <% ctx().panels %>
       sex: <% ctx().sex %>
       fastq_r1: "{{ ctx().fastq_files.get(ctx().sample_id).R1 }}"
       fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
