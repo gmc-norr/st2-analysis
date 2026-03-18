@@ -27,27 +27,38 @@ gmc_norr_analysis.generate_tumor_evolution_report | Generate a tumor evolution r
 gmc_norr_analysis.write_file                      | Write a text string to a file
 gmc_norr_analysis.make_case_id                    | Make a case id of random words and a hash of sample ids
 gmc_norr_analysis.make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
+gmc_norr_analysis.get_pipeline_output_files       | Get output files for updating an analysis in Cleve
+gmc_norr_analysis.get_plumber_arguments           | Translate a iGene TestProfile into a pipeline with versions and config files
 
 ## Workflows
 
-ref                                               | description
---------------------------------------------------|------------------------------------------
-gmc_norr_analysis.tumor_evolution                 | Workflow for generating a tumor evolution report
-gmc_norr_analysis.update_complete_pumbler_analysis| Move output files and update the analysis in Cleve
+ref                                                 | description
+----------------------------------------------------|------------------------------------------
+gmc_norr_analysis.tumor_evolution                   | Workflow for generating a tumor evolution report
+gmc_norr_analysis.update_complete_plumbler_analysis | Move output files and update the analysis in Cleve
 
 ## Rules
 
-ref                                               | description
---------------------------------------------------|---------------------------------
-gmc_norr_analysis.generate_tumor_evolution_report | Generate tumor evolution report
-gmc_norr_analysis.send_notification_email         | Send a notification email
-gmc_norr_analysis.update_complete_plumber_analysis| Trigger workflow of same name by successful ended plumber webhook
+ref                                                  | description
+-----------------------------------------------------|---------------------------------
+gmc_norr_analysis.generate_tumor_evolution_report    | Generate tumor evolution report
+gmc_norr_analysis.send_notification_email            | Send a notification email
+gmc_norr_analysis.email_plumber_end                  | Trigger send_notification_email when plumber reports the end of an analysis
+gmc_norr_analysis.update_complete_plumber_analysis   | Trigger workflow of same name if plumber ended successfully
+gmc_norr_analysis.update_incomplete_plumber_analysis | Update analysis to incomplete in Cleve if plumber ends unsuccessfully
 
 ## Sensors
 
 ref                                               | description
 --------------------------------------------------|---------------------------------
 gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+
+## Policies
+
+ref                                                            | description
+---------------------------------------------------------------|---------------------------------
+gmc_norr_analysis.tumor_evolution.concurrency                  | Limit concurrent executions to 1 at a time and delay the rest
+gmc_norr_analysis.update_complete_plumber_analysis.concurrency | Limit concurrent executions to 2 at a time and delay the rest
 
 # Known issues
 
