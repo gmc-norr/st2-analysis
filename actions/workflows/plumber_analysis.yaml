@@ -166,7 +166,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - plumber_analysis_id: <% result().result.analysis_id %>
+          - plumber_analysis_id: <% result().result.body.analysis_id %>
         do:
           make_plumber_cmd
       - when: "{{ failed() }}"
