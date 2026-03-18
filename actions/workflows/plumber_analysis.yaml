@@ -274,3 +274,5 @@ tasks:
       payload:
         subject: "Failed to analyse sample <% ctx().sample_id %>"
         message: <% ctx().msg %>
+    next:
+      - do: fail

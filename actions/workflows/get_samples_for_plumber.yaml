@@ -70,3 +70,5 @@ tasks:
         subject: "Failed to start downstream analysis for
           {{ctx().run_id}}"
         message: "{{ctx().msg}}"
+    next:
+      - do: fail
