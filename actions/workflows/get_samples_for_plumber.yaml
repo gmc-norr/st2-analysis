@@ -1,0 +1,74 @@
+version: "1.0"
+
+description: Find the sample IDs for a run and start a
+  workflow to perform a downstream analysis with plumber.
+
+input:
+  - run_id
+  - analysis_id
+
+vars:
+  - msg:
+  - sample_ids:
+  - run_path:
+
+tasks:
+  get_sample_ids:
+    action: cleve.get_samplesheet
+    input:
+      run_id: <% ctx(run_id) %>
+      section: BCLConvert_Data
+      column: Sample_ID
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 3
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          sample_ids={{ result().get("result").get("body").get("Sample_ID") }}
+        do:
+          get_run_path
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get samplesheet data from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_run_path:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          run_path={{ result().get("result").get("body").get("runs") | map(attribute='path') | first  }}
+        do:
+          start_sample_workflow
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get run path from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  start_sample_workflow:
+    with: sample_id in <% ctx(sample_ids) %>
+    input:
+      sample_id: <% item(sample_id) %>
+      run_id: <% ctx(run_id) %>
+      run_path: <% ctx().run_path %>
+      analysis_id: <% ctx().analysis_id %>
+    action: gmc_norr_analysis.plumber_analysis
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed to start downstream analysis for
+          {{ctx().run_id}}"
+        message: "{{ctx().msg}}"
+    next:
+      - do: fail
