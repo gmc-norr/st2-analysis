@@ -45,12 +45,12 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - test_profile: <% result().body.TestProfile %>
-          - panels: <% result().body.Panels %>
-          - referral_type: <% result().body.ReferralType %>
-          - mother_sample_id: <% result().body.Mother %>
-          - father_sample_id: <% result().body.Father %>
-          - sex: <% result().body.Sex %>
+          - test_profile: <% result().result.body.TestProfile %>
+          - panels: <% result().result.body.Panels %>
+          - referral_type: <% result().result.body.ReferralType %>
+          - mother_sample_id: <% result().result.body.Mother %>
+          - father_sample_id: <% result().result.body.Father %>
+          - sex: <% result().result.body.Sex %>
           - output_dir: "<% ctx().run_path %>/<% ctx().test_profile %>/<% ctx().sample_id %>"
         do:
           get_plumber_arguments
