@@ -35,7 +35,3 @@ parameters:
     description: Host to run plumber on
     type: string
     default: "{{config_context.plumber.host}}"
-  plumber_user:
-    description: User to run plumber with
-    type: string
-    default: "{{config_context.plumber.user}}"
