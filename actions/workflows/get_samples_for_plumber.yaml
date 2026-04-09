@@ -22,11 +22,11 @@ tasks:
     retry:
       when: "{{ failed() }}"
       delay: 1
-      count: 3
+      count: 2
     next:
       - when: "{{ succeeded() }}"
         publish:
-          sample_ids={{ result().get("result").get("body").get("Sample_ID") }}
+          sample_ids={{ result().get("result").get("body").get("Sample_ID") | unique }}
         do:
           get_run_path
       - when: "{{ failed() }}"
