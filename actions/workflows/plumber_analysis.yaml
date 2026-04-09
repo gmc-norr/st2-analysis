@@ -258,7 +258,6 @@ tasks:
     input:
       cmd: "ps --no-headers --pid <% ctx().pid %>"
       cwd: <% ctx().output_dir %>
-      username: <% ctx().plumber_user %>
       hosts: <% ctx().plumber_host %>
     next:
       - when: "{{ failed() }}"
