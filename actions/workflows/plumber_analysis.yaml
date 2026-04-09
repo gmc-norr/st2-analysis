@@ -178,7 +178,7 @@ tasks:
   make_plumber_cmd:
     action: core.echo message="nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
       --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-      -p <% ctx().pipeline_profile %> --analysis_id <% ctx().plumber_analysis_id %> > plumber.log & echo \$!"
+      -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> > plumber.log & echo \$!"
     next:
       - when: "{{ ctx().test_profile == 'WGSRareDisease_1' }}"
         publish:
