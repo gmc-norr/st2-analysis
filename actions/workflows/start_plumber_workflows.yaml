@@ -1,0 +1,54 @@
+version: "1.0"
+
+description: The initial workflow for starting downstream analyses
+  with plumber from a ready BCLConvert analysis. Finds run IDs and starts another
+  workflow which find their respective samples and start the final plumber workflow
+  of te chain.
+
+input:
+  - analysis_id
+  - path
+
+vars:
+  - msg:
+  - run_ids:
+
+tasks:
+  get_run_id:
+    action: cleve.get_analyses
+    input:
+      analysis_id: <% ctx().analysis_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 3
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          run_ids={{ result().get("result").get("body").get("analyses") | map(attribute='runs') }}
+        do:
+          start_run_workflow
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get run id from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  start_run_workflow:
+    with: run_id in <% ctx(run_ids) %>
+    action: gmc_norr_analysis.get_samples_for_plumber
+    input:
+      run_id: <% item(run_id) %>
+      analysis_id: <% ctx(analysis_id) %>
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed to start downstream analysis for
+          {{ctx().analysis_id}} in {{ctx().path}}"
+        message: "{{ctx().msg}}"
+    next:
+      - do: fail
