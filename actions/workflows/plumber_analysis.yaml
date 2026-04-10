@@ -150,7 +150,8 @@ tasks:
           add_plumber_analysis_to_cleve
       - when: "{{ failed() }}"
         publish:
-          - msg: <% result().stderr %>
+          msg="Failed to format {{ ctx().pipeline }} input files for Cleve.
+            {{ result().result }} "
         do:
           - report_failure
 
