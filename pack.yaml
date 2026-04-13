@@ -11,3 +11,4 @@ dependencies:
   - https://github.com/gmc-norr/st2-cleve.git
   - https://github.com/gmc-norr/st2-igene.git
   - https://github.com/gmc-norr/st2-seqdata.git
+  - email
