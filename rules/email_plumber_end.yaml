@@ -22,6 +22,6 @@ action:
     trigger_name: gmc_norr_analysis.email_notification
     payload:
       subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
-      message: "{{ trigger.body.message }}\n\n
+      message: "{{ trigger.body.message | json_escape }}\n\n
         Success: {{ trigger.body.success }}\n\n
         Error: {{ trigger.body.error }}"
