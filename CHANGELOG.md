@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.0](https://github.com/gmc-norr/st2-analysis/compare/v0.3.2...v0.4.0) (2026-04-14)
+
+
+### Features
+
+* add `get pipeline input files` (for Cleve) action ([#51](https://github.com/gmc-norr/st2-analysis/issues/51)) ([ac5247c](https://github.com/gmc-norr/st2-analysis/commit/ac5247ce40c77280622f66fc39247b40a53a2328))
+* add `get plumber arguments` action ([#48](https://github.com/gmc-norr/st2-analysis/issues/48)) ([c484e8a](https://github.com/gmc-norr/st2-analysis/commit/c484e8ac6aa0e422cd96e2e888e5150b6d0bbf55))
+* add `make case id` action ([#47](https://github.com/gmc-norr/st2-analysis/issues/47)) ([fe6758b](https://github.com/gmc-norr/st2-analysis/commit/fe6758b2e22842f5f2a8e4e1ca2d263e7b861728))
+* add `make raredisease samplesheet` action ([#49](https://github.com/gmc-norr/st2-analysis/issues/49)) ([996ea12](https://github.com/gmc-norr/st2-analysis/commit/996ea12efca0226a85a2af72a5f78bdd4f7609fc))
+* add `update complete plumber analysis` workflow and rule ([#46](https://github.com/gmc-norr/st2-analysis/issues/46)) ([b28293b](https://github.com/gmc-norr/st2-analysis/commit/b28293bfe2d94deb8214b5047a33a8a17cc679dd))
+* add `update incomplete plumber analysis` rule ([#44](https://github.com/gmc-norr/st2-analysis/issues/44)) ([9753a4c](https://github.com/gmc-norr/st2-analysis/commit/9753a4c1e220fb6d3cb54e31e5f2b5104b9eaae1))
+* add rule to send a notification email when a plumber run ends ([#42](https://github.com/gmc-norr/st2-analysis/issues/42)) ([3d9d5d2](https://github.com/gmc-norr/st2-analysis/commit/3d9d5d227f02533aae3cb686cea867c65249b614))
+
+
+### Bug Fixes
+
+* escape the message from plumber ([#53](https://github.com/gmc-norr/st2-analysis/issues/53)) ([33ec788](https://github.com/gmc-norr/st2-analysis/commit/33ec788d8a7c84fb92e61b7251f3e88c06a33e53))
+* take notification email from datastore instead of config parameter ([#50](https://github.com/gmc-norr/st2-analysis/issues/50)) ([9609a54](https://github.com/gmc-norr/st2-analysis/commit/9609a54256d0e13c490e4616b5c3b814c568e292))
+
 ## [0.3.2](https://github.com/gmc-norr/st2-analysis/compare/v0.3.1...v0.3.2) (2025-03-14)
 
 
