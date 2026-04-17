@@ -1,0 +1,37 @@
+---
+name: plumber_analysis
+pack: gmc_norr_analysis
+description: Workflow to run downstream analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/plumber_analysis.yaml
+enabled: true
+
+parameters:
+  sample_id:
+    description: The ID of the sample to analyze
+    type: string
+    required: true
+  run_id:
+    description: The ID of the run the sample belongs to
+    type: string
+    required: true
+  run_path:
+    description: The path to the sequencing run
+    type: string
+    required: true
+  analysis_id:
+    description: The ID of the analysis that generated the sample's fastq files
+    type: string
+    required: true
+  plumber_env:
+    type: object
+    secret: true
+    required: true
+    default:
+      PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
+      PLUMBER_WEBHOOK_API_KEY: "{{ st2kv.system.plumber_api_key | decrypt_kv }}"
+      PLUMBER_WEBHOOK_NO_VERIFY: "val"
+  plumber_host:
+    description: Host to run plumber on
+    type: string
+    default: "{{config_context.plumber.host}}"

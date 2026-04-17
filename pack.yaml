@@ -7,3 +7,8 @@ python_versions:
   - "3"
 author: Niklas Mähler
 email: niklas.mahler@regionvasterbotten.se
+dependencies:
+  - https://github.com/gmc-norr/st2-cleve.git
+  - https://github.com/gmc-norr/st2-igene.git
+  - https://github.com/gmc-norr/st2-seqdata.git
+  - email
