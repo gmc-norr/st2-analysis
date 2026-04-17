@@ -243,7 +243,7 @@ tasks:
         publish:
           - pid: <% ctx().remote_stdout %>
         do:
-          pause
+          check_progress
       - when: "{{ ctx().remote_stderr != '' }}"
         publish:
           msg="Failed to start plumber.
@@ -251,15 +251,9 @@ tasks:
         do:
           report_failure
 
-  pause:
-    action: core.pause max_pause=30
-    next:
-      - when: "{{ succeeded() }}"
-        do:
-          check_progress
-
   check_progress:
     action: core.remote
+    delay: 20
     input:
       cmd: "ps --no-headers --pid <% ctx().pid %>"
       cwd: <% ctx().output_dir %>
