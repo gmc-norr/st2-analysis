@@ -73,8 +73,8 @@ tasks:
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: <% result().result.body.where($.path.matches("R1*.fastq.gz")).select($.path).orderBy($) %>
-                R2: <% result().result.body.where($.path.matches("R2*.fastq.gz")).select($.path).orderBy($) %>
+                R1: <% result().result.body.where($.path.matches("_R1_")).select($.path).orderBy($) %>
+                R2: <% result().result.body.where($.path.matches("_R2_")).select($.path).orderBy($) %>
         do:
           get_plumber_arguments
       - when: "{{ failed() }}"
