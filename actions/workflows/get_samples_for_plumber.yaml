@@ -54,9 +54,11 @@ tasks:
           report_failure
 
   start_sample_workflow:
-    with: sample_id in <% ctx(sample_ids) %>
+    with:
+      items: <% ctx(sample_ids) %>
+      concurrency: 2
     input:
-      sample_id: <% item(sample_id) %>
+      sample_id: <% item() %>
       run_id: <% ctx(run_id) %>
       run_path: <% ctx().run_path %>
       analysis_id: <% ctx().analysis_id %>
