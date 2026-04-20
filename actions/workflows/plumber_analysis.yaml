@@ -7,8 +7,8 @@ input:
   - run_path
   - analysis_id
   - plumber_host
-  - plumber_user
   - plumber_env
+  - supported_profiles
 
 vars:
   - msg:
@@ -43,7 +43,7 @@ tasks:
       delay: 1
       count: 2
     next:
-      - when: "{{ succeeded() }}"
+      - when: "{{ succeeded() and result().result.body.TestProfile in ctx().supported_profiles }}"
         publish:
           - test_profile: <% result().result.body.TestProfile %>
           - panels: <% result().result.body.Panels %>
@@ -54,6 +54,8 @@ tasks:
           - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().test_profile }}/{{ ctx().sample_id }}"
         do:
           get_fastq_files
+      - when: "{{ succeeded() and result().result.body.TestProfile not in ctx().supported_profiles }}"
+        do: noop
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get sample data from the iGene API.
