@@ -33,7 +33,36 @@ vars:
   - remote_stderr:
   - pid:
 
+output:
+  - workflow_msg: "{{ ctx().msg }}"
+
 tasks:
+  check_sample_reads: # checking if its worth to start the workflow
+    action: cleve.get_run_qc
+    input:
+      run_id: <% ctx().run_id %>
+      sample_id: <% ctx().sample_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: "{{ succeeded() and result().result.body.read_count | int >= 4*10**8 }}"
+        do:
+          get_sample_data
+      - when: "{{ succeeded() and result().result.body.read_count | int < 4*10**8 }}"
+        publish:
+          msg="Only {{ result().result.body.read_count }} reads.
+          Probably a prerun sequencing, so stopping workflow here."
+        do:
+          noop
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get number of reads for sample from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
   get_sample_data:
     action: igene.get_sample
     input:
@@ -55,6 +84,8 @@ tasks:
         do:
           get_fastq_files
       - when: "{{ succeeded() and result().result.body.TestProfile not in ctx().supported_profiles }}"
+        publish:
+          msg="{{ result().result.body.TestProfile }} not supported in automation."
         do: noop
       - when: "{{ failed() }}"
         publish:
