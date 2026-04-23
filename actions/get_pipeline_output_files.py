@@ -33,7 +33,7 @@ def get_rd_output_files(sample_id, case_id):
 
 class GetPipelineOutputFiles(Action):
     def run(self, pipeline, sample_id, case_id):
-        if pipeline == "nf-core-raredisease":
+        if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
