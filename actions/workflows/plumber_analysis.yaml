@@ -20,7 +20,6 @@ vars:
   - sex:
   - output_dir:
   - pipeline:
-  - pipeline_system:
   - pipeline_version:
   - pipeline_profile:
   - plumber_config_version:
@@ -125,7 +124,6 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - pipeline: <% result().result.Pipeline %>
-          - pipeline_system: <% result().result.PipelineSystem%>
           - pipeline_version: <% result().result.Version %>
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
@@ -250,7 +248,7 @@ tasks:
   start_plumber:
     action: core.remote
     input:
-      cmd: "nohup plumber <% ctx().pipeline_system %> run <% ctx().pipeline %>
+      cmd: "nohup plumber run <% ctx().pipeline %>
         --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
         -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> > plumber.log & echo $!"
       cwd: <% ctx().output_dir %>
