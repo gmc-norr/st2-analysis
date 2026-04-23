@@ -101,7 +101,7 @@ tasks:
         do: report_failure
       - when: <% succeeded() and result().result != null %>
         publish:
-          - destination: "{{ result().result }}/{{ctx().run_id}}/{{ctx().pipeline}}"
+          - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}"
         do: make_destination
 
   make_destination:
@@ -133,11 +133,11 @@ tasks:
 
   divide_pipeline_tasks:
     action: core.noop
-    next: # Note that this needs to match what plumber calls them
-      - when: "{{ ctx().pipeline == 'nf-core-raredisease'}}"
+    next:
+      - when: "{{ ctx().pipeline == 'nf-core/raredisease'}}"
         do:
           get_case_id
-      - when: "{{ ctx().pipeline != 'nf-core-raredisease'}}"
+      - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
         publish:
           - msg: "Unsupported pipeline {{ ctx().pipeline }}"
         do:
