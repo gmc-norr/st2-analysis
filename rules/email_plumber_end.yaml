@@ -24,4 +24,4 @@ action:
       subject: "{{ trigger.body.pipeline }} in {{ trigger.body.workdir }}"
       message: "{{ trigger.body.message | json_escape }}\n\n
         Success: {{ trigger.body.success }}\n\n
-        Error: {{ trigger.body.error }}"
+        Error: {{ trigger.body.error | json_escape }}"
