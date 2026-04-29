@@ -1,7 +1,8 @@
 ---
 name: update_complete_plumber_analysis
 pack: gmc_norr_analysis
-description: Workflow to update a complete plumber analysis in Cleve
+description: Workflow to move a complete plumber analysis, update it in Cleve,
+  and start scout generate and load case workflow
 runner_type: orquesta
 entry_point: workflows/update_complete_plumber_analysis.yaml
 enabled: true
