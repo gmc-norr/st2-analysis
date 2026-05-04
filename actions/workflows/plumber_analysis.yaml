@@ -36,32 +36,6 @@ output:
   - workflow_msg: "{{ ctx().msg }}"
 
 tasks:
-  check_sample_reads: # checking if its worth to start the workflow
-    action: cleve.get_run_qc
-    input:
-      run_id: <% ctx().run_id %>
-      sample_id: <% ctx().sample_id %>
-    retry:
-      when: "{{ failed() }}"
-      delay: 1
-      count: 2
-    next:
-      - when: "{{ succeeded() and result().result.body.read_count | int >= 4*10**8 }}"
-        do:
-          get_sample_data
-      - when: "{{ succeeded() and result().result.body.read_count | int < 4*10**8 }}"
-        publish:
-          msg="Only {{ result().result.body.read_count }} reads.
-          Probably a prerun sequencing, so stopping workflow here."
-        do:
-          noop
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to get number of reads for sample from Cleve.
-          {{ result() | to_json_string }}"
-        do:
-          report_failure
-
   get_sample_data:
     action: igene.get_sample
     input:
@@ -128,7 +102,7 @@ tasks:
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
         do:
-          divide_pipelines
+          divide_workflow
       - when: "{{ failed() }}"
         publish:
           msg="Failed to get TestProfile configuration.
@@ -136,33 +110,59 @@ tasks:
         do:
           report_failure
 
-  divide_pipelines:
+  divide_workflow:
     action: core.noop
     next:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
         do:
-          prepare_output_folder
+          rd_check_sample_reads
       - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
         publish:
           msg="Unsupported pipeline {{ ctx().pipeline }}"
         do:
           report_failure
 
-  prepare_output_folder:
+  rd_check_sample_reads: # stop the workflow if it's a prerun of the sequencing
+    action: cleve.get_run_qc
+    input:
+      run_id: <% ctx().run_id %>
+      sample_id: <% ctx().sample_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: "{{ succeeded() and result().result.body.read_count | int >= 4*10**8 }}"
+        do:
+          rd_prepare_output_folder
+      - when: "{{ succeeded() and result().result.body.read_count | int < 4*10**8 }}"
+        publish:
+          msg="Only {{ result().result.body.read_count }} reads.
+          Probably a prerun sequencing, so stopping workflow here."
+        do:
+          noop
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get number of reads for sample from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  rd_prepare_output_folder:
     action: core.local
     input:
       cmd:  "mkdir -p <% ctx().output_dir %>"
     next:
       - when: "{{ succeeded() }}"
         do:
-          make_case_id
+          rd_make_case_id
       - when: "{{ failed() }}"
         publish:
           msg="Failed to output directory.
           {{ result() | to_json_string }}"
         do: report_failure
 
-  make_case_id:
+  rd_make_case_id:
     action: gmc_norr_analysis.make_case_id
     input:
       samples:
@@ -174,7 +174,7 @@ tasks:
         publish:
           - case_id: <% result().result %>
         do:
-          make_rare_disease_input_files
+          rd_make_input_files
       - when: "{{ failed() }}"
         publish:
           msg="Failed to generate case id.
@@ -182,7 +182,7 @@ tasks:
         do:
           report_failure
 
-  make_rare_disease_input_files:
+  rd_make_input_files:
     action: gmc_norr_analysis.make_raredisease_samplesheet
     input:
       sample_id: <% ctx().sample_id %>
@@ -202,7 +202,7 @@ tasks:
           {{ result() | to_json_string }}"
         do: report_failure
 
-  format_cleve_input_files:
+  format_cleve_input_files: # the workflow reconnects here
     action: gmc_norr_analysis.get_pipeline_input_files
     input:
       pipeline: <% ctx().pipeline %>
