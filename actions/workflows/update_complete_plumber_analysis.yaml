@@ -194,11 +194,23 @@ tasks:
       state: ready
       files: <% ctx().output_files %>
     next:
+      - when: "{{ succeeded() }}"
+        do: start_scout_workflow
       - when: "{{ failed() }}"
         publish:
           - msg: <% result().stderr %>
         do:
           - report_failure
+
+  start_scout_workflow:
+    action: scout.generate_and_load_case
+    input:
+      case_id: <% ctx().case_id %>
+      sample_ids:
+        - <% ctx().sample_id %>
+      pipeline: <% ctx().pipeline %>
+      analysis_id: <% ctx().analysis_id %>
+      output_path: <% ctx().destination %>/<% ctx().sample_id %>
 
   report_failure:
     action: core.inject_trigger
