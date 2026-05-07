@@ -29,7 +29,7 @@ parameters:
     required: true
     default:
       PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
-      PLUMBER_WEBHOOK_API_KEY: "{{ st2kv.system.plumber_api_key | decrypt_kv }}"
+      PLUMBER_WEBHOOK_API_KEY: "St2-Api-Key={{ st2kv.system.plumber_api_key | decrypt_kv }}"
   plumber_host:
     description: Host to run plumber on
     type: string
