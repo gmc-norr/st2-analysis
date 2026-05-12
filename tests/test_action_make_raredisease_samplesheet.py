@@ -1,11 +1,10 @@
 from pathlib import Path
 import os
 import subprocess
+import tempfile
 
 
 def test_make_rd_samplesheet():
-    out_dir = Path("workdir")
-    out_dir.mkdir(exist_ok=True)
     sample_id = "Seq26-100"
     case_id = "first-test-12345"
     referral = "Konstitutionell"
@@ -13,17 +12,15 @@ def test_make_rd_samplesheet():
     fq_r1 = "Seq26-100_S1_L001_R1_001.fastq,Seq26-100_S1_L002_R1_001.fastq"
     fq_r2 = "Seq26-100_S1_L001_R2_001.fastq,Seq26-100_S1_L002_R2_001.fastq"
     panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_r1, fq_r2, out_dir.name]
-                                ).returncode
-    assert returncode == 0
-    assert os.path.isfile(out_dir / "samplesheet.csv")
-
-    with open(out_dir / "samplesheet.csv") as file:
-        samplesheet = file.readlines()
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                     case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                    ).returncode
+        assert returncode == 0
+        with open(tmpdirname + "/samplesheet.csv") as file:
+            samplesheet = file.readlines()
 
     assert len(samplesheet) == 3
-
     header = ["sample", "lane", "fastq_1", "fastq_2", "sex", "phenotype", "paternal_id",
               "maternal_id", "case_id"]
     samplesheet_header = samplesheet[0].strip().split(",")
@@ -44,8 +41,6 @@ def test_make_rd_samplesheet():
         assert samplesheet_line[7] == ""
         assert samplesheet_line[8] == case_id
 
-    os.remove(out_dir / "samplesheet.csv")
-
 
 def test_wrong_referral_fastq():
     out_dir = Path("workdir")
@@ -57,16 +52,15 @@ def test_wrong_referral_fastq():
     fq_r1 = "Seq26-1_S1_L001_R1_001.fastq"
     fq_r2 = "Seq26-1_S1_L001_R2_001.fastq"
     panels = "HTAD_PAN_WGS_v.1.0"
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_r1, fq_r2, out_dir.name]
-                                ).returncode
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                     case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                    ).returncode
+        assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
     assert returncode == 1
-    assert not os.path.isfile(out_dir / "samplesheet.csv")
 
 
 def test_wrong_panel():
-    out_dir = Path("workdir")
-    out_dir.mkdir(exist_ok=True)
     sample_id = "Seq26-1"
     case_id = "another-test-12345"
     referral = "Konstitutionell"
@@ -74,17 +68,15 @@ def test_wrong_panel():
     fq_r1 = "Seq26-1_S1_L001_R1_001.fastq"
     fq_r2 = "Seq26-1_S1_L001_R2_001.fastq"
     panels = "OTHER_PAN_WGS_v.1.0"
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_r1, fq_r2, out_dir.name]
-                                ).returncode
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                    case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                    ).returncode
+        assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
     assert returncode == 1
-
-    assert not os.path.isfile(out_dir / "samplesheet.csv")
 
 
 def test_unsorted_fastq():
-    out_dir = Path("workdir")
-    out_dir.mkdir(exist_ok=True)
     sample_id = "Seq26-1"
     case_id = "other-test-12345"
     referral = "Konstitutionell"
@@ -92,14 +84,15 @@ def test_unsorted_fastq():
     fq_1 = "Seq26-1_S1_L002_R1_001.fastq,Seq26-1_S1_L003_R1_001.fastq,Seq26-1_S1_L001_R1_001.fastq"
     fq_2 = "Seq26-1_S1_L003_R2_001.fastq,Seq26-1_S1_L002_R2_001.fastq,Seq26-1_S1_L001_R2_001.fastq"
     panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_1, fq_2, out_dir.name]
-                                ).returncode
-    assert returncode == 0
-    assert os.path.isfile(out_dir / "samplesheet.csv")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                     case_id, referral, sex, panels, fq_1, fq_2, tmpdirname]
+                                    ).returncode
+        assert os.path.isfile(tmpdirname + "/samplesheet.csv")
+        assert returncode == 0
 
-    with open(out_dir / "samplesheet.csv") as file:
-        samplesheet = file.readlines()
+        with open(tmpdirname + "/samplesheet.csv") as file:
+            samplesheet = file.readlines()
 
     assert len(samplesheet) == 4
 
@@ -119,12 +112,8 @@ def test_unsorted_fastq():
         assert samplesheet_line[7] == ""
         assert samplesheet_line[8] == case_id
 
-    os.remove(out_dir / "samplesheet.csv")
-
 
 def test_uneven_fastq():
-    out_dir = Path("workdir")
-    out_dir.mkdir(exist_ok=True)
     sample_id = "Seq26-1"
     case_id = "last-test-12345"
     referral = "Konstitutionell"
@@ -132,16 +121,15 @@ def test_uneven_fastq():
     fq_r1 = "Seq26-1_S1_L002_R1_001.fastq,Seq26-1_S1_L003_R1_001.fastq,Seq26-1_S1_L001_R1_001.fastq"
     fq_r2 = "Seq26-1_S1_L003_R2_001.fastq,Seq26-1_S1_L002_R2_001.fastq"
     panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_r1, fq_r2, out_dir.name]
-                                ).returncode
-    assert returncode == 1
-    assert not os.path.isfile(out_dir / "samplesheet.csv")
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                    case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                    ).returncode
+        assert returncode == 1
+        assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
 
-    returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                 case_id, referral, sex, panels, fq_r2, fq_r1, out_dir.name]
-                                ).returncode
-    assert returncode == 1
-    assert not os.path.isfile(out_dir / "samplesheet.csv")
-
-    os.rmdir(out_dir)
+        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
+                                    case_id, referral, sex, panels, fq_r2, fq_r1, tmpdirname]
+                                    ).returncode
+        assert returncode == 1
+        assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
