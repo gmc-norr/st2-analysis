@@ -11,10 +11,9 @@ def test_make_rd_samplesheet():
     sex = "F"
     fq_r1 = "Seq26-100_S1_L001_R1_001.fastq,Seq26-100_S1_L002_R1_001.fastq"
     fq_r2 = "Seq26-100_S1_L001_R2_001.fastq,Seq26-100_S1_L002_R2_001.fastq"
-    panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
     with tempfile.TemporaryDirectory() as tmpdirname:
         returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                     case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                     case_id, referral, sex, fq_r1, fq_r2, tmpdirname]
                                     ).returncode
         assert returncode == 0
         with open(tmpdirname + "/samplesheet.csv") as file:
@@ -51,26 +50,9 @@ def test_wrong_referral_fastq():
     sex = "U"
     fq_r1 = "Seq26-1_S1_L001_R1_001.fastq"
     fq_r2 = "Seq26-1_S1_L001_R2_001.fastq"
-    panels = "HTAD_PAN_WGS_v.1.0"
     with tempfile.TemporaryDirectory() as tmpdirname:
         returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                     case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
-                                    ).returncode
-        assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
-    assert returncode == 1
-
-
-def test_wrong_panel():
-    sample_id = "Seq26-1"
-    case_id = "another-test-12345"
-    referral = "Konstitutionell"
-    sex = "U"
-    fq_r1 = "Seq26-1_S1_L001_R1_001.fastq"
-    fq_r2 = "Seq26-1_S1_L001_R2_001.fastq"
-    panels = "OTHER_PAN_WGS_v.1.0"
-    with tempfile.TemporaryDirectory() as tmpdirname:
-        returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                    case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                     case_id, referral, sex, fq_r1, fq_r2, tmpdirname]
                                     ).returncode
         assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
     assert returncode == 1
@@ -83,10 +65,9 @@ def test_unsorted_fastq():
     sex = "U"
     fq_1 = "Seq26-1_S1_L002_R1_001.fastq,Seq26-1_S1_L003_R1_001.fastq,Seq26-1_S1_L001_R1_001.fastq"
     fq_2 = "Seq26-1_S1_L003_R2_001.fastq,Seq26-1_S1_L002_R2_001.fastq,Seq26-1_S1_L001_R2_001.fastq"
-    panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
     with tempfile.TemporaryDirectory() as tmpdirname:
         returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                     case_id, referral, sex, panels, fq_1, fq_2, tmpdirname]
+                                     case_id, referral, sex, fq_1, fq_2, tmpdirname]
                                     ).returncode
         assert os.path.isfile(tmpdirname + "/samplesheet.csv")
         assert returncode == 0
@@ -120,16 +101,15 @@ def test_uneven_fastq():
     sex = "U"
     fq_r1 = "Seq26-1_S1_L002_R1_001.fastq,Seq26-1_S1_L003_R1_001.fastq,Seq26-1_S1_L001_R1_001.fastq"
     fq_r2 = "Seq26-1_S1_L003_R2_001.fastq,Seq26-1_S1_L002_R2_001.fastq"
-    panels = "HTAD_PAN_WGS_v.1.0,OTHER_PAN_WGS_v.1.0"
     with tempfile.TemporaryDirectory() as tmpdirname:
         returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                    case_id, referral, sex, panels, fq_r1, fq_r2, tmpdirname]
+                                    case_id, referral, sex, fq_r1, fq_r2, tmpdirname]
                                     ).returncode
         assert returncode == 1
         assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
 
         returncode = subprocess.run(["bash", "actions/make_raredisease_samplesheet.sh", sample_id,
-                                    case_id, referral, sex, panels, fq_r2, fq_r1, tmpdirname]
+                                    case_id, referral, sex, fq_r2, fq_r1, tmpdirname]
                                     ).returncode
         assert returncode == 1
         assert not os.path.isfile(tmpdirname + "/samplesheet.csv")
