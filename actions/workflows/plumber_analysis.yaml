@@ -13,7 +13,6 @@ input:
 vars:
   - msg:
   - test_profile:
-  - panels:
   - referral_type:
   - mother_sample_id:
   - father_sample_id:
@@ -48,7 +47,6 @@ tasks:
       - when: "{{ succeeded() and result().result.body.TestProfile in ctx().supported_profiles }}"
         publish:
           - test_profile: <% result().result.body.TestProfile %>
-          - panels: <% result().result.body.Panels %>
           - referral_type: <% result().result.body.ReferralType %>
           - mother_sample_id: <% result().result.body.Mother %>
           - father_sample_id: <% result().result.body.Father %>
@@ -188,7 +186,6 @@ tasks:
       sample_id: <% ctx().sample_id %>
       case_id: <% ctx().case_id %>
       referral_type: <% ctx().referral_type %>
-      panels: <% ctx().panels %>
       sex: <% ctx().sex %>
       fastq_r1: "{{ ctx().fastq_files.get(ctx().sample_id).R1 }}"
       fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
