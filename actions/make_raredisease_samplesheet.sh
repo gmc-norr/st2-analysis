@@ -54,6 +54,11 @@ IFS=',' read -r -a FQ2 <<< "$FQ_R2"
 FQ1_SORT=( $(IFS=$'\n'; echo "${FQ1[*]}" | sort))
 FQ2_SORT=( $(IFS=$'\n'; echo "${FQ2[*]}" | sort))
 
+if [ ${#FQ1_SORT[@]} != ${#FQ2_SORT[@]} ]; then
+    echo >&2 "warning: Differing number of R1 and R2 fastq files for ${SAMPLE_ID}"
+    exit 1
+fi
+
 echo "sample,lane,fastq_1,fastq_2,sex,phenotype,paternal_id,maternal_id,case_id" > ${SAMPLESHEET}
 for N in $(seq 0 $((${#FQ1_SORT[@]} - 1))); do
     LANE=$(echo ${FQ1_SORT[$N]} | grep -Po '(?<=_)L\d{3}(?=_)')
