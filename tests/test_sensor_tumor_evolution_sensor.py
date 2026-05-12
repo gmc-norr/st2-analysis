@@ -20,7 +20,6 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
     def _sensor_setup(self):
         self.sensor = self.get_sensor_instance(
             config={
-                "notification_email": ["me@mail.com"],
                 "tumor_evolution": {
                     "output_directory": str(self.output_dir),
                     "watch_file": str(self.watch_file),
@@ -107,7 +106,6 @@ class TumorEvolutionSensorTest(BaseSensorTestCase):
         self.assertTriggerDispatched(
             trigger="gmc_norr_analysis.email_notification",
             payload={
-                "to": ["me@mail.com"],
                 "subject": "[TumorEvolutionSensor] Failed to create watch file",
                 "message": "Failed to create watch file: [Errno 2] "
                 "No such file or directory: "
