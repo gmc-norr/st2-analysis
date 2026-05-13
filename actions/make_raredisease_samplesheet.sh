@@ -22,27 +22,15 @@ function sex_to_int() {
 
 SAMPLE_ID="$1"
 CASE_ID="$2"
-TYPE="$3"
-SEX="$4"
-PANELS="$5"
-FQ_R1="$6"
-FQ_R2="$7"
-OUT_DIR="$8"
+SEX="$3"
+FQ_R1="$4"
+FQ_R2="$5"
+OUT_DIR="$6"
 
 SAMPLESHEET="${OUT_DIR}/samplesheet.csv"
 
 if [ -f $SAMPLESHEET ]; then
     echo >&2 "warning: samplesheet already exists for sample ${SAMPLE_ID}, delete it if you want to recreate it: ${SAMPLESHEET}"
-    exit 1
-fi
-
-if [ "$TYPE" != "Konstitutionell" ]; then
-    echo >&2 "warning: invalid referral type for $SAMPLE_ID: $TYPE"
-    exit 1
-fi
-
-if ! echo "$PANELS" | grep -q "HTAD_PAN_WGS_v.1.0"; then
-    echo >&2 "warning: HTAD panel not found among panels on worksheet for ${SAMPLE_ID}"
     exit 1
 fi
 
@@ -53,6 +41,11 @@ IFS=',' read -r -a FQ2 <<< "$FQ_R2"
 
 FQ1_SORT=( $(IFS=$'\n'; echo "${FQ1[*]}" | sort))
 FQ2_SORT=( $(IFS=$'\n'; echo "${FQ2[*]}" | sort))
+
+if [ ${#FQ1_SORT[@]} != ${#FQ2_SORT[@]} ]; then
+    echo >&2 "warning: Differing number of R1 and R2 fastq files for ${SAMPLE_ID}"
+    exit 1
+fi
 
 echo "sample,lane,fastq_1,fastq_2,sex,phenotype,paternal_id,maternal_id,case_id" > ${SAMPLESHEET}
 for N in $(seq 0 $((${#FQ1_SORT[@]} - 1))); do
