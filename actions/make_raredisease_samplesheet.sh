@@ -22,21 +22,15 @@ function sex_to_int() {
 
 SAMPLE_ID="$1"
 CASE_ID="$2"
-TYPE="$3"
-SEX="$4"
-FQ_R1="$5"
-FQ_R2="$6"
-OUT_DIR="$7"
+SEX="$3"
+FQ_R1="$4"
+FQ_R2="$5"
+OUT_DIR="$6"
 
 SAMPLESHEET="${OUT_DIR}/samplesheet.csv"
 
 if [ -f $SAMPLESHEET ]; then
     echo >&2 "warning: samplesheet already exists for sample ${SAMPLE_ID}, delete it if you want to recreate it: ${SAMPLESHEET}"
-    exit 1
-fi
-
-if [ "$TYPE" != "Konstitutionell" ]; then
-    echo >&2 "warning: invalid referral type for $SAMPLE_ID: $TYPE"
     exit 1
 fi
 
