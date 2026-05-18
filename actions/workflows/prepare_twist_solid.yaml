@@ -1,0 +1,85 @@
+version: 1.0
+name: prepare_twist_solid
+description: >
+  Workflow for preparing to start a Twist Solid analysis of a sample with plumber
+
+input:
+  - sample_id
+  - run_id
+  - fastq_files
+  - twist_solid_dir
+
+vars:
+  - msg:
+  - work_dir:
+
+output:
+  - workdir: <% ctx().work_dir %>
+
+tasks:
+  name_work_dir:
+    action: core.noop
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - work_dir: "{{ ctx().twist_solid_dir }}/{{ ctx().run_id }}/{{ ctx().sample_id }}"
+        do:
+          make_work_dir
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  make_work_dir:
+    action: core.local
+    input:
+      cmd: "mkdir -p {{ ctx().work_dir }}/fastq"
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          symlink_fastq
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  symlink_fastq:
+    with: fastq_file in "{{ ctx().fastq_files }}"
+    action: core.local
+    input:
+      cmd: 'ln -s "<% item(fastq_file) %>" "{{ ctx().workdir }}/fastq"'
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          make_gms_solid_input_files
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  make_gms_solid_input_files:
+    action: core.local
+    input:
+      cmd: 'hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform NovaSeqXPlus'
+      cwd: "{{ ctx().work_dir }}"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "{{ result() }}"
+        do:
+          - report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: >
+          Failed prepare sample {{ ctx().sample_id }} for plumber analysis of GMS Solid
+        message: <% ctx().msg %>
+    next:
+      - when: "{{ succeeded() }}"
+        do: fail
