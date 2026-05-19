@@ -31,10 +31,27 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
+def get_twist_solid_output_files(sample_id):
+    output_files = [
+        {
+            'path': f'bam_dna/{sample_id}_T.bam',
+            'level': 'sample', 'type': 'bam', 'parent_id': sample_id
+            },
+        {
+            'path': f'results/dna/{sample_id}_T/vcf/{sample_id}_T.annotated.'
+            'exon_only.filter.hard_filter.codon_snv.vcf',
+            'level': 'sample', 'type': 'vcf', 'parent_id': sample_id
+            },
+         ]
+    return output_files
+
+
 class GetPipelineOutputFiles(Action):
     def run(self, pipeline, sample_id, case_id):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
+        if pipeline == "genomic-medicine-sweden/Twist_Solid":
+            output_files = get_twist_solid_output_files(sample_id)
         else:
             return (False, "unsupported pipeline")
         return (True,  output_files)
