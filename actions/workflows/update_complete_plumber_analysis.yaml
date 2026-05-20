@@ -14,6 +14,8 @@ vars:
   - sample_id:
   - case_id:
   - output_files:
+  - destination:
+  - new_workdir:
 
 tasks:
   get_sample_id:
@@ -102,6 +104,7 @@ tasks:
       - when: <% succeeded() and result().result != null %>
         publish:
           - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}"
+          - new_workdir: "{{ ctx().destination }}/{{ ctx().sample_id }}"
         do: make_destination
 
   make_destination:
@@ -146,7 +149,7 @@ tasks:
   get_case_id:
     action: core.local
     input:
-      cmd: 'cut -d "," -f 9 "{{ ctx().workdir }}/samplesheet.csv" | tail -n 1'
+      cmd: 'cut -d "," -f 9 "{{ ctx().new_workdir }}/samplesheet.csv" | tail -n 1'
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -190,7 +193,7 @@ tasks:
     action: cleve.update_analysis
     input:
       analysis_id: <% ctx().analysis_id %>
-      path: <% ctx().destination %>/<% ctx().sample_id %>
+      path: <% ctx().new_workdir %>
       state: ready
       files: <% ctx().output_files %>
     next:
