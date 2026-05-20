@@ -4,14 +4,15 @@ import requests
 from st2common.runners.base_action import Action
 
 
-def get_supported_analysis(test_analyses):
-    for analysis in test_analyses:
-        return analysis["ApplicationProfileName"], analysis["ApplicationProfileVersion"]
-    return None, None
+def get_supported_analysis(test_analyses, number):
+    if number > len(test_analyses):
+        return None, None
+    analysis = test_analyses[number - 1]
+    return analysis["ApplicationProfileName"], analysis["ApplicationProfileVersion"]
 
 
 class GetPlumberArgumentsAction(Action):
-    def run(self, config_path, test_profile):
+    def run(self, config_path, test_profile, number):
         test_profile_path = os.path.join(config_path, "test-profile-config/test_profiles/",
                                          f"{test_profile}.yaml")
         r = requests.get(test_profile_path)
@@ -25,10 +26,10 @@ class GetPlumberArgumentsAction(Action):
         if test_analyses is None:
             return (False, "Error: DownstreamAnalysis not found")
         else:
-            app_profile, app_profile_v = get_supported_analysis(test_analyses)
+            app_profile, app_profile_v = get_supported_analysis(test_analyses, number)
 
         if app_profile is None:
-            return (False, "Error: Unsupported DownstreamAnalysis")
+            return (False, "Error: Test doesn't have that many downstream analyses")
 
         app_profile_path = os.path.join(config_path, "test-profile-config/application_profiles/",
                                         f"{app_profile}.yaml")
