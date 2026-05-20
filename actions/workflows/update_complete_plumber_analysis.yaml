@@ -213,7 +213,7 @@ tasks:
         - <% ctx().sample_id %>
       pipeline: <% ctx().pipeline %>
       analysis_id: <% ctx().analysis_id %>
-      output_path: <% ctx().destination %>/<% ctx().sample_id %>
+      output_path: <% ctx().new_workdir %>
 
   report_failure:
     action: core.inject_trigger
