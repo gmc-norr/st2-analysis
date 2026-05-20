@@ -3,13 +3,10 @@ import yaml
 import requests
 from st2common.runners.base_action import Action
 
-supported_applications = ["NfCoreRareDisease"]
-
 
 def get_supported_analysis(test_analyses):
     for analysis in test_analyses:
-        if analysis["ApplicationProfileName"] in supported_applications:
-            return analysis["ApplicationProfileName"], analysis["ApplicationProfileVersion"]
+        return analysis["ApplicationProfileName"], analysis["ApplicationProfileVersion"]
     return None, None
 
 
