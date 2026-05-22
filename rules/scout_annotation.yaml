@@ -23,7 +23,7 @@ criteria:
     pattern: genomic-medicine-sweden/Twist_Solid
 
 action:
-  ref: scout.annotation_twist_solid
+  ref: scout.annotate_twist_solid
   parameters:
     analysis_id: "{{ trigger.body.analysis_id }}"
     pipeline: "{{ trigger.body.pipeline }}"
