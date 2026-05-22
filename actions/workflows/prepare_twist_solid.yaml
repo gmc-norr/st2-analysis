@@ -14,7 +14,7 @@ vars:
   - work_dir:
 
 output:
-  - workdir: <% ctx().work_dir %>
+  - work_dir: <% ctx().work_dir %>
 
 tasks:
   name_work_dir:
@@ -25,11 +25,6 @@ tasks:
           - work_dir: "{{ ctx().twist_solid_dir }}/{{ ctx().run_id }}/{{ ctx().sample_id }}"
         do:
           make_work_dir
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "{{ result() }}"
-        do:
-          - report_failure
 
   make_work_dir:
     action: core.local
@@ -41,22 +36,24 @@ tasks:
           symlink_fastq
       - when: "{{ failed() }}"
         publish:
-          - msg: "{{ result() }}"
+          - msg: "Failed to make work dir {{ ctx().work_dir }}/fastq
+             {{ result() }}"
         do:
           - report_failure
 
   symlink_fastq:
-    with: fastq_file in "{{ ctx().fastq_files }}"
+    with: fastq_file in <% ctx().fastq_files %>
     action: core.local
     input:
-      cmd: 'ln -s "<% item(fastq_file) %>" "{{ ctx().workdir }}/fastq"'
+      cmd: 'ln -s <% item(fastq_file) %> <% ctx().work_dir %>/fastq'
     next:
       - when: "{{ succeeded() }}"
         do:
           make_gms_solid_input_files
       - when: "{{ failed() }}"
         publish:
-          - msg: "{{ result() }}"
+          - msg: "Failed to symlink fastq files.
+             {{ result() }}"
         do:
           - report_failure
 
@@ -68,7 +65,8 @@ tasks:
     next:
       - when: "{{ failed() }}"
         publish:
-          - msg: "{{ result() }}"
+          - msg: "Failed to make GMS Solid input files
+             {{ result() }}"
         do:
           - report_failure
 
