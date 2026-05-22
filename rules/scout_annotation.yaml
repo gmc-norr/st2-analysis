@@ -25,6 +25,6 @@ criteria:
 action:
   ref: scout.annotate_twist_solid
   parameters:
-    analysis_id: "{{ trigger.body.analysis_id }}"
-    pipeline: "{{ trigger.body.pipeline }}"
-    workdir: "{{ trigger.body.workdir }}"
+    prev_analysis_id: "{{ trigger.body.analysis_id }}"
+    prev_pipeline: "{{ trigger.body.pipeline }}"
+    prev_analysis_path: "{{ trigger.body.workdir }}"
