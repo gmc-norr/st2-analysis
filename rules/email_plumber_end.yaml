@@ -2,8 +2,8 @@
 name: email_plumber_end
 pack: gmc_norr_analysis
 description: >
-  Send a notification email for plumber when a run ends
-  (both in success and failure)
+  Send a notification email for plumber
+  when a run ends in failure
 enabled: true
 
 trigger:
@@ -15,6 +15,9 @@ criteria:
   trigger.body.message_type:
     type: equals
     pattern: end
+  trigger.body.success:
+    type: equals
+    pattern: false
 
 action:
   ref: core.inject_trigger

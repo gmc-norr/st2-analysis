@@ -11,6 +11,10 @@ def get_fastq_input_files(sample_id, analysis_id, fastq_files):
 
 class GetPipelineInputFilesAction(Action):
     def run(self, pipeline, fastq_files, analysis_ids, sample_id):
+        if len(fastq_files[sample_id]["R1"]) != len(fastq_files[sample_id]["R2"]):
+            return (False, "The number of R1 and R2 fastq files don't match")
+        if len(fastq_files[sample_id]["R1"]) < 1:
+            return (False, "No fastq files received")
         if pipeline == "nf-core/raredisease" or pipeline == "genomic-medicine-sweden/Twist_Solid":
             input_files = get_fastq_input_files(sample_id, analysis_ids[sample_id],
                                                 fastq_files[sample_id])
