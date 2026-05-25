@@ -31,7 +31,7 @@ vars:
   - pid:
 
 output:
-  - msg:
+  - msg: <% ctx().msg %>
 
 tasks:
   get_sample_data:
