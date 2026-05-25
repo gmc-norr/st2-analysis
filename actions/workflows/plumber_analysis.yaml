@@ -127,10 +127,10 @@ tasks:
       delay: 1
       count: 2
     next:
-      - when: <% succeeded() and result().result.body.runs.values().first().run_info.flowcell_name != '1.5B' %>
+      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
         do:
           rd_prepare_output_folder
-      - when: <% succeeded() and result().result.body.runs.values().first().run_info.flowcell_name != '1.5B' %>
+      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
         publish:
           msg="Only {{ result().result.body.read_count }} reads.
           Probably a prerun sequencing, so stopping workflow here."
