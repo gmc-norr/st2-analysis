@@ -118,20 +118,19 @@ tasks:
         do:
           report_failure
 
-  rd_check_sample_reads: # stop the workflow if it's a prerun of the sequencing
-    action: cleve.get_run_qc
+  rd_check_flowcell: # stop the workflow if it's a prerun of the sequencing
+    action: cleve.get_run
     input:
       run_id: <% ctx().run_id %>
-      sample_id: <% ctx().sample_id %>
     retry:
       when: "{{ failed() }}"
       delay: 1
       count: 2
     next:
-      - when: "{{ succeeded() and result().result.body.read_count | int >= 4*10**8 }}"
+      - when: <% succeeded() and result().result.body.runs.values().first().run_info.flowcell_name != '1.5B' %>
         do:
           rd_prepare_output_folder
-      - when: "{{ succeeded() and result().result.body.read_count | int < 4*10**8 }}"
+      - when: <% succeeded() and result().result.body.runs.values().first().run_info.flowcell_name != '1.5B' %>
         publish:
           msg="Only {{ result().result.body.read_count }} reads.
           Probably a prerun sequencing, so stopping workflow here."
