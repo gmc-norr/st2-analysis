@@ -130,7 +130,7 @@ tasks:
       - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
         do:
           rd_prepare_output_folder
-      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
+      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name = '1.5B' %>
         publish:
           msg="Sequenced on a 1.5B flowcell, so probably a prerun sequencing. Stopping workflow here."
         do:
