@@ -31,7 +31,7 @@ vars:
   - pid:
 
 output:
-  - workflow_msg: "{{ ctx().msg }}"
+  - stop_msg:
 
 tasks:
   get_sample_data:
@@ -54,7 +54,7 @@ tasks:
           get_fastq_files
       - when: "{{ succeeded() and result().result.body.TestProfile not in ctx().supported_profiles }}"
         publish:
-          msg="{{ result().result.body.TestProfile }} not supported in automation."
+          stop_msg="{{ result().result.body.TestProfile }} not supported in automation."
         do: noop
       - when: "{{ failed() }}"
         publish:
@@ -132,7 +132,7 @@ tasks:
           rd_prepare_output_folder
       - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
         publish:
-          msg="Sequenced on a 1.5B flowcell, so probably a prerun sequencing. Stopping workflow here."
+          stop_msg="Sequenced on a 1.5B flowcell, so probably a prerun sequencing. Stopping workflow here."
         do:
           noop
       - when: "{{ failed() }}"
