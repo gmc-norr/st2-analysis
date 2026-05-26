@@ -56,12 +56,12 @@ tasks:
         publish:
           msg="{{ result().result.body.TestProfile }} not supported in automation."
         do: noop
-      - when: "{{ failed() and ctx().sample_id[0:4] != 'Seq' }}"
+      - when: "{{ failed() and not ctx().sample_id.startswith('Seq') }}"
         publish:
           msg="Failed to get sample data from the iGene API for {{ ctx().sample_id }}.
           {{ result() | to_json_string }}"
         do: noop
-      - when: "{{ failed() and ctx().sample_id[0:4] == 'Seq' }}"
+      - when: "{{ failed() and ctx().sample_id.startswith('Seq') }}"
         publish:
           msg="Failed to get sample data from the iGene API.
           {{ result() | to_json_string }}"
