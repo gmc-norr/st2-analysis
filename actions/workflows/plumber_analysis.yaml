@@ -26,8 +26,6 @@ vars:
   - fastq_files:
   - analysis_ids:
   - input_files:
-  - remote_stdout:
-  - remote_stderr:
   - pid:
 
 output:
@@ -247,7 +245,7 @@ tasks:
     input:
       cmd: "nohup plumber run <% ctx().pipeline %>
         --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> > plumber.log & echo $!"
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> &> plumber.log & echo $!"
       cwd: <% ctx().output_dir %>
       hosts: <% ctx().plumber_host %>
       env: <% ctx().plumber_env %>
@@ -260,24 +258,8 @@ tasks:
           report_failure
       - when: "{{ succeeded() }}"
         publish:
-          - remote_stderr: "{{ result().get((result().keys() | list | first)).get('stderr') }}"
-          - remote_stdout: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
-        do: check_remote_output
-
-  check_remote_output: # if connecting to the remote works but the command fails the action still "succeeded"
-    action: core.noop # so we need to check if the stderr is empty
-    next:
-      - when: "{{ ctx().remote_stderr == '' }}"
-        publish:
-          - pid: <% ctx().remote_stdout %>
-        do:
-          check_progress
-      - when: "{{ ctx().remote_stderr != '' }}"
-        publish:
-          msg="Failed to start plumber.
-          {{ ctx().remote_stderr }}"
-        do:
-          report_failure
+          - pid: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
+        do: check_progress
 
   check_progress:
     action: core.remote
