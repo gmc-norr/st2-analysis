@@ -281,7 +281,7 @@ tasks:
 
   check_progress:
     action: core.remote
-    delay: 20
+    delay: 30
     input:
       cmd: "ps --no-headers --pid <% ctx().pid %>"
       cwd: <% ctx().output_dir %>
