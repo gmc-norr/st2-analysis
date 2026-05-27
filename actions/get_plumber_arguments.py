@@ -38,8 +38,8 @@ class GetPlumberArgumentsAction(Action):
                     f"Request for ApplicationProfile file {app_profile_path} failed, " +
                     f"status={r.status_code}")
         app_config = yaml.safe_load(r.text)
-
-        if app_config["ApplicationProfileVersion"] != app_profile_v:
+        app_major_v = str(app_config["ApplicationProfileVersion"]).split(".")[0]
+        if app_major_v != str(app_profile_v):
             return (False, "Error: ApplicationProfileVersions don't match.")
 
         pipeline_dict = {"PipelineSystem": app_config["ApplicationType"],
