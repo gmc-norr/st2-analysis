@@ -245,7 +245,7 @@ tasks:
     input:
       cmd: "nohup plumber run <% ctx().pipeline %>
         --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> 2>&1 > plumber.log & echo $!"
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> &> plumber.log & echo $!"
       cwd: <% ctx().output_dir %>
       hosts: <% ctx().plumber_host %>
       env: <% ctx().plumber_env %>
