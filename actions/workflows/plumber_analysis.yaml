@@ -119,7 +119,7 @@ tasks:
       - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do:
           gms_solid_workflow
-      - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
+      - when: "{{ ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid'}}"
         publish:
           msg="Unsupported pipeline {{ ctx().pipeline }}"
         do:
