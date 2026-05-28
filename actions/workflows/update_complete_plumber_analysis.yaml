@@ -123,7 +123,7 @@ tasks:
   rsync_output:
     action: core.local
     input:
-      cmd: "rsync -aP <% ctx().workdir %> <% ctx().destination %>"
+      cmd: "rsync -a <% ctx().workdir %> <% ctx().destination %>"
       timeout: 7500
     next:
       - when: "{{ succeeded() }}"
