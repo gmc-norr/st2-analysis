@@ -124,7 +124,7 @@ tasks:
     action: core.local
     input:
       cmd: "rsync -aP <% ctx().workdir %> <% ctx().destination %>"
-      timeout: 5000
+      timeout: 7500
     next:
       - when: "{{ succeeded() }}"
         do: divide_pipeline_tasks
