@@ -123,8 +123,8 @@ tasks:
   rsync_output:
     action: core.local
     input:
-      cmd: "rsync -a <% ctx().workdir %> <% ctx().destination %>"
-      timeout: 7500
+      cmd: "rsync -a --remove-source-files <% ctx().workdir %> <% ctx().destination %>"
+      timeout: 10000
     next:
       - when: "{{ succeeded() }}"
         do: divide_pipeline_tasks
