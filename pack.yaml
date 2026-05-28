@@ -2,10 +2,14 @@
 ref: gmc_norr_analysis
 name: GMC Norr Analysis
 description: StackStorm pack for automation of GMC Norr downstream analysis
-version: 0.3.2 # x-release-please-version
+version: 0.4.0 # x-release-please-version
 python_versions:
   - "3"
 author: Niklas Mähler
 email: niklas.mahler@regionvasterbotten.se
 dependencies:
+  - https://github.com/gmc-norr/st2-cleve.git
+  - https://github.com/gmc-norr/st2-igene.git
+  - https://github.com/gmc-norr/st2-seqdata.git
   - https://github.com/gmc-norr/st2-scout.git
+  - email
