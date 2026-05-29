@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.4.0](https://github.com/gmc-norr/st2-analysis/compare/v0.3.2...v0.4.0) (2026-05-20)
+
+
+### Features
+
+* add `get pipeline input files` (for Cleve) action ([#51](https://github.com/gmc-norr/st2-analysis/issues/51)) ([ac5247c](https://github.com/gmc-norr/st2-analysis/commit/ac5247ce40c77280622f66fc39247b40a53a2328))
+* add `get plumber arguments` action ([#48](https://github.com/gmc-norr/st2-analysis/issues/48)) ([c484e8a](https://github.com/gmc-norr/st2-analysis/commit/c484e8ac6aa0e422cd96e2e888e5150b6d0bbf55))
+* add `make case id` action ([#47](https://github.com/gmc-norr/st2-analysis/issues/47)) ([fe6758b](https://github.com/gmc-norr/st2-analysis/commit/fe6758b2e22842f5f2a8e4e1ca2d263e7b861728))
+* add `make raredisease samplesheet` action ([#49](https://github.com/gmc-norr/st2-analysis/issues/49)) ([996ea12](https://github.com/gmc-norr/st2-analysis/commit/996ea12efca0226a85a2af72a5f78bdd4f7609fc))
+* add `update complete plumber analysis` workflow and rule ([#46](https://github.com/gmc-norr/st2-analysis/issues/46)) ([b28293b](https://github.com/gmc-norr/st2-analysis/commit/b28293bfe2d94deb8214b5047a33a8a17cc679dd))
+* add `update incomplete plumber analysis` rule ([#44](https://github.com/gmc-norr/st2-analysis/issues/44)) ([9753a4c](https://github.com/gmc-norr/st2-analysis/commit/9753a4c1e220fb6d3cb54e31e5f2b5104b9eaae1))
+* add rule to send a notification email when a plumber run ends ([#42](https://github.com/gmc-norr/st2-analysis/issues/42)) ([3d9d5d2](https://github.com/gmc-norr/st2-analysis/commit/3d9d5d227f02533aae3cb686cea867c65249b614))
+* add start plumber workflows ([#39](https://github.com/gmc-norr/st2-analysis/issues/39)) ([6d488ed](https://github.com/gmc-norr/st2-analysis/commit/6d488ed1de34e4e0412631a735303e73ee5fc011))
+* start scout workflow at the end of `update finished plumber analysis` workflow ([#57](https://github.com/gmc-norr/st2-analysis/issues/57)) ([9e0b856](https://github.com/gmc-norr/st2-analysis/commit/9e0b8567f459d4a19c3aba1a722d8ff875acc1a3))
+
+
+### Bug Fixes
+
+* `get plumber arguments` no longer checks if application is supported ([#72](https://github.com/gmc-norr/st2-analysis/issues/72)) ([a2b1630](https://github.com/gmc-norr/st2-analysis/commit/a2b1630dc89fcfdbb5dfb43c6d57c37f3ae185ea))
+* change `make rd samplesheet` checks ([#59](https://github.com/gmc-norr/st2-analysis/issues/59)) ([9261da4](https://github.com/gmc-norr/st2-analysis/commit/9261da44c445725a811bbbfebff35a542ea25739))
+* escape error message on plumber email rule ([#56](https://github.com/gmc-norr/st2-analysis/issues/56)) ([73132d2](https://github.com/gmc-norr/st2-analysis/commit/73132d2d3cdfa38946a52af2bb0bb207239361de))
+* escape the message from plumber ([#53](https://github.com/gmc-norr/st2-analysis/issues/53)) ([33ec788](https://github.com/gmc-norr/st2-analysis/commit/33ec788d8a7c84fb92e61b7251f3e88c06a33e53))
+* Formating of pipeline output files, with correct level ([#54](https://github.com/gmc-norr/st2-analysis/issues/54)) ([60d8da1](https://github.com/gmc-norr/st2-analysis/commit/60d8da1ae7f78bee3d266d6d801efbacab92d45f))
+* match original pipeline names ([#55](https://github.com/gmc-norr/st2-analysis/issues/55)) ([56318ba](https://github.com/gmc-norr/st2-analysis/commit/56318baf8b837a0058dabef7fc78053c1aa28bae))
+* rsync removes source files in the `update complete plumber analysis` workflow ([#70](https://github.com/gmc-norr/st2-analysis/issues/70)) ([04856e7](https://github.com/gmc-norr/st2-analysis/commit/04856e7ea7813a52356deb2c0ed2f360b551bfd5))
+* scout output_path parameter uses variable ([#71](https://github.com/gmc-norr/st2-analysis/issues/71)) ([51567df](https://github.com/gmc-norr/st2-analysis/commit/51567df8006ed1328000fed6eb1224fba46b608b))
+* take notification email from datastore instead of config parameter ([#50](https://github.com/gmc-norr/st2-analysis/issues/50)) ([9609a54](https://github.com/gmc-norr/st2-analysis/commit/9609a54256d0e13c490e4616b5c3b814c568e292))
+* tumor evolution tests use correct email setup ([#58](https://github.com/gmc-norr/st2-analysis/issues/58)) ([8425dc0](https://github.com/gmc-norr/st2-analysis/commit/8425dc0a779b0004001ba12d8c8929dc2463e75a))
+
 ## [0.3.2](https://github.com/gmc-norr/st2-analysis/compare/v0.3.1...v0.3.2) (2025-03-14)
 
 

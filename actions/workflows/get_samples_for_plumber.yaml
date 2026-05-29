@@ -56,7 +56,7 @@ tasks:
   start_sample_workflow:
     with:
       items: <% ctx(sample_ids) %>
-      concurrency: 2
+      concurrency: 1
     input:
       sample_id: <% item() %>
       run_id: <% ctx(run_id) %>
