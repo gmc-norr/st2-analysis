@@ -1,0 +1,25 @@
+---
+name: plumber_analysis
+pack: gmc_norr_analysis
+description: Workflow to run downstream analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/plumber_analysis.yaml
+enabled: true
+
+parameters:
+  first_pipeline:
+    description: The previous analysis run (e.g. GMS Solid)
+    type: string
+    required: true
+  first_analysis_id:
+    description: The ID of the first analysis in Cleve
+    type: string
+    required: true
+  first_workdir:
+    description: The path to the first analysis
+    type: string
+    required: true
+  plumber_host:
+    description: Host to run plumber on
+    type: string
+    default: "{{config_context.plumber.host}}"
