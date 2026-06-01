@@ -21,18 +21,22 @@ parameters:
     type: string
     required: true
   sample_id:
-    description: The ID of the plumber analysis
+    description: The ID of the sample that was analysed
     type: string
     required: false
   run_id:
-    description: The ID of the plumber analysis
+    description: The ID of the run
     type: string
     required: false
   case_id:
-    description: The ID of the plumber analysis
+    description: The ID of the case
+    type: string
+    required: false
+  secondary_analysis_id:
+    description: The id of the secondary analysis (e.g. scout-annotation)
     type: string
     required: false
   secondary_pipeline:
-    description: The pipeline the analysis was performed with
+    description: The pipeline the secondary analysis was performed with
     type: string
     required: false
