@@ -78,9 +78,9 @@ class GetPipelineOutputFiles(Action):
     def run(self, pipeline, sample_id, case_id):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
-        if pipeline == "genomic-medicine-sweden/Twist_Solid":
+        elif pipeline == "genomic-medicine-sweden/Twist_Solid":
             output_files = get_twist_solid_output_files(sample_id)
-        if pipeline == "gmc-norr/scout-annotation":
+        elif pipeline == "gmc-norr/scout-annotation":
             output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
