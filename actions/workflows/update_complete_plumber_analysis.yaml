@@ -182,19 +182,32 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - output_files: <% result().result %>
-        do: update_in_cleve
+        do: update_path_in_cleve
       - when: "{{ failed() }}"
         publish:
           - msg: <% result().stderr %>
         do:
           - report_failure
 
-  update_in_cleve:
+  update_path_in_cleve:
     action: cleve.update_analysis
     input:
       analysis_id: <% ctx().analysis_id %>
       path: <% ctx().new_workdir %>
       state: ready
+    next:
+      - when: "{{ succeeded() }}"
+        do: update_files_in_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  update_files_in_cleve:
+    action: cleve.update_analysis
+    input:
+      analysis_id: <% ctx().analysis_id %>
       files: <% ctx().output_files %>
     next:
       - when: "{{ succeeded() }}"
