@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.2](https://github.com/gmc-norr/st2-analysis/compare/v0.4.1...v0.4.2) (2026-06-01)
+
+
+### Bug Fixes
+
+* **update_complete_plumber_analysis:** update path to analysis in a seperate step from adding the output files ([#82](https://github.com/gmc-norr/st2-analysis/issues/82)) ([9c917fd](https://github.com/gmc-norr/st2-analysis/commit/9c917fd1ef06cc8163784129db84ee6d9654e6dc))
+
 ## [0.4.1](https://github.com/gmc-norr/st2-analysis/compare/v0.4.0...v0.4.1) (2026-05-29)
 
 
