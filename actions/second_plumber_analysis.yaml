@@ -1,9 +1,9 @@
 ---
-name: plumber_analysis
+name: second_plumber_analysis
 pack: gmc_norr_analysis
-description: Workflow to run downstream analysis of a sample with plumber
+description: Workflow to run second downstream analysis of a sample with plumber
 runner_type: orquesta
-entry_point: workflows/plumber_analysis.yaml
+entry_point: workflows/second_plumber_analysis.yaml
 enabled: true
 
 parameters:
