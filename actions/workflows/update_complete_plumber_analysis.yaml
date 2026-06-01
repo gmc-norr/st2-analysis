@@ -202,19 +202,32 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - secondary_output_files: <% result().result %>
-        do: update_secondary_in_cleve
+        do: update_secondary_path_in_cleve
       - when: "{{ failed() }}"
         publish:
           - msg: <% result().stderr %>
         do:
           - report_failure
 
-  update_secondary_in_cleve:
+  update_secondary_path_in_cleve:
     action: cleve.update_analysis
     input:
       analysis_id: <% ctx().secondary_analysis_id %>
       path: "{{ ctx().new_workdir }}/{{ ctx().secondary_pipeline.split('/')[1] }}"
       state: ready
+    next:
+      - when: "{{ succeeded() }}"
+        do: update_secondary_files_in_cleve
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  update_secondary_files_in_cleve:
+    action: cleve.update_analysis
+    input:
+      analysis_id: <% ctx().secondary_analysis_id %>
       files: <% ctx().secondary_output_files %>
     next:
       - when: "{{ succeeded() }}"
