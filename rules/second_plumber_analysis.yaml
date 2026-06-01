@@ -1,5 +1,5 @@
 ---
-name: scout_annotation
+name: second_plumber_analysis
 pack: gmc_norr_analysis
 description: >
   Move a plumber analysis and update it in Cleve to state ready
@@ -23,8 +23,8 @@ criteria:
     pattern: genomic-medicine-sweden/Twist_Solid
 
 action:
-  ref: scout.annotate_twist_solid
+  ref: gmc_norr_analysis.second_plumber_analysis
   parameters:
-    prev_analysis_id: "{{ trigger.body.analysis_id }}"
-    prev_pipeline: "{{ trigger.body.pipeline }}"
-    prev_analysis_path: "{{ trigger.body.workdir }}"
+    first_analysis_id: "{{ trigger.body.analysis_id }}"
+    first_pipeline: "{{ trigger.body.pipeline }}"
+    first_analysis_path: "{{ trigger.body.workdir }}"
