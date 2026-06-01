@@ -31,7 +31,7 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
-def get_twist_solid_output_files(sample_id, case_id):
+def get_twist_solid_output_files(sample_id):
     output_files = [
         {'path': f'bam_dna/{sample_id}_T.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id
@@ -62,12 +62,26 @@ def get_twist_solid_output_files(sample_id, case_id):
     return output_files
 
 
+def get_scout_annotation_output_files(sample_id, case_id):
+    output_files = [
+        {'path': f'results/annotation/{case_id}/{case_id}.annotated.genmod.vcf.gz',
+         'level': 'case', 'type': 'vcf', 'parent_id': case_id
+         },
+        {'path': f'results/coverage/{case_id}/{sample_id}.coverage.d4',
+         'level': 'sample', 'type': 'd4', 'parent_id': sample_id
+         }]
+
+    return output_files
+
+
 class GetPipelineOutputFiles(Action):
     def run(self, pipeline, sample_id, case_id):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
         if pipeline == "genomic-medicine-sweden/Twist_Solid":
-            output_files = get_twist_solid_output_files(sample_id, case_id)
+            output_files = get_twist_solid_output_files(sample_id)
+        if pipeline == "gmc-norr/scout-annotation":
+            output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
         return (True,  output_files)
