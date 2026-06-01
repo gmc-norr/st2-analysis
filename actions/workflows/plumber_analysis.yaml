@@ -207,6 +207,7 @@ tasks:
       sample_id: <% ctx().sample_id %>
       run_id: <% ctx().run_id %>
       fastq_files: "{{ ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 }}"
+      host: <% ctx().plumber_host %>
       # twist_solid_dir: "use default in action or ask seqdata? Which config?"
     next:
       - when: "{{ succeeded() }}"
