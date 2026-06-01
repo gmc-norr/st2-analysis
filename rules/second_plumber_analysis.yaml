@@ -27,4 +27,4 @@ action:
   parameters:
     first_analysis_id: "{{ trigger.body.analysis_id }}"
     first_pipeline: "{{ trigger.body.pipeline }}"
-    first_analysis_path: "{{ trigger.body.workdir }}"
+    first_workdir: "{{ trigger.body.workdir }}"
