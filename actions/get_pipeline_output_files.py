@@ -38,7 +38,7 @@ def get_twist_solid_output_files(sample_id):
          },
         {'path': f'results/dna/{sample_id}_T/vcf/{sample_id}_T.annotated.'
          'exon_only.filter.hard_filter.codon_snv.vcf',
-         'level': 'sample', 'type': 'vcf', 'parent_id': sample_id
+         'level': 'sample', 'type': 'vcf_snv', 'parent_id': sample_id
          },
         {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
          'level': 'sample', 'type': 'html', 'parent_id': sample_id
@@ -48,15 +48,15 @@ def get_twist_solid_output_files(sample_id):
          'level': 'sample', 'type': 'html', 'parent_id': sample_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.TMB.txt",
-         'level': 'sample', 'type': 'txt', 'parent_id': sample_id
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T."
          "pathology_purecn.scarhrd_cnvkit_score.txt",
-         'level': 'sample', 'type': 'txt', 'parent_id': sample_id
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro."
          "filtered.score.tsv",
-         'level': 'sample', 'type': 'txt', 'parent_id': sample_id
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
          }]
 
     return output_files
@@ -65,7 +65,7 @@ def get_twist_solid_output_files(sample_id):
 def get_scout_annotation_output_files(sample_id, case_id):
     output_files = [
         {'path': f'results/annotation/{case_id}/{case_id}.annotated.genmod.vcf.gz',
-         'level': 'case', 'type': 'vcf', 'parent_id': case_id
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id
          },
         {'path': f'results/coverage/{case_id}/{sample_id}.coverage.d4',
          'level': 'sample', 'type': 'd4', 'parent_id': sample_id
