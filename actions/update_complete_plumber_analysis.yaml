@@ -29,14 +29,14 @@ parameters:
     type: string
     required: false
   case_id:
-    description: The ID of the case
+    description: The ID of the case. Required for Twist Solid analyses.
     type: string
     required: false
   secondary_analysis_id:
-    description: The id of the secondary analysis (e.g. scout-annotation)
+    description: The id of the secondary analysis (e.g. scout-annotation). Required for Twist Solid analyses.
     type: string
     required: false
   secondary_pipeline:
-    description: The pipeline the secondary analysis was performed with
+    description: The pipeline the secondary analysis was performed with. Required for Twist Solid analyses.
     type: string
     required: false

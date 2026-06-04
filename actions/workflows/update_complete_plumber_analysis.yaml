@@ -152,14 +152,9 @@ tasks:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease'}}"
         do:
           get_case_id
-      - when: <% ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' and
-            ctx().secondary_analysis_id != null and ctx().secondary_pipeline != null %> # assumes case_id exists
+      - when: <% ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
         do:
           format_secondary_output_files
-      - when: <% ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' and
-          ctx().secondary_analysis_id = null or ctx().secondary_pipeline = null %>
-        do:
-          format_output_files
       - when: <% ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
         publish:
           - msg: "Unsupported pipeline {{ ctx().pipeline }}"
