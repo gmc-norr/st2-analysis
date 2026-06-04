@@ -154,7 +154,7 @@ tasks:
           get_case_id
       - when: <% ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
         do:
-          format_secondary_output_files
+          check_twist_solid_needed_variables
       - when: <% ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
         publish:
           - msg: "Unsupported pipeline {{ ctx().pipeline }}"
@@ -184,6 +184,23 @@ tasks:
       - when: "{{ ctx().case_id == '' }}"
         publish:
           - msg: "Failed to parse the case ID from the samplesheet."
+        do:
+          - report_failure
+
+  check_twist_solid_needed_variables:
+    action: core.noop
+    next:
+      - when: <% ctx().case_id != null and ctx().secondary_pipeline != null
+         and ctx().secondary_analysis_id != null %>
+        do: format_secondary_output_files
+      - when: <% ctx().case_id = null or ctx().secondary_pipeline = null
+         or ctx().secondary_analysis_id = null %>
+        publish:
+          msg="Missing necessary variables to be able to
+          continue for genomic-medicine-sweden/Twist_Solid.
+          Secondary analysis id {{ ctx().secondary_analysis_id }}
+          Secondary pipeline {{ ctx().secondary_pipeline }}
+          case id {{ ctx().case_id }}"
         do:
           - report_failure
 
