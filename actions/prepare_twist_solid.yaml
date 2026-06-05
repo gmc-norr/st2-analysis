@@ -24,3 +24,7 @@ parameters:
     type: string
     required: true
     default: "{{ config_context.plumber.twist_solid_dir }}"
+  host:
+    description: The host where to run hydra-genetics on
+    type: string
+    required: true
