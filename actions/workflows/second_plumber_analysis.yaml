@@ -40,11 +40,11 @@ tasks:
         do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
-          - msg: analysis <% ctx().analysis_id %> not found in Cleve
+          - msg: analysis <% ctx().first_analysis_id %> not found in Cleve
         do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count > 1 %>
         publish:
-          - msg: more than one analysis with ID <% ctx().analysis_id %> found in Cleve
+          - msg: more than one analysis with ID <% ctx().first_analysis_id %> found in Cleve
         do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 1 %>
         publish:
@@ -111,7 +111,7 @@ tasks:
         do:
           - report_failure
 
-  make_new_dir:
+  make_new_work_dir:
     action: core.local
     input:
       cmd:  "mkdir -p <% ctx().new_workdir %>"
@@ -203,9 +203,9 @@ tasks:
   start_update_complete_workflow:
     action: gmc_norr_analysis.update_complete_plumber_analysis
     input:
-      analysis_id: <% ctx().prev_analysis_id %>
-      pipeline: <% ctx().prev_pipeline %>
-      workdir: <% ctx().prev_analysis_path %>
+      analysis_id: <% ctx().first_analysis_id %>
+      pipeline: <% ctx().first_pipeline %>
+      workdir: <% ctx().first_workdir %>
       sample_id: <% ctx().sample_id %>
       run_id: <% ctx().run_id %>
       case_id: <% ctx().case_id %>
@@ -217,7 +217,7 @@ tasks:
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to bridge to scout in {{ ctx().prev_analysis_dir }}"
+        subject: "Failed to bridge to scout in {{ ctx().first_workdir }}"
         message: <% ctx().msg %>
     next:
       - do: fail
