@@ -52,4 +52,3 @@ tasks:
       cmd: 'hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform NovaSeqXPlus'
       cwd: "{{ ctx().work_dir }}"
       hosts: <% ctx().host %>
-    next:
