@@ -155,7 +155,7 @@ tasks:
         do: add_secondary_analysis_to_cleve
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
@@ -177,7 +177,7 @@ tasks:
         do: start_plumber
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
