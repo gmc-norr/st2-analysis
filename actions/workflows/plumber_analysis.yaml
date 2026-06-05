@@ -212,7 +212,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          output_dir: <% result().result.output.output_dir %>
+          output_dir: <% result().result.output.work_dir %>
         do:
           format_cleve_input_files
       - when: "{{ failed() }}"
