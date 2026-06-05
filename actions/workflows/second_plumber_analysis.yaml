@@ -120,7 +120,7 @@ tasks:
         do: get_input_files
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
