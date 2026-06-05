@@ -218,7 +218,7 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           msg="Failed to output directory.
-          {{ result() | to_json_string }}"
+          {{ result().result.output.error }}"
         do: report_failure
 
   format_cleve_input_files: # the workflow reconnects here

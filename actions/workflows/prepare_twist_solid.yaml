@@ -16,6 +16,7 @@ vars:
 
 output:
   - work_dir: <% ctx().work_dir %>
+  - error: <% ctx().msg %>
 
 tasks:
   name_work_dir:
@@ -38,9 +39,7 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           - msg: "Failed to make work dir {{ ctx().work_dir }}/fastq
-             {{ result() }}"
-        do:
-          - report_failure
+             {{ result() | to_json_string }}"
 
   symlink_fastq:
     with: fastq_file in <% ctx().fastq_files %>
@@ -54,9 +53,7 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           - msg: "Failed to symlink fastq files.
-             {{ result() }}"
-        do:
-          - report_failure
+             {{ result() | to_json_string }}"
 
   make_gms_solid_input_files:
     action: core.remote
@@ -68,18 +65,4 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           - msg: "Failed to make GMS Solid input files
-             {{ result() }}"
-        do:
-          - report_failure
-
-  report_failure:
-    action: core.inject_trigger
-    input:
-      trigger_name: gmc_norr_analysis.email_notification
-      payload:
-        subject: >
-          Failed prepare sample {{ ctx().sample_id }} for plumber analysis of GMS Solid
-        message: <% ctx().msg %>
-    next:
-      - when: "{{ succeeded() }}"
-        do: fail
+             {{ result() | to_json_string }}"
