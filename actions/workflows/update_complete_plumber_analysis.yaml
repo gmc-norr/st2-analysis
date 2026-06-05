@@ -305,6 +305,7 @@ tasks:
       pipeline: <% ctx().pipeline %>
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
+      secondary_analysis_id: <% ctx().secondary_analysis_id %>
 
   report_failure:
     action: core.inject_trigger
