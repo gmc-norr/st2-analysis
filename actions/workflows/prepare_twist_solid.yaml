@@ -12,6 +12,7 @@ input:
 
 vars:
   - work_dir:
+  - platform:
 
 output:
   - work_dir: <% ctx().work_dir %>
@@ -44,11 +45,29 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         do:
-          make_gms_solid_input_files
+          get_run_platform
+
+  get_run_platform:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - platform: <% result().result.body.runs.first().platform.replace(" ", "") %>
+        do: make_gms_solid_input_files
 
   make_gms_solid_input_files:
     action: core.remote
     input:
-      cmd: 'hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform NovaSeqXPlus'
+      cmd: 'hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform {{ ctx().platform }}'
       cwd: "{{ ctx().work_dir }}"
       hosts: <% ctx().host %>
