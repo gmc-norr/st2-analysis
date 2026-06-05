@@ -136,8 +136,8 @@ tasks:
           - input_files:
             - <% result().result.where($.type.matches("bam")).select($) %>
             - <% result().result.where($.type.matches("vcf")).select($) %>
-          - bam_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("bam")).select($.path) %>
-          - vcf_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("vcf")).select($.path) %>
+          - bam_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("bam")).select($.path).first() %>
+          - vcf_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("vcf")).select($.path).first() %>
         do: make_secondary_pipeline_input
       - when: <% failed() %>
         publish:
