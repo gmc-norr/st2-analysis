@@ -11,12 +11,10 @@ input:
   - host
 
 vars:
-  - msg:
   - work_dir:
 
 output:
   - work_dir: <% ctx().work_dir %>
-  - error: <% ctx().msg %>
 
 tasks:
   name_work_dir:
@@ -37,9 +35,6 @@ tasks:
         do:
           symlink_fastq
       - when: "{{ failed() }}"
-        publish:
-          - msg: "Failed to make work dir {{ ctx().work_dir }}/fastq
-             {{ result() | to_json_string }}"
 
   symlink_fastq:
     with: fastq_file in <% ctx().fastq_files %>
@@ -50,10 +45,6 @@ tasks:
       - when: "{{ succeeded() }}"
         do:
           make_gms_solid_input_files
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "Failed to symlink fastq files.
-             {{ result() | to_json_string }}"
 
   make_gms_solid_input_files:
     action: core.remote
@@ -62,7 +53,3 @@ tasks:
       cwd: "{{ ctx().work_dir }}"
       hosts: <% ctx().host %>
     next:
-      - when: "{{ failed() }}"
-        publish:
-          - msg: "Failed to make GMS Solid input files
-             {{ result() | to_json_string }}"
