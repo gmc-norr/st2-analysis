@@ -1,0 +1,19 @@
+---
+name: get_samples_for_plumber
+pack: gmc_norr_analysis
+description: >
+  Workflow for starting downstream analysis of samples with plumber
+  from a ready sequencing run
+runner_type: orquesta
+entry_point: workflows/get_samples_for_plumber.yaml
+enabled: true
+
+parameters:
+  run_id:
+    description: ID of a sequencing run
+    type: string
+    required: true
+  analysis_id:
+    description: ID of the analysis that triggered the workflow
+    type: string
+    required: true
