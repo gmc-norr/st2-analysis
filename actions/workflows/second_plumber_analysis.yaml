@@ -1,0 +1,238 @@
+
+version: 1.0
+
+description: Build Scout load config for a case, and load into scout and loqusdb.
+
+input:
+  - first_pipeline
+  - first_analysis_id
+  - first_workdir
+  - plumber_host
+
+tasks:
+  get_sample_id:
+    action: core.local
+    input:
+      cmd: basename <% ctx().first_workdir %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - sample_id: <% result().stdout %>
+        do: get_run_id
+      - when: <% failed() %>
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
+
+  get_run_id:
+    action: cleve.get_analyses
+    input:
+      analysis_id: <% ctx().first_analysis_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: <% failed() %>
+        publish:
+          - msg: Cleve not reachable
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        publish:
+          - msg: analysis <% ctx().first_analysis_id %> not found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        publish:
+          - msg: more than one analysis with ID <% ctx().first_analysis_id %> found in Cleve
+        do: report_failure
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - run_id: <% result().result.body.analyses.first().runs.first() %>
+        do:
+          make_case_id
+
+  make_case_id:
+    action: gmc_norr_analysis.make_case_id
+    input:
+      samples:
+        - <% ctx().sample_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - case_id: <% result().result %>
+        do:
+          get_test_profile
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to generate case id.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_test_profile:
+    action: igene.get_sample
+    input:
+      sample_id: <% ctx().sample_id %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - test_profile: <% result().result.body.TestProfile %>
+        do:
+          get_plumber_arguments
+      - when: "{{ failed()  }}"
+        publish:
+          msg="Failed to get sample data from the iGene API.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  get_plumber_arguments:
+    action: gmc_norr_analysis.get_plumber_arguments
+    input:
+       test_profile: <% ctx().test_profile %>
+       number: 2
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - pipeline: <% result().result.Pipeline %>
+          - pipeline_version: <% result().result.Version %>
+          - pipeline_profile: <% result().result.Profile %>
+          - plumber_config_version: <% result().result.ConfigVersion %>
+          - new_workdir: "{{ ctx().first_workdir }}/{{ ctx().pipeline.split('/')[-1] }}"
+        do: make_new_work_dir
+      - when: <% failed() %>
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
+
+  make_new_work_dir:
+    action: core.local
+    input:
+      cmd:  "mkdir -p <% ctx().new_workdir %>"
+    next:
+      - when: <% succeeded() %>
+        do: get_first_output_files
+      - when: <% failed() %>
+        publish:
+          - msg: "{{ result() | to_json_string }}"
+        do:
+          - report_failure
+
+  get_first_output_files:
+    action: gmc_norr_analysis.get_pipeline_output_files
+    input:
+      pipeline: <% ctx().first_pipeline %>
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - first_output_files: <% result().result %>
+        do: parse_first_output_files
+      - when: <% failed() %>
+        publish:
+          - msg: <% result() %>
+        do:
+          - report_failure
+
+  parse_first_output_files:
+    action: core.noop
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - input_files: "[{% for file in ctx().first_output_files %}
+              {% if file.type == 'bam' or file.type == 'vcf_snv' %}
+              {% set file = dict(file.items(), analysis_id = ctx().first_analysis_id,
+              name = file.path.split('/')[-1]) %}
+              {{ file }},
+              {% endif %}
+              {% endfor %}]"
+          - bam_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("bam")).select($.path).first() %>
+          - vcf_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("vcf")).select($.path).first() %>
+        do: make_secondary_pipeline_input
+      - when: <% failed() %>
+        publish:
+          - msg: "{{ result() | to_json_string }}"
+        do:
+          - report_failure
+
+  make_secondary_pipeline_input:
+    action: core.local
+    input:
+      cmd: 'echo -e "sample\tfamily\tvcf\tbam\n{{ ctx().sample_id }}\t{{ ctx().case_id }}\t{{ ctx().vcf_file }}\t{{ ctx().bam_file }}" > samples.tsv'
+      cwd: <% ctx().new_workdir %>
+    next:
+      - when: <% succeeded() %>
+        do: add_secondary_analysis_to_cleve
+      - when: <% failed() %>
+        publish:
+          - msg: "{{ result() | to_json_string }}"
+        do:
+          - report_failure
+
+  add_secondary_analysis_to_cleve:
+    action: cleve.add_analysis
+    input:
+      input_files: <% ctx().input_files %>
+      path: <% ctx().new_workdir %>
+      software: <% ctx().pipeline %>
+      software_version: <% ctx().pipeline_version %>
+      run_id: <% ctx().run_id %>
+      state: pending
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.analysis_id %>
+        do: start_plumber
+      - when: <% failed() %>
+        publish:
+          - msg: "{{ result() | to_json_string }}"
+        do:
+          - report_failure
+
+  start_plumber:
+    action: core.remote
+    input:
+      cmd: "nohup plumber run <% ctx().pipeline %>
+        --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> &> plumber.log"
+      cwd: <% ctx().new_workdir %>
+      hosts: <% ctx().plumber_host %>
+      timeout: 2500
+    next:
+      - when: <% succeeded() %>
+        do:
+          - start_update_complete_workflow
+      - when: <% failed() %>
+        publish:
+          - msg: <% result().values().first().stderr %>
+        do:
+          - report_failure
+
+  start_update_complete_workflow:
+    action: gmc_norr_analysis.update_complete_plumber_analysis
+    input:
+      analysis_id: <% ctx().first_analysis_id %>
+      pipeline: <% ctx().first_pipeline %>
+      workdir: <% ctx().first_workdir %>
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      case_id: <% ctx().case_id %>
+      secondary_analysis_id: <% ctx().plumber_analysis_id %>
+      secondary_pipeline: <% ctx().pipeline %>
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed to bridge to scout in {{ ctx().first_workdir }}"
+        message: <% ctx().msg %>
+    next:
+      - do: fail
