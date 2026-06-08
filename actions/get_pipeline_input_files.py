@@ -1,7 +1,7 @@
 from st2common.runners.base_action import Action
 
 
-def get_rd_input_files(sample_id, analysis_id, fastq_files):
+def get_fastq_input_files(sample_id, analysis_id, fastq_files):
     input_files = []
     for file in fastq_files["R1"] + fastq_files["R2"]:
         input_files.append({'analysis_id': analysis_id, 'name':  file.split('/')[-1],
@@ -15,9 +15,9 @@ class GetPipelineInputFilesAction(Action):
             return (False, "The number of R1 and R2 fastq files don't match")
         if len(fastq_files[sample_id]["R1"]) < 1:
             return (False, "No fastq files received")
-        if pipeline == "nf-core/raredisease":
-            input_files = get_rd_input_files(sample_id, analysis_ids[sample_id],
-                                             fastq_files[sample_id])
+        if pipeline == "nf-core/raredisease" or pipeline == "genomic-medicine-sweden/Twist_Solid":
+            input_files = get_fastq_input_files(sample_id, analysis_ids[sample_id],
+                                                fastq_files[sample_id])
         else:
             return (False, f"Pipeline not supported: {pipeline}")
         return (True, input_files)

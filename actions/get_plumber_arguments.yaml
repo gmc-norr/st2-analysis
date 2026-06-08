@@ -11,10 +11,15 @@ parameters:
     description: URL to the (raw) config file repo
     type: string
     required: true
-    default: "{{ config_context.plumber.config_repo}}"
+    default: "{{ config_context.plumber.config_repo }}"
     position: 0
   test_profile:
     description: The iGene TestProfile to get the corresponding settings for
     type: string
     required: true
     position: 1
+  number:
+    description: Which of the downstream analysis to choose
+    default: 1
+    position: 2
+    type: integer

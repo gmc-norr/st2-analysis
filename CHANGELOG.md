@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.4.2](https://github.com/gmc-norr/st2-analysis/compare/v0.4.1...v0.4.2) (2026-06-01)
+
+
+### Bug Fixes
+
+* **update_complete_plumber_analysis:** update path to analysis in a seperate step from adding the output files ([#82](https://github.com/gmc-norr/st2-analysis/issues/82)) ([9c917fd](https://github.com/gmc-norr/st2-analysis/commit/9c917fd1ef06cc8163784129db84ee6d9654e6dc))
+
+## [0.4.1](https://github.com/gmc-norr/st2-analysis/compare/v0.4.0...v0.4.1) (2026-05-29)
+
+
+### Bug Fixes
+
+* **get_plumber_arguments:** only compare major version of application profiles ([#78](https://github.com/gmc-norr/st2-analysis/issues/78)) ([0121c71](https://github.com/gmc-norr/st2-analysis/commit/0121c7181abbb9157f11c7060001aa326de62887))
+* **plumber_analysis:** limit concurrency to 1 and increase pause to 30s ([#77](https://github.com/gmc-norr/st2-analysis/issues/77)) ([e280318](https://github.com/gmc-norr/st2-analysis/commit/e2803183805316dbe44adaa59fca8aa91e275cec))
+* **plumber_analysis:** only email about failing to get sample info from iGene if the sample id starts with "Seq" ([#75](https://github.com/gmc-norr/st2-analysis/issues/75)) ([b732908](https://github.com/gmc-norr/st2-analysis/commit/b7329086f51a37f9f126d22ca8e69d3640db7d9c))
+* **plumber_analysis:** redirect plumber's stderr  ([#76](https://github.com/gmc-norr/st2-analysis/issues/76)) ([471896c](https://github.com/gmc-norr/st2-analysis/commit/471896c9dc654b834eed82c439141f3009a7dd5d))
+* rd workflow checks flowcell instead of number of reads per sample ([#73](https://github.com/gmc-norr/st2-analysis/issues/73)) ([cd02a7d](https://github.com/gmc-norr/st2-analysis/commit/cd02a7d8f09ae705d81b047a0217f5e2f7ff0b4c))
+* **update_complete_plumber_analysis:** increase rsync timeout and change flags to `-a --remove-source-files` ([#79](https://github.com/gmc-norr/st2-analysis/issues/79)) ([cb30a76](https://github.com/gmc-norr/st2-analysis/commit/cb30a7654831b346a054bd3007947e0cdc3d986f))
+
 ## [0.4.0](https://github.com/gmc-norr/st2-analysis/compare/v0.3.2...v0.4.0) (2026-05-20)
 
 
