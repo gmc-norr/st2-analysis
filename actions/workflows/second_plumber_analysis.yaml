@@ -134,10 +134,10 @@ tasks:
       - when: <% succeeded() %>
         publish:
           - input_files:
-            - <% result().result.where($.type.matches("bam")).select($) %>
-            - <% result().result.where($.type.matches("vcf")).select($) %>
-          - bam_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("bam")).select($.path).first() %>
-          - vcf_file: <% ctx().new_workdir %>/<% result().result.where($.type.matches("vcf")).select($.path).first() %>
+            - <% result().result.where($.type.matches("bam")).select($).first() %>
+            - <% result().result.where($.type.matches("vcf")).select($).first() %>
+          - bam_file: <% ctx().first_workdir %>/<% result().result.where($.type.matches("bam")).select($.path).first() %>
+          - vcf_file: <% ctx().first_workdir %>/<% result().result.where($.type.matches("vcf")).select($.path).first() %>
         do: make_secondary_pipeline_input
       - when: <% failed() %>
         publish:
@@ -162,9 +162,10 @@ tasks:
   add_secondary_analysis_to_cleve:
     action: cleve.add_analysis
     input:
-      input_files: "{% for file in ctx().input_files %}
+      input_files: "[{% for file in ctx().input_files %}
         {% set file = dict(file.items(), analysis_id = ctx().first_analysis_id, name = file.path) %}
-        {{ file }}{% endfor %}"
+        {{ file }},
+        {% endfor %}]"
       path: <% ctx().new_workdir %>
       software: <% ctx().pipeline %>
       software_version: <% ctx().pipeline_version %>
