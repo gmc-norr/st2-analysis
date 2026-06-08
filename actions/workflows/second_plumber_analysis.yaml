@@ -117,14 +117,14 @@ tasks:
       cmd:  "mkdir -p <% ctx().new_workdir %>"
     next:
       - when: <% succeeded() %>
-        do: get_input_files
+        do: get_first_output_files
       - when: <% failed() %>
         publish:
           - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
-  get_input_files:
+  get_first_output_files:
     action: gmc_norr_analysis.get_pipeline_output_files
     input:
       pipeline: <% ctx().first_pipeline %>
@@ -133,15 +133,32 @@ tasks:
     next:
       - when: <% succeeded() %>
         publish:
-          - input_files:
-            - <% result().result.where($.type.matches("bam")).select($).first() %>
-            - <% result().result.where($.type.matches("vcf")).select($).first() %>
-          - bam_file: <% ctx().first_workdir %>/<% result().result.where($.type.matches("bam")).select($.path).first() %>
-          - vcf_file: <% ctx().first_workdir %>/<% result().result.where($.type.matches("vcf")).select($.path).first() %>
-        do: make_secondary_pipeline_input
+          - first_output_files: <% result().result %>
+        do: parse_first_output_files
       - when: <% failed() %>
         publish:
           - msg: <% result() %>
+        do:
+          - report_failure
+
+  parse_first_output_files:
+    action: core.noop
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - input_files: "[{% for file in ctx().first_output_files %}
+              {% if file.type == 'bam' or file.type == 'vcf_snv' %}
+              {% set file = dict(file.items(), analysis_id = ctx().first_analysis_id,
+              name = file.path.split('/')[-1]) %}
+              {{ file }},
+              {% endif %}
+              {% endfor %}]"
+          - bam_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("bam")).select($.path).first() %>
+          - vcf_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("vcf")).select($.path).first() %>
+        do: make_secondary_pipeline_input
+      - when: <% failed() %>
+        publish:
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
@@ -162,10 +179,7 @@ tasks:
   add_secondary_analysis_to_cleve:
     action: cleve.add_analysis
     input:
-      input_files: "[{% for file in ctx().input_files %}
-        {% set file = dict(file.items(), analysis_id = ctx().first_analysis_id, name = file.path) %}
-        {{ file }},
-        {% endfor %}]"
+      input_files: <% ctx().input_files %>
       path: <% ctx().new_workdir %>
       software: <% ctx().pipeline %>
       software_version: <% ctx().pipeline_version %>
