@@ -1,5 +1,20 @@
 # Changelog
 
+## [0.5.0](https://github.com/gmc-norr/st2-analysis/compare/v0.4.2...v0.5.0) (2026-06-08)
+
+
+### Features
+
+* add suport for genomic-medicine-sweden/Twist_Solid in get pipeline input files ([#67](https://github.com/gmc-norr/st2-analysis/issues/67)) ([a4abaf6](https://github.com/gmc-norr/st2-analysis/commit/a4abaf6f3622ac448b0d80846f5d8f3189bbc96b))
+* complete twist solid plumber webhook triggers second plumber analysis workflow, not update complete analysis ([#68](https://github.com/gmc-norr/st2-analysis/issues/68)) ([68f17fc](https://github.com/gmc-norr/st2-analysis/commit/68f17fc26ec0a8418143f8def03c6bbb9f0ab9c8))
+* **update_complete_plumber_analysis:** Handle a secondary plumber analysis  ([#85](https://github.com/gmc-norr/st2-analysis/issues/85)) ([b4fc899](https://github.com/gmc-norr/st2-analysis/commit/b4fc8994fede145610ce0ca57d124b4eefb6919c))
+
+
+### Bug Fixes
+
+* **get_plumber_aruments:** handle several downstream analyses ([#80](https://github.com/gmc-norr/st2-analysis/issues/80)) ([126ad71](https://github.com/gmc-norr/st2-analysis/commit/126ad71820d1190a0f7f4f7a77942a3fbb8874b5))
+* **update_complete_plumber_analysis:** make msg variable only stderr ([#88](https://github.com/gmc-norr/st2-analysis/issues/88)) ([7e4f0f0](https://github.com/gmc-norr/st2-analysis/commit/7e4f0f0dbd23f1200cd1babb1e6b5b720fa25a6a))
+
 ## [0.4.2](https://github.com/gmc-norr/st2-analysis/compare/v0.4.1...v0.4.2) (2026-06-01)
 
 
