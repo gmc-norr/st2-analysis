@@ -21,7 +21,7 @@ tasks:
         do: get_run_id
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
@@ -36,7 +36,7 @@ tasks:
     next:
       - when: <% failed() %>
         publish:
-          - msg: Cleve not reachable
+          - msg: "Cleve not reachable. {{ result() | to_json_string }}"
         do: report_failure
       - when: <% succeeded() and result().result.body.metadata.count = 0 %>
         publish:
@@ -107,7 +107,7 @@ tasks:
         do: make_new_work_dir
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
@@ -137,7 +137,7 @@ tasks:
         do: parse_first_output_files
       - when: <% failed() %>
         publish:
-          - msg: <% result() %>
+          - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
