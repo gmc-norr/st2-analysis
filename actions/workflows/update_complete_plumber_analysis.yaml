@@ -319,7 +319,7 @@ tasks:
   log_sample:
     action: core.local
     input:
-      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> complete/' <% ctx().pipeline %>.automation.log
+      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> completed/' <% ctx().pipeline %>.automation.log
       cwd: <% ctx().run_path %>
     next:
       - when: "{{ failed() }}"
