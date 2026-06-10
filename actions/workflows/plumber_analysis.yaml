@@ -232,11 +232,28 @@ tasks:
         publish:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do:
-          start_plumber
+          log_sample
       - when: "{{ failed() }}"
         publish:
           msg="Failed to add {{ ctx().pipeline }} analysis to Cleve
             {{ result().stderr }}"
+        do:
+          - report_failure
+
+  log_sample:
+    action: core.local
+    input:
+      cmd:  echo <% ctx().sample_id %> started >> <% ctx().test_profile %>.automation.log
+      cwd: <% ctx().run_path %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          input_files="{{ result().result }}"
+        do:
+          start_plumber
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to log"
         do:
           - report_failure
 
