@@ -1,0 +1,82 @@
+version: "1.0"
+
+description: Check finished finished samples against worksheet in iGene.
+
+input:
+  - test_profile
+  - completed_samples
+  - failed_samples
+
+vars:
+  - msg:
+  - run_ids:
+
+tasks:
+  get_sample_info:
+    action: igene.get_sample
+    input:
+      sample_id: "{{ ctx().completed_samples[0] }}"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get sample info from the iGene API.
+          {{ result() | to_json_string }}"
+      - when: "{{ succeded() and result().result.body.TestProfile != ctx().test_profile }}"
+        publish:
+          msg="Something is wrong.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+      - when: "{{ succeded() and result().result.body.TestProfile == ctx().test_profile }}"
+        publish:
+          - worksheet_id: <% result().result.body.WorksheetID %>
+        do:
+          get_worksheet_info
+
+  get_worksheet_info:
+    action: igene.get_worksheets
+    input:
+      worksheet_id: "{{ ctx().worksheet_id }}"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get sample info from the iGene API.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+      - when: "{{ succeded() }}"
+        publish:
+            - worksheet_samples: <% result().result.body.where($.TestProfile.matches(ctx().test_profile)).select($.SampleID) %>
+        do:
+          check_samples
+
+  check_samples:
+    action: core.noop
+    next:
+      - when: "{{ ctx().worksheet_samples | sort != (ctx().completed_samples + ctx().failed_samples) | sort }}"
+        publish:
+          - msg: "Samples on worksheet: {{ ctx().worksheet_samples }}
+              Completed samples: {{ ctx().completed_samples }}
+              Failed samples: {{ ctx().failed_samples }}"
+        do:
+          report_failure
+      - when: "{{ ctx().worksheet_samples | sort != (ctx().completed_samples + ctx().failed_samples) | sort }}"
+        do:
+          report_success
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed: {{ ctx).test_profile }} analyses on {{ ctx().worksheet_id }} missing"
+        message: "{{ ctx().msg }}"
+
+  report_success:
+    action: core.inject_trigger
+    input: # should maybe go to another email?
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "{{ ctx().worksheet_id }} {{ ctx).test_profile }} analyses done"
+        message: "Successful samples: {{ ctx().samples | to_json_string }}
+          Failed samples: {{ ctx().failed_samples | to_json_string }}"

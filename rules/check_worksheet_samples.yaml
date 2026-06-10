@@ -1,0 +1,16 @@
+---
+name: check_worksheet_samples
+pack: gmc_norr_analysis
+description: >
+  Send a notification email
+enabled: true
+
+trigger:
+  type: cleve.complete_worksheet
+
+action:
+  ref: gmc_norr_analysis.check_worksheet_samples
+  parameters:
+    test_profile: "{{ trigger.test_profile }}"
+    completed_samples: "{{ trigger.completed_samples }}"
+    failed_samples: "{{ trigger.failed_samples }}"
