@@ -68,6 +68,6 @@ tasks:
   make_gms_solid_input_files:
     action: core.remote
     input:
-      cmd: 'hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform {{ ctx().platform }}'
+      cmd: '/adhome/svcgenetikstackstorm/.local/bin/hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform {{ ctx().platform }}'
       cwd: "{{ ctx().work_dir }}"
       hosts: <% ctx().host %>
