@@ -16,6 +16,8 @@ input:
 
 vars:
   - msg:
+  - platform:
+  - run_path:
   - output_files:
   - secondary_output_files:
   - destination:
@@ -100,6 +102,7 @@ tasks:
       - when: <% succeeded() and result().result.body.metadata.count = 1 %>
         publish:
           - platform: <% result().result.body.runs.first().platform %>
+          - run_path: <% result().result.body.runs.first().path %>
         do: get_destination
 
   get_destination:
@@ -310,7 +313,21 @@ tasks:
       output_path: <% ctx().new_workdir %>
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
     next:
-      - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+      - when: "{{ succeeded() }}"
+        do: log_sample
+
+  log_sample:
+    action: core.local
+    input:
+      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> complete/' <% ctx().pipeline %>.automation.log
+      cwd: <% ctx().run_path %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to log success"
+        do:
+          - report_failure
+      - when: "{{ succeeded() }} and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do: copy_bam
 
   copy_bam:
