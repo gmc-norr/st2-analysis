@@ -1,0 +1,24 @@
+---
+name: log_plumber_failure
+pack: gmc_norr_analysis
+description: >
+  Log when a run ends in failure
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type:
+    type: equals
+    pattern: end
+  trigger.body.success:
+    type: equals
+    pattern: false
+
+action:
+  ref: gmc_norr_analysis.log_plumber_failure
+  parameters:
+    workdir: "{{ trigger.body.workdir }}"
