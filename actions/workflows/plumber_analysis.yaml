@@ -113,7 +113,7 @@ tasks:
     next:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
         publish:
-          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().test_profile }}/{{ ctx().sample_id }}"
+          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}/{{ ctx().sample_id }}"
         do:
           rd_check_flowcell
       - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
