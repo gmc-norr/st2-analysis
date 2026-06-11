@@ -1,0 +1,30 @@
+---
+name: prepare_twist_solid
+pack: gmc_norr_analysis
+description: Workflow for preparing to start a Twist Solid analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/prepare_twist_solid.yaml
+enabled: true
+
+parameters:
+  sample_id:
+    description: The ID of the sample
+    type: string
+    required: true
+  run_id:
+    description: The ID of the run
+    type: string
+    required: true
+  fastq_files:
+    description: The sample's fastq files
+    type: array
+    required: true
+  twist_solid_dir:
+    description: The path to the directory where we have to start snakemake analyses from
+    type: string
+    required: true
+    default: "{{ config_context.plumber.twist_solid_dir }}"
+  host:
+    description: The host where to run hydra-genetics on
+    type: string
+    required: true

@@ -47,7 +47,6 @@ tasks:
           - mother_sample_id: <% result().result.body.Mother %>
           - father_sample_id: <% result().result.body.Father %>
           - sex: <% result().result.body.Sex %>
-          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().test_profile }}/{{ ctx().sample_id }}"
         do:
           get_fastq_files
       - when: "{{ succeeded() and result().result.body.TestProfile not in ctx().supported_profiles }}"
@@ -113,9 +112,14 @@ tasks:
     action: core.noop
     next:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
+        publish:
+          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}/{{ ctx().sample_id }}"
         do:
           rd_check_flowcell
-      - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
+      - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+        do:
+          gms_solid_workflow
+      - when: "{{ ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid'}}"
         publish:
           msg="Unsupported pipeline {{ ctx().pipeline }}"
         do:
@@ -194,6 +198,25 @@ tasks:
       - when: "{{ failed() }}"
         publish:
           msg="Failed to make rare-disease samplesheet.
+          {{ result() | to_json_string }}"
+        do: report_failure
+
+  gms_solid_workflow:
+    action: gmc_norr_analysis.prepare_twist_solid
+    input:
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      fastq_files: "{{ ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 }}"
+      host: <% ctx().plumber_host %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - output_dir: <% result().output.work_dir %>
+        do:
+          format_cleve_input_files
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to output directory.
           {{ result() | to_json_string }}"
         do: report_failure
 

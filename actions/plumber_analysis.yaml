@@ -42,3 +42,4 @@ parameters:
     immutable: true
     default:
       - WGSRareDisease_1
+      - PanelTwistSolid_0.23.0

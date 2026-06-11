@@ -65,7 +65,9 @@ plumber:
     config_repo:
       type: string
       description: Link to the raw config-files repo, which has the files that translate TestProfile into a pipeline with arguments
-
     host:
       type: string
-      description: Where to run the analysis with plumber
+      description: The host where the analysis should be run with plumber
+    twist_solid_dir:
+      type: string
+      description: Path to prepare and run Twist Solid analyses from

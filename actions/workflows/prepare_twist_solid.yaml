@@ -1,0 +1,73 @@
+version: 1.0
+name: prepare_twist_solid
+description: >
+  Workflow for preparing to start a Twist Solid analysis of a sample with plumber
+
+input:
+  - sample_id
+  - run_id
+  - fastq_files
+  - twist_solid_dir
+  - host
+
+vars:
+  - work_dir:
+  - platform:
+
+output:
+  - work_dir: <% ctx().work_dir %>
+
+tasks:
+  name_work_dir:
+    action: core.noop
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - work_dir: "{{ ctx().twist_solid_dir }}/{{ ctx().run_id }}/{{ ctx().sample_id }}"
+        do:
+          make_work_dir
+
+  make_work_dir:
+    action: core.local
+    input:
+      cmd: "mkdir -p {{ ctx().work_dir }}/fastq"
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          symlink_fastq
+      - when: "{{ failed() }}"
+
+  symlink_fastq:
+    with: fastq_file in <% ctx().fastq_files %>
+    action: core.local
+    input:
+      cmd: 'ln -s <% item(fastq_file) %> <% ctx().work_dir %>/fastq'
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          get_run_platform
+
+  get_run_platform:
+    action: cleve.get_runs
+    input:
+      run_id: <% ctx(run_id) %>
+    retry:
+      when: "{{ failed() }}"
+      delay: 1
+      count: 2
+    next:
+      - when: <% succeeded() and result().result.body.metadata.count = 0 %>
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count > 1 %>
+        do: fail
+      - when: <% succeeded() and result().result.body.metadata.count = 1 %>
+        publish:
+          - platform: <% result().result.body.runs.first().platform.replace(" ", "") %>
+        do: make_gms_solid_input_files
+
+  make_gms_solid_input_files:
+    action: core.remote
+    input:
+      cmd: '/adhome/svcgenetikstackstorm/.local/bin/hydra-genetics create-input-files --nreads 5000 --directory fastq --tc 1.0 --platform {{ ctx().platform }}'
+      cwd: "{{ ctx().work_dir }}"
+      hosts: <% ctx().host %>
