@@ -323,7 +323,7 @@ tasks:
   log_sample:
     action: core.local
     input:
-      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> completed/' <% ctx().test_profile %>.<% ctx().log_suffix %>
+      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> completed/' <% ctx().test_profile %><% ctx().log_suffix %>
       cwd: <% ctx().run_path %>
     next:
       - when: "{{ failed() }}"

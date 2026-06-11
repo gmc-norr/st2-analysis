@@ -72,3 +72,4 @@ plumber:
     log_suffix:
       type: string
       description: Suffix to use when naming automation log files
+      default: .stackstorm.log

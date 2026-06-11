@@ -243,7 +243,7 @@ tasks:
   log_sample:
     action: core.local
     input:
-      cmd:  echo <% ctx().sample_id %> started >> <% ctx().test_profile %>.<% ctx().log_suffix %>
+      cmd:  echo <% ctx().sample_id %> started >> <% ctx().test_profile %><% ctx().log_suffix %>
       cwd: <% ctx().run_path %>
     next:
       - when: "{{ succeeded() }}"
