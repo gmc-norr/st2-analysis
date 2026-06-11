@@ -312,13 +312,15 @@ tasks:
     next:
       - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do: copy_bam
+      - when: "{{ succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: noop
 
   copy_bam:
     action: gmc_norr_seqdata.copy_bam
     input:
       run_id: <% ctx().run_id %>
       pipeline: <% ctx().pipeline %>
-      bam_path: <% ctx().new_workdir %>/bam_dna
+      bam_path: <% ctx().new_workdir %>/bam_dna/
     next:
       - when: "{{ failed() }}"
         publish:
