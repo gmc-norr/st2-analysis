@@ -42,3 +42,8 @@ parameters:
     immutable: true
     default:
       - WGSRareDisease_1
+  log_suffix:
+    description: Workdir of failed analysis
+    type: string
+    required: true
+    default: "{{ config_context.plumber.log_suffix }}"

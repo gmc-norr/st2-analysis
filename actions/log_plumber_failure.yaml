@@ -1,0 +1,20 @@
+---
+name: log_plumber_failure
+pack: gmc_norr_analysis
+description: >
+  Workflow for starting downstream analysis of samples with plumber
+  from a ready sequencing run
+runner_type: orquesta
+entry_point: workflows/log_plumber_failure.yaml
+enabled: true
+
+parameters:
+  workdir:
+    description: Workdir of failed analysis
+    type: string
+    required: true
+  log_suffix:
+    description: Workdir of failed analysis
+    type: string
+    required: true
+    default: "{{ config_context.plumber.log_suffix }}"

@@ -1,0 +1,72 @@
+version: "1.0"
+
+description: >
+  Update the log of a failed analysis to say that the sample failed.
+
+input:
+  - workdir
+  - log_suffix
+
+vars:
+  - msg:
+  - sample_id:
+  - logfile:
+
+tasks:
+  get_sample_id:
+    action: core.local
+    input:
+      cmd: basename <% ctx().workdir %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - sample_id: <% result().stdout %>
+        do:
+          find_log_file
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to parse sample ID from path
+              {{ result().stderr }}"
+        do:
+          - report_failure
+
+  find_log_file:
+    action: core.local
+    input:
+      cmd: grep -l <% ctx().sample_id %> ../../*<% ctx().log_suffix %>
+      cwd: <% ctx().workdir %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - sample_id: <% result().stdout %>
+        do:
+          log_failure
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to find logfile.
+              {{ result().stderr }}"
+        do:
+          - report_failure
+
+  log_failure:
+    action: core.local
+    input:
+      cmd: 'sed -i "s/{{ ctx().sample_id}} started/{{ ctx().sample_id}} failed/" {{ ctx().logfile }}'
+      cwd: <% ctx().workdir %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to update log file
+              {{ result().stderr }}"
+        do:
+          - report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed to log failure {{ctx().workdir}}"
+        message: "{{ ctx().msg }}"
+    next:
+      - do: fail

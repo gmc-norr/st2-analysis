@@ -13,6 +13,7 @@ input:
   - case_id
   - secondary_analysis_id
   - secondary_pipeline
+  - log_suffix
 
 vars:
   - msg:
@@ -22,6 +23,7 @@ vars:
   - secondary_output_files:
   - destination:
   - new_workdir:
+  - test_profile:
 
 output:
   - msg: <% ctx().msg %>
@@ -314,12 +316,14 @@ tasks:
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
     next:
       - when: "{{ succeeded() }}"
+        publish:
+          - test_profile: <% result().output.test_profile %>
         do: log_sample
 
   log_sample:
     action: core.local
     input:
-      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> completed/' <% ctx().pipeline %>.automation.log
+      cmd:  sed -i 's/<% ctx().sample_id %> started/<% ctx().sample_id %> completed/' <% ctx().test_profile %>.<% ctx().log_suffix %>
       cwd: <% ctx().run_path %>
     next:
       - when: "{{ failed() }}"

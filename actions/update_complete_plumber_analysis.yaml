@@ -40,3 +40,8 @@ parameters:
     description: The pipeline the secondary analysis was performed with. Required for Twist Solid analyses.
     type: string
     required: false
+  log_suffix:
+    description: Workdir of failed analysis
+    type: string
+    required: true
+    default: "{{ config_context.plumber.log_suffix }}"
