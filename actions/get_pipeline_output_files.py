@@ -31,32 +31,32 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
-def get_twist_solid_output_files(sample_id):
+def get_twist_solid_output_files(sample_id, case_id):
     output_files = [
         {'path': f'bam_dna/{sample_id}_T.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id
          },
         {'path': f'results/dna/{sample_id}_T/vcf/{sample_id}_T.annotated.'
          'exon_only.filter.hard_filter.codon_snv.vcf',
-         'level': 'sample', 'type': 'vcf_snv', 'parent_id': sample_id
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
-         'level': 'sample', 'type': 'html', 'parent_id': sample_id
+         'level': 'case', 'type': 'html', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/cnv/{sample_id}_T"
          ".pathology_purecn.cnv.html",
-         'level': 'sample', 'type': 'html', 'parent_id': sample_id
+         'level': 'case', 'type': 'html', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.TMB.txt",
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         'level': 'case', 'type': 'text', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T."
          "pathology_purecn.scarhrd_cnvkit_score.txt",
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         'level': 'case', 'type': 'text', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro."
          "filtered.score.tsv",
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         'level': 'case', 'type': 'text', 'parent_id': case_id
          }]
 
     return output_files
@@ -79,7 +79,7 @@ class GetPipelineOutputFiles(Action):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
         elif pipeline == "genomic-medicine-sweden/Twist_Solid":
-            output_files = get_twist_solid_output_files(sample_id)
+            output_files = get_twist_solid_output_files(sample_id, case_id)
         elif pipeline == "gmc-norr/scout-annotation":
             output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:
