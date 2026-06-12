@@ -19,8 +19,8 @@ criteria:
     type: equals
     pattern: true
   trigger.body.pipeline:
-    type: nequals
-    pattern: genomic-medicine-sweden/Twist_Solid
+    type: equals
+    pattern: nf-core/raredisease
 
 action:
   ref: gmc_norr_analysis.update_complete_plumber_analysis

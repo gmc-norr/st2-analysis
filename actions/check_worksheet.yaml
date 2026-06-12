@@ -1,0 +1,19 @@
+---
+name: check_worksheet
+pack: gmc_norr_analysis
+description: Workflow to check if all samples of the worksheet with
+  the TestProfile have been analysed
+runner_type: orquesta
+entry_point: workflows/check_worksheet.yaml
+enabled: true
+
+parameters:
+  test_profile:
+    description: The test profile that the samples were analysed with
+    type: string
+    required: true
+  samples:
+    description: The samples
+    type: array
+    items:
+      type: string
