@@ -1,0 +1,15 @@
+---
+name: check_worksheet
+pack: gmc_norr_analysis
+description: >
+  Send a notification email
+enabled: true
+
+trigger:
+  type: gmc_norr_analysis.complete_worksheet
+
+action:
+  ref: gmc_norr_analysis.check_worksheet
+  parameters:
+    test_profile: "{{ trigger.pipeline }}"
+    samples: "{{ trigger.samples }}"

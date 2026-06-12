@@ -1,0 +1,70 @@
+version: "1.0"
+
+description: The initial workflow for starting downstream analyses
+  with plumber from a ready BCLConvert analysis. Finds run IDs and starts another
+  workflow which find their respective samples and start the final plumber workflow
+  of te chain.
+
+input:
+  - workdir
+  - pipeline
+  - type
+  - success
+  - base_log_dir
+
+vars:
+  - msg:
+  - run_ids:
+
+tasks:
+  get_sample_id:
+    action: core.local
+    input:
+      cmd: basename <% ctx().workdir %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - sample_id: <% result().stdout %>
+          - log_dir: "{{ ctx().base_log_dir }}/{{ ctx().workdir.split('/')[-3] }}/{{ ctx().pipeline.split('/')[-1]}}"
+        do:
+          make_log_dir
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  make_log_dir:
+    action: core.local
+    input:
+      cmd: mkdir -p {{ ctx().run_id }}
+      cwd: <% ctx(log_dir) %>
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          write_log
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  write_log:
+    action: core.local
+    input:
+      cmd: echo {{ ctx().sample_id }} {{ ctx().success }} >> {{ ctx().type }}
+      cwd: <% ctx(log_dir) %>
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: <% result().stderr %>
+        do:
+          - report_failure
+
+  report_failure:
+    action: core.inject_trigger
+    input:
+      trigger_name: gmc_norr_analysis.email_notification
+      payload:
+        subject: "Failed: {{ ctx).test_profile }} analyses on {{ ctx().worksheet_id }} missing"
+        message: "{{ ctx().msg }}"

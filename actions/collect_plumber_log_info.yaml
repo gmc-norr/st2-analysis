@@ -1,0 +1,30 @@
+---
+name: collect_plumber_log_info
+pack: gmc_norr_analysis
+description: COllect info from plumbers webhooks to one place
+runner_type: orquesta
+entry_point: workflows/collect_plumber_log_info.yaml
+enabled: true
+
+parameters:
+  workdir:
+    description: The path to the analysis
+    type: string
+    required: true
+  pipeline:
+    description: ID of the ready analysis
+    type: string
+    required: true
+  type:
+    description: ID of the ready analysis
+    type: string
+    required: true
+  success:
+    description: ID of the ready analysis
+    type: string
+    required: true
+  base_log_dir:
+    description: ID of the ready analysis
+    type: string
+    required: true
+    default: "{{ config_context.plumber.log_dir }}"
