@@ -1,5 +1,4 @@
 import os
-import shutil
 from pathlib import Path
 from st2common import log as logging
 from st2reactor.sensor.base import PollingSensor
@@ -12,7 +11,7 @@ class CompleteWorksheetSensor(PollingSensor):
         super(CompleteWorksheetSensor, self).__init__(
             sensor_service, config, poll_interval
         )
-        self._watched_directory = self.config.get("log_directory")
+        self._watched_directory = self.config.get("plumber").get("log_dir")
 
     def setup(self):
         pass
@@ -30,6 +29,7 @@ class CompleteWorksheetSensor(PollingSensor):
                 if len(completed_samples) + len(failed_samples) == len(started_samples):
 
                     pipeline = dir.split("/")[-1]
+                    run_id = dir.split("/")[-2]
                     LOG.info(f"dispatching trigger gmc_norr_analysis.complete_worksheet\n"
                              f"completed_samples: {completed_samples}\n"
                              f"failed_samples: {failed_samples}\n"
@@ -41,7 +41,7 @@ class CompleteWorksheetSensor(PollingSensor):
                          "failed_samples": failed_samples,
                          "pipeline": pipeline}
                          )
-                    shutil.move(dir, self._watched_directory + "/complete ")
+                    os.rename(dir, self._watched_directory + f"/complete/{run_id}_{pipeline}")
 
     def samples_from_logfiles(self, dir):
         """
@@ -53,13 +53,13 @@ class CompleteWorksheetSensor(PollingSensor):
         failed_samples = []
         completed_samples = []
         try:
-            with open(dir + "/start") as file:
+            with open(dir + "/start", "r") as file:
                 sample_lines = file.readlines()
             started_samples = [sample_line.split(" ")[0] for sample_line in sample_lines]
         except FileNotFoundError:
             started_samples = []
         try:
-            with open(dir + "/end") as file:
+            with open(dir + "/end", "r") as file:
                 sample_lines = file.readlines()
             for sample_line in sample_lines:
                 sample, succeeded = sample_line.split(" ")
@@ -69,7 +69,7 @@ class CompleteWorksheetSensor(PollingSensor):
                     failed_samples.append(sample)
         except FileNotFoundError:
             started_samples = []
-        return started_samples, completed_samples, failed_samples
+        return list(set(started_samples)), list(set(completed_samples)), list(set(failed_samples))
 
     def check_ongoing_worksheets(self):
         dirs = set()

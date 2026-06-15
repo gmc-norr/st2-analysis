@@ -12,8 +12,13 @@ parameters:
     description: The test profile that the samples were analysed with
     type: string
     required: true
-  samples:
-    description: The samples
+  failed_samples:
+    description: The samples that completed the analysis
+    type: array
+    items:
+      type: string
+  completed_samples:
+    description: The samples that failed
     type: array
     items:
       type: string

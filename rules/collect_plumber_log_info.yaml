@@ -21,7 +21,6 @@ criteria:
 action:
   ref: gmc_norr_analysis.collect_plumber_log_info
   parameters:
-    payload:
       workdir: "{{ trigger.body.workdir }}"
       pipeline: "{{ trigger.body.pipeline }}"
       message_type: "{{ trigger.body.message_type }}"

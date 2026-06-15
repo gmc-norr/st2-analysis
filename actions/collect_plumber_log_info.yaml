@@ -23,9 +23,6 @@ parameters:
     description: If the plumber step was successful or not
     type: string
     required: true
-    enum:
-      - true
-      - false
   base_log_dir:
     description: Directory where the plumber log messages are collected
     type: string

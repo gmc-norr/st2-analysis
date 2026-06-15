@@ -12,4 +12,5 @@ action:
   ref: gmc_norr_analysis.check_worksheet
   parameters:
     test_profile: "{{ trigger.pipeline }}"
-    samples: "{{ trigger.samples }}"
+    completed_samples: "{{ trigger.completed_samples }}"
+    failed_samples: "{{ trigger.failed_samples }}"

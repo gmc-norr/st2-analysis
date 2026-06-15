@@ -37,8 +37,7 @@ tasks:
   make_log_dir:
     action: core.local
     input:
-      cmd: mkdir -p {{ ctx().run_id }}
-      cwd: <% ctx(log_dir) %>
+      cmd: mkdir -p {{ ctx().log_dir }}
     next:
       - when: "{{ succeeded() }}"
         do:
@@ -66,5 +65,5 @@ tasks:
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed: {{ ctx).test_profile }} analyses on {{ ctx().worksheet_id }} missing"
+        subject: "Log failed"
         message: "{{ ctx().msg }}"
