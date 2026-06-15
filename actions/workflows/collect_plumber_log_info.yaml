@@ -8,7 +8,7 @@ description: The initial workflow for starting downstream analyses
 input:
   - workdir
   - pipeline
-  - type
+  - message_type
   - success
   - base_log_dir
 
@@ -52,7 +52,7 @@ tasks:
   write_log:
     action: core.local
     input:
-      cmd: echo {{ ctx().sample_id }} {{ ctx().success }} >> {{ ctx().type }}
+      cmd: echo {{ ctx().sample_id }} {{ ctx().success }} >> {{ ctx().message_type }}
       cwd: <% ctx(log_dir) %>
     next:
       - when: "{{ failed() }}"

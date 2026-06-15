@@ -12,19 +12,19 @@ parameters:
     type: string
     required: true
   pipeline:
-    description: ID of the ready analysis
+    description: The pipeline the analysis is run with
     type: string
     required: true
-  type:
-    description: ID of the ready analysis
+  message_type:
+    description: Type of message from plumber webhook
     type: string
     required: true
   success:
-    description: ID of the ready analysis
+    description: If the plumber step was successful or not
     type: string
     required: true
   base_log_dir:
-    description: ID of the ready analysis
+    description: Directory where the plumber log messages are collected
     type: string
     required: true
     default: "{{ config_context.plumber.log_dir }}"
