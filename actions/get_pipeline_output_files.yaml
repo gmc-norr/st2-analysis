@@ -18,4 +18,4 @@ parameters:
   case_id:
     description: The case ID
     type: string
-    required: true
+    required: false
