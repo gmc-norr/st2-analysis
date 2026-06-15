@@ -1,7 +1,7 @@
 ---
 name: collect_plumber_log_info
 pack: gmc_norr_analysis
-description: COllect info from plumbers webhooks to one place
+description: Collect info from plumbers webhooks to one place
 runner_type: orquesta
 entry_point: workflows/collect_plumber_log_info.yaml
 enabled: true
@@ -23,6 +23,9 @@ parameters:
     description: If the plumber step was successful or not
     type: string
     required: true
+    enum:
+      - true
+      - false
   base_log_dir:
     description: Directory where the plumber log messages are collected
     type: string
