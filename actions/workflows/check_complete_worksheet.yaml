@@ -27,7 +27,7 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - worksheet_id: <% result().result.body.WorksheetID %>
-          - test_profile: <% result().result.body.TestProfile %?
+          - test_profile: <% result().result.body.TestProfile %>
         do:
           check_if_last_downstream_analysis
 
@@ -42,7 +42,7 @@ tasks:
           - msg: "Pipeline {{ ctx().pipeline }} was not the last pipeline."
         do:
           noop
-      - when: "{{ succeeded() and ctx().pipeline != result().result.Pipeline.split('/')[-1] }}"
+      - when: "{{ succeeded() and ctx().pipeline == result().result.Pipeline.split('/')[-1] }}"
         do:
           get_worksheet_info
 
@@ -73,7 +73,7 @@ tasks:
               Failed samples: {{ ctx().failed_samples }}"
         do:
           report_failure
-      - when: "{{ ctx().worksheet_samples | sort != (ctx().completed_samples + ctx().failed_samples) | sort }}"
+      - when: "{{ ctx().worksheet_samples | sort == (ctx().completed_samples + ctx().failed_samples) | sort }}"
         do:
           report_success
 
@@ -84,6 +84,8 @@ tasks:
       payload:
         subject: "Failed: {{ ctx().pipeline }} analyses on {{ ctx().worksheet_id }} missing"
         message: "{{ ctx().msg }}"
+    next:
+      do: fail
 
   report_success:
     action: core.inject_trigger
@@ -91,5 +93,5 @@ tasks:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
         subject: "{{ ctx().worksheet_id }} {{ ctx().test_profile }} analyses done"
-        message: "Successful samples: {{ ctx().completed_samples | to_json_string }}
-          Failed samples: {{ ctx().failed_samples | to_json_string }}"
+        message: "Successful samples:\n{% for sample in ctx().completed_samples %}{{ sample }}\n{% endfor %}
+                 \nFailed samples:\n{% for sample in ctx().failed_samples %}{{ sample }}\n{% endfor %}"
