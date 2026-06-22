@@ -1,89 +1,98 @@
 version: "1.0"
 
-description: Check finished finished samples against worksheet in iGene.
+description: Check finished finished samples against logged samples from plumber
 
 input:
   - pipeline
-  - completed_samples
-  - failed_samples
+  - sample_id
+  - run_id
+  - base_log_dir
 
 vars:
-  - msg:
-  - run_ids:
-
-output:
-  - msg: <% ctx().msg %>
+  - log_dir:
+  - n_complete:
+  - n_total:
+  - n_failed:
 
 tasks:
-  get_sample_info:
-    action: igene.get_sample
-    input:
-      sample_id: "{{ ctx().completed_samples[0] }}"
+  make_log_dir:
+    action: coe.noop
     next:
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to get sample info from the iGene API.
-          {{ result() | to_json_string }}"
       - when: "{{ succeeded() }}"
-        publish:
-          - worksheet_id: <% result().result.body.WorksheetID %>
-          - test_profile: <% result().result.body.TestProfile %>
+        publish: # TODO: How to get the run_id, i.e. ctx().workdir.split('/')[-3] ? Needs to match the log action at least
+          - log_dir: "{{ ctx().base_log_dir }}/{{ run_id() }}/{{ ctx().pipeline.split('/')[-1]}}"
         do:
-          check_if_last_downstream_analysis
+          complete_sample_log
 
-  check_if_last_downstream_analysis:
-    action: gmc_norr_analysis.get_plumber_arguments
+  complete_sample_log:
+    action: core.local
     input:
-      test_profile: <% ctx().test_profile %>
-      number: 0 # This will get the last one
+      cmd: "mv {{ ctx().log_dir }}/{{ ctx().sample_id }} {{ ctx().log_dir }}/{{ ctx().sample_id }}.complete"
     next:
-      - when: "{{ succeeded() and ctx().pipeline != result().result.Pipeline.split('/')[-1] }}"
-        publish:
-          - msg: "Pipeline {{ ctx().pipeline }} was not the last pipeline."
+      - when: "{{ succeeded() }}"
         do:
-          noop
-      - when: "{{ succeeded() and ctx().pipeline == result().result.Pipeline.split('/')[-1] }}"
-        do:
-          get_worksheet_info
-
-  get_worksheet_info:
-    action: igene.get_worksheets
-    input:
-      worksheet_id: "{{ ctx().worksheet_id }}"
-    next:
+          count_complete
       - when: "{{ failed() }}"
-        publish:
-          msg="Failed to get sample info from the iGene API.
-          {{ result() | to_json_string }}"
         do:
           report_failure
+
+  count_complete:
+    action: core.local
+    input:
+      cmd: "ls {{ ctx().log_dir }}/*.complete | wc -l"
+    next:
       - when: "{{ succeeded() }}"
         publish:
-            - worksheet_samples: <% result().result.body.where($.TestProfile.matches(ctx().test_profile)).select($.SampleID) %>
+          - n_complete: "{{ result().stdout() }}"
         do:
-          check_samples
-
-  check_samples:
-    action: core.noop
-    next:
-      - when: "{{ ctx().worksheet_samples | sort != (ctx().completed_samples + ctx().failed_samples) | sort }}"
-        publish:
-          - msg: "Samples on worksheet: {{ ctx().worksheet_samples }}
-              Completed samples: {{ ctx().completed_samples }}
-              Failed samples: {{ ctx().failed_samples }}"
+          count_all
+      - when: "{{ failed() }}"
         do:
           report_failure
-      - when: "{{ ctx().worksheet_samples | sort == (ctx().completed_samples + ctx().failed_samples) | sort }}"
+
+  count_all:
+    action: core.local
+    input:
+      cmd: "ls {{ ctx().log_dir }}/  | wc -l"
+    next:
+      - when: "{{ succeeded() and result().stdout() == ctx().n_complete }}"
         do:
           report_success
+      - when: "{{ succeeded() and result().stdout() != ctx().n_complete }}"
+        publish:
+          - n_all:  "{{ result().stdout() }}"
+        do:
+          check_incomplete
+      - when: "{{ failed() }}"
+        do:
+          report_failure
+
+  check_incomplete:
+    action: core.local
+    input:
+      cmd: "grep -lr 'false' {{ ctx().log_dir }}/ | wc -l"
+    next:
+      - when: "{{ succeeded() and ctx().n_all == result().stdout() + ctx().n_complete }}"
+        publish:
+          - n_failed: " {{ result().stdout() }}"
+        do:
+          report_success
+      - when: "{{ succeeded() and ctx().n_all != result().stdout() + ctx().n_complete }}"
+        do: # this just means the others are still ongoing
+          noop
+      - when: "{{ failed() }}"
+        do:
+          report_failure
 
   report_failure:
     action: core.inject_trigger
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed: {{ ctx().pipeline }} analyses on {{ ctx().worksheet_id }} missing"
-        message: "{{ ctx().msg }}"
+        subject: "Failed to check if all samples are done"
+        message: "{{ ctx().sample_id }} was successfully loaded into Scout
+          but the check if the rest of the samples were also done failed.
+          Check for problems in the log directory {{ ctx().log_dir }}"
     next:
       do: fail
 
@@ -91,7 +100,7 @@ tasks:
     action: core.inject_trigger
     input: # should maybe go to another email?
       trigger_name: gmc_norr_analysis.email_notification
-      payload:
-        subject: "{{ ctx().worksheet_id }} {{ ctx().test_profile }} analyses done"
-        message: "Successful samples:\n{% for sample in ctx().completed_samples %}{{ sample }}\n{% endfor %}
-                 \nFailed samples:\n{% for sample in ctx().failed_samples %}{{ sample }}\n{% endfor %}"
+      payload: # Would be nicer to also list the samples, at least the failed ones
+        subject: "{{ ctx().pipeline }} analyses done"
+        message: "{{ ctx().n_complete }} successful samples
+                 \n{{ ctx().n_failed }} failed samples"

@@ -51,7 +51,7 @@ tasks:
   write_log:
     action: core.local
     input:
-      cmd: echo {{ ctx().sample_id }} {{ ctx().success }} >> {{ ctx().message_type }}
+      cmd: echo {{ ctx().message_type }} {{ ctx().success }} >> {{ ctx().sample_id }}
       cwd: <% ctx(log_dir) %>
     next:
       - when: "{{ failed() }}"
