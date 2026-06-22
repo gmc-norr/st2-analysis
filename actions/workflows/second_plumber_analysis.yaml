@@ -144,7 +144,7 @@ tasks:
   parse_first_output_files:
     action: core.noop
     next:
-      - when: <% succeeded() %>
+      - when: <% succeeded() and ctx().pipeline = 'gmc-norr/scout-annotation' %>
         publish:
           - input_files: "[{% for file in ctx().first_output_files %}
               {% if file.type == 'bam' or file.type == 'vcf_snv' %}
@@ -154,15 +154,19 @@ tasks:
               {% endif %}
               {% endfor %}]"
           - bam_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("bam")).select($.path).first() %>
-          - vcf_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("vcf")).select($.path).first() %>
-        do: make_secondary_pipeline_input
+          - vcf_file: <% ctx().first_workdir %>/<% ctx().first_output_files.where($.type.matches("vcf_snv")).select($.path).first() %>
+        do: make_scout_annotation_input
+      - when: <% succeeded() and ctx().pipeline != 'gmc-norr/scout-annotation' %>
+        publish:
+          - msg: "Unsupported pipeline {{ ctx().pipeline }}"
+        do: noop
       - when: <% failed() %>
         publish:
           - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
 
-  make_secondary_pipeline_input:
+  make_scout_annotation_input:
     action: core.local
     input:
       cmd: 'echo -e "sample\tfamily\tvcf\tbam\n{{ ctx().sample_id }}\t{{ ctx().case_id }}\t{{ ctx().vcf_file }}\t{{ ctx().bam_file }}" > samples.tsv'
