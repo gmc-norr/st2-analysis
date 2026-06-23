@@ -11,16 +11,19 @@ input:
 vars:
   - log_dir:
   - n_complete:
-  - n_total:
+  - n_all:
   - n_failed:
+  - completed_samples:
+  - failed_samples:
+
 
 tasks:
   make_log_dir:
-    action: coe.noop
+    action: core.noop
     next:
       - when: "{{ succeeded() }}"
         publish: # TODO: How to get the run_id, i.e. ctx().workdir.split('/')[-3] ? Needs to match the log action at least
-          - log_dir: "{{ ctx().base_log_dir }}/{{ run_id() }}/{{ ctx().pipeline.split('/')[-1]}}"
+          - log_dir: "{{ ctx().base_log_dir }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1]}}"
         do:
           complete_sample_log
 
@@ -43,7 +46,21 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - n_complete: "{{ result().stdout() }}"
+          - n_complete: <% result().stdout %>
+        do:
+          list_complete
+      - when: "{{ failed() }}"
+        do:
+          report_failure
+
+  list_complete:
+    action: core.local
+    input:
+      cmd: "ls {{ ctx().log_dir }}/*.complete"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - completed_samples: "{% for file in result().stdout.split('\n') %}{{ file.split('/')[-1][0:-9]}}\n{% endfor %}"
         do:
           count_all
       - when: "{{ failed() }}"
@@ -53,14 +70,14 @@ tasks:
   count_all:
     action: core.local
     input:
-      cmd: "ls {{ ctx().log_dir }}/  | wc -l"
+      cmd: "ls {{ ctx().log_dir }}/ | wc -l"
     next:
-      - when: "{{ succeeded() and result().stdout() == ctx().n_complete }}"
+      - when: "{{ succeeded() and result().stdout == ctx().n_complete }}"
         do:
           report_success
-      - when: "{{ succeeded() and result().stdout() != ctx().n_complete }}"
+      - when: "{{ succeeded() and result().stdout != ctx().n_complete }}"
         publish:
-          - n_all:  "{{ result().stdout() }}"
+          - n_all:  <% result().stdout %>
         do:
           check_incomplete
       - when: "{{ failed() }}"
@@ -70,16 +87,32 @@ tasks:
   check_incomplete:
     action: core.local
     input:
-      cmd: "grep -lr 'false' {{ ctx().log_dir }}/ | wc -l"
+      cmd: "grep -lri 'false' {{ ctx().log_dir }}/ | wc -l"
     next:
-      - when: "{{ succeeded() and ctx().n_all == result().stdout() + ctx().n_complete }}"
-        publish:
-          - n_failed: " {{ result().stdout() }}"
+      - when: "{{ succeeded() and ctx().n_all == result().stdout + ctx().n_complete  }}"
+        publish: # all have completed or crashed
+          - n_failed: "{{ result().stdout }}"
         do:
-          report_success
-      - when: "{{ succeeded() and ctx().n_all != result().stdout() + ctx().n_complete }}"
+          list_failed
+      - when: "{{ succeeded() and ctx().n_all != result().stdout + ctx().n_complete }}"
+        publish: # all have completed or crashed
+          - n_failed: "{{ result().stdout }}"
         do: # this just means the others are still ongoing
           noop
+      - when: "{{ failed() }}"
+        do:
+          report_failure
+
+  list_failed:
+    action: core.local
+    input:
+      cmd: "ls --hide=*.complete {{ ctx().log_dir }}/"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - failed_samples: " {{ result().stdout }}"
+        do:
+          report_success
       - when: "{{ failed() }}"
         do:
           report_failure
@@ -94,13 +127,14 @@ tasks:
           but the check if the rest of the samples were also done failed.
           Check for problems in the log directory {{ ctx().log_dir }}"
     next:
-      do: fail
+      - when: "{{ succeeded() }}"
+        do: fail
 
   report_success:
     action: core.inject_trigger
     input: # should maybe go to another email?
       trigger_name: gmc_norr_analysis.email_notification
-      payload: # Would be nicer to also list the samples, at least the failed ones
+      payload:
         subject: "{{ ctx().pipeline }} analyses done"
-        message: "{{ ctx().n_complete }} successful samples
-                 \n{{ ctx().n_failed }} failed samples"
+        message: "{{ctx().n_complete }} successful samples:\n{{ ctx().completed_samples}}
+                  \n{{ctx().n_failed }} failed samples:\n{{ ctx().failed_samples }}"
