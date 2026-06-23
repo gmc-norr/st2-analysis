@@ -15,6 +15,9 @@ criteria:
   trigger.software:
     type: contains
     pattern: BCLConvert
+  trigger.path:
+    type: contains
+    pattern: Analysis/1
 
 action:
   ref: gmc_norr_analysis.start_plumber_workflows
