@@ -21,6 +21,9 @@ vars:
   - destination:
   - new_workdir:
 
+output:
+  - msg: <% ctx().msg %>
+
 tasks:
   check_start:
     action: core.noop
@@ -42,7 +45,7 @@ tasks:
           get_run_id
       - when: "{{ failed() }}"
         publish:
-          - msg: "{{ result() }}"
+          - msg: <% result().stderr %>
         do:
           - report_failure
 
@@ -128,7 +131,7 @@ tasks:
         do: rsync_output
       - when: "{{ failed() }}"
         publish:
-          - msg: <% result() %>
+          - msg: <% result().stderr %>
         do:
           - report_failure
 
@@ -142,7 +145,7 @@ tasks:
         do: divide_pipeline_tasks
       - when: "{{ failed() }}"
         publish:
-          - msg: <% result() %>
+          - msg: <% result().stderr %>
         do:
           - report_failure
 
