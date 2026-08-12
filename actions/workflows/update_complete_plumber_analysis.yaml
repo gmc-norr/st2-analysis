@@ -309,6 +309,25 @@ tasks:
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
+    next:
+      - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: copy_bam
+      - when: "{{ succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: noop
+
+  copy_bam:
+    action: gmc_norr_seqdata.copy_bam
+    input:
+      run_id: <% ctx().run_id %>
+      pipeline: <% ctx().pipeline %>
+      bam_path: <% ctx().new_workdir %>/bam_dna/
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to move bam files to K:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
 
   report_failure:
     action: core.inject_trigger
