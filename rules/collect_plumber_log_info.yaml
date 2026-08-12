@@ -1,0 +1,27 @@
+---
+name: collect_plumber_log_info
+pack: gmc_norr_analysis
+description: >
+  Collect start and end webhooks messages
+enabled: true
+
+trigger:
+  type: "core.st2.webhook"
+  parameters:
+    url: "plumber"
+
+criteria:
+  trigger.body.message_type#1:
+    type: nequals
+    pattern: progress
+  trigger.body.message_type#2:
+    type: nequals
+    pattern: init
+
+action:
+  ref: gmc_norr_analysis.collect_plumber_log_info
+  parameters:
+      workdir: "{{ trigger.body.workdir }}"
+      pipeline: "{{ trigger.body.pipeline }}"
+      message_type: "{{ trigger.body.message_type }}"
+      success: "{{ trigger.body.success }}"

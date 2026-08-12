@@ -69,3 +69,6 @@ plumber:
     host:
       type: string
       description: Where to run the analysis with plumber
+    log_dir:
+      type: string
+      description: Directory to collect plumber logs per run and pipeline

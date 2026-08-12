@@ -1,0 +1,24 @@
+---
+name: check_all_done
+pack: gmc_norr_analysis
+description: Workflow to check if all samples of the started
+runner_type: orquesta
+entry_point: workflows/check_all_done.yaml
+enabled: true
+
+parameters:
+  pipeline:
+    description: The pipeline that the samples were analysed with
+    type: string
+    required: true
+  sample_id:
+    description: The ID of the sample that was just completed
+    type: string
+  run_id:
+    description: The id of the sequencing run the sample data came from
+    type: string
+  base_log_dir:
+    description: The directory where the log fiels are kept
+    type: string
+    required: true
+    default: "{{ config_context.plumber.log_dir }}"
