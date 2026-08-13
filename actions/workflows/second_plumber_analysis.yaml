@@ -1,14 +1,30 @@
 
 version: 1.0
 
-description: Build Scout load config for a case, and load into scout and loqusdb.
+description: Run a secondary pipeline, for example gmc-norr/scout-annotation,
+  for pipelines that need a second step before loading the case into Scout.
 
 input:
   - first_pipeline
   - first_analysis_id
   - first_workdir
   - plumber_host
-  - plumber_additional_arguments
+
+vars:
+  - msg:
+  - run_id:
+  - case_id:
+  - sample_id:
+  - pipeline:
+  - pipeline_version:
+  - pipeline_profile:
+  - plumber_config_version:
+  - plumber_additional_arguments:
+  - new_workdir:
+  - input_files:
+  - bam_file:
+  - vcf_file:
+  - plumber_analysis_id:
 
 tasks:
   get_sample_id:
@@ -217,7 +233,7 @@ tasks:
           - start_update_complete_workflow
       - when: <% failed() %>
         publish:
-          - msg: <% result().values().first().stderr %>
+          - msg: "Failed to run {{ ctx().pipeline }} for {{ ctx().sample }} with plumber"
         do:
           - report_failure
 
@@ -238,7 +254,7 @@ tasks:
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to bridge to scout in {{ ctx().first_workdir }}"
+        subject: "Failed run secondary pipeline in {{ ctx().first_workdir }}"
         message: <% ctx().msg %>
     next:
       - do: fail
