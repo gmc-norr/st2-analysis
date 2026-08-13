@@ -8,6 +8,7 @@ input:
   - first_analysis_id
   - first_workdir
   - plumber_host
+  - plumber_additional_arguments
 
 tasks:
   get_sample_id:
@@ -103,6 +104,7 @@ tasks:
           - pipeline_version: <% result().result.Version %>
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
+          - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
           - new_workdir: "{{ ctx().first_workdir }}/{{ ctx().pipeline.split('/')[-1] }}"
         do: make_new_work_dir
       - when: <% failed() %>
@@ -205,7 +207,7 @@ tasks:
     input:
       cmd: "nohup plumber run <% ctx().pipeline %>
         --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> &> plumber.log"
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> <% ctx().plumber_additional_arguments %> &> plumber.log"
       cwd: <% ctx().new_workdir %>
       hosts: <% ctx().plumber_host %>
       timeout: 2500
