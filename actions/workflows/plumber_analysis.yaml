@@ -104,7 +104,7 @@ tasks:
           divide_workflow
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get TestProfile configuration.
+          msg="Failed to get TestProfile configuration from config-repo.
           {{ result() | to_json_string }}"
         do:
           report_failure
@@ -145,7 +145,7 @@ tasks:
           noop
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get number of reads for sample from Cleve.
+          msg="Failed to get flowcell name from Cleve.
           {{ result() | to_json_string }}"
         do:
           report_failure
@@ -160,7 +160,7 @@ tasks:
           rd_make_case_id
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to output directory.
+          msg="Failed to create output directory {{ ctx().output_dir }}.
           {{ result() | to_json_string }}"
         do: report_failure
 
@@ -198,7 +198,7 @@ tasks:
         do: format_cleve_input_files
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to make rare-disease samplesheet.
+          msg="Failed to make raredisease samplesheet.
           {{ result() | to_json_string }}"
         do: report_failure
 
@@ -217,7 +217,7 @@ tasks:
           format_cleve_input_files
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to output directory.
+          msg="Failed to prepare for running {{ ctx().pipeline }}.
           {{ result() | to_json_string }}"
         do: report_failure
 
@@ -305,7 +305,7 @@ tasks:
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to analyse sample <% ctx().sample_id %>"
+        subject: "Failed to start pipeline for sample <% ctx().sample_id %> from <% ctx().run_id %>"
         message: <% ctx().msg %>
     next:
       - do: fail
