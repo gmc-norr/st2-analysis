@@ -122,12 +122,24 @@ tasks:
           - plumber_config_version: <% result().result.ConfigVersion %>
           - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
           - new_workdir: "{{ ctx().first_workdir }}/{{ ctx().pipeline.split('/')[-1] }}"
-        do: make_new_work_dir
+        do: divide_workflow
       - when: <% failed() %>
         publish:
           - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
+
+  divide_workflow:
+    action: core.noop
+    next:
+      - when: "{{ ctx().pipeline == 'gmc-norr/scout-annotation' }}"
+        do:
+          make_new_work_dir
+      - when: "{{ ctx().pipeline != 'gmc-norr/scout-annotation'}}"
+        publish:
+          - msg: "Unsupported pipeline {{ ctx().pipeline }}"
+        do:
+          - noop
 
   make_new_work_dir:
     action: core.local
