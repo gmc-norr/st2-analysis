@@ -305,9 +305,9 @@ tasks:
         do: noop
 
   wait:
-    action: core.local
+    action: core.pause
     input:
-      cmd: sleep 20m
+      max_pause: 1800
 
   report_failure:
     action: core.inject_trigger
