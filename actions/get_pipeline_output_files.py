@@ -48,15 +48,15 @@ def get_twist_solid_output_files(sample_id, case_id):
          'level': 'case', 'type': 'html', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.TMB.txt",
-         'level': 'case', 'type': 'text', 'parent_id': case_id
+         'level': 'sample', 'type': 'text', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T."
          "pathology_purecn.scarhrd_cnvkit_score.txt",
-         'level': 'case', 'type': 'text', 'parent_id': case_id
+         'level': 'sample', 'type': 'text', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro."
          "filtered.score.tsv",
-         'level': 'case', 'type': 'text', 'parent_id': case_id
+         'level': 'sample', 'type': 'text', 'parent_id': case_id
          }]
 
     return output_files
