@@ -299,6 +299,15 @@ tasks:
           in {{ ctx().output_dir }}."
         do:
           report_failure
+      - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: wait
+      - when: "{{ succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: noop
+
+  wait:
+    action: core.local
+    input:
+      cmd: sleep 20m
 
   report_failure:
     action: core.inject_trigger
