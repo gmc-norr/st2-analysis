@@ -31,7 +31,7 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
-def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool = True):
+def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
     output_files = [
         {'path': f'bam_dna/{sample_id}_T.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id
