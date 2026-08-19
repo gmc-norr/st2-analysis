@@ -31,7 +31,7 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
-def get_twist_solid_output_files(sample_id, case_id):
+def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool = True):
     output_files = [
         {'path': f'bam_dna/{sample_id}_T.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id
@@ -39,9 +39,6 @@ def get_twist_solid_output_files(sample_id, case_id):
         {'path': f'results/dna/{sample_id}_T/vcf/{sample_id}_T.annotated.'
          'exon_only.filter.hard_filter.codon_snv.vcf',
          'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id
-         },
-        {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
-         'level': 'case', 'type': 'html', 'parent_id': case_id
          },
         {'path': f"results/dna/{sample_id}_T/cnv/{sample_id}_T"
          ".pathology_purecn.cnv.html",
@@ -58,7 +55,12 @@ def get_twist_solid_output_files(sample_id, case_id):
          "filtered.score.tsv",
          'level': 'case', 'type': 'text', 'parent_id': case_id
          }]
-
+    if complete:
+        output_files.append(
+            {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
+             'level': 'case', 'type': 'html', 'parent_id': case_id
+             }
+             )
     return output_files
 
 
@@ -75,11 +77,11 @@ def get_scout_annotation_output_files(sample_id, case_id):
 
 
 class GetPipelineOutputFiles(Action):
-    def run(self, pipeline, sample_id, case_id):
+    def run(self, pipeline, sample_id, case_id, complete):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
         elif pipeline == "genomic-medicine-sweden/Twist_Solid":
-            output_files = get_twist_solid_output_files(sample_id, case_id)
+            output_files = get_twist_solid_output_files(sample_id, case_id, complete)
         elif pipeline == "gmc-norr/scout-annotation":
             output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:

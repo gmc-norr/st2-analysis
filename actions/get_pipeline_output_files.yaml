@@ -19,3 +19,6 @@ parameters:
     description: The case ID
     type: string
     required: false
+  complete:
+    type: boolean
+    default: true
