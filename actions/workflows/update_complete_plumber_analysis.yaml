@@ -16,6 +16,7 @@ input:
 
 vars:
   - msg:
+  - complete:
   - output_files:
   - secondary_output_files:
   - destination:
@@ -191,10 +192,14 @@ tasks:
           - report_failure
 
   check_twist_solid_needed_variables:
-    action: core.noop
+    action: core.local
+    input:
+      cmd: 'cat {{ ctx().new_workdir }}/.plumber-analysis.json'
     next:
       - when: <% ctx().case_id != null and ctx().secondary_pipeline != null
          and ctx().secondary_analysis_id != null %>
+        publish:
+          - complete: "{{ result().stdout.state.name == 'succeeded'}}"
         do: format_secondary_output_files
       - when: <% ctx().case_id = null or ctx().secondary_pipeline = null
          or ctx().secondary_analysis_id = null %>
@@ -259,6 +264,7 @@ tasks:
       pipeline: "{{ ctx().pipeline }}"
       case_id: "{{ ctx().case_id }}"
       sample_id: "{{ ctx().sample_id }}"
+      complete: "{{ ctx().complete }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
