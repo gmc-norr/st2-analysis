@@ -58,7 +58,7 @@ tasks:
     next:
       - when: <% succeeded() %>
         publish:
-          - qc_row: <% result() %>
+          - qc_row: <% result().result %>
         do:
           - append_qc_row
 
