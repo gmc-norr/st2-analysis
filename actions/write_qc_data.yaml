@@ -17,5 +17,5 @@ parameters:
     required: true
   sample_id:
     description: sample_id for sample
-    type str
+    type: str
     required: true

@@ -104,8 +104,3 @@ class GetQCRow(Action):
 
         except Exception as exc:
             return False, str(exc) 
-
-
-
-
-
