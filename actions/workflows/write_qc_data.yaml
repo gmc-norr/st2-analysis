@@ -65,4 +65,4 @@ tasks:
   append_qc_row:
     action: core.local
     input:
-      cmd: "echo -e <% ctx().qc_row %> >> <% ctx().destination_file %>"
+      cmd: "echo -e '<% ctx().qc_row %>' >> <% ctx().destination_file %>"
