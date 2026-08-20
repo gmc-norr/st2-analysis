@@ -16,31 +16,26 @@ QC_COLUMN_MAP = {
         "Duplicates [%]": {
             "suffix": "",
             "data_field": "PERCENT_DUPLICATION",
-            "multiply_by": 100,
             "format": "{:.1%}"
             },
         "Bases on exon target [%]": {
             "suffix": "",
             "data_field": "PCT_SELECTED_BASES",
-            "multiply_by": 100,
             "format": "{:.1%}"
             },
         "Usable bases [%]": {
             "suffix": "",
             "data_field": "PCT_USABLE_BASES_ON_TARGET",
-            "multiply_by": 100,
             "format": "{:.1%}"
             },
         "Exon target bases over 100X [%]": {
             "suffix": "",
             "data_field": "PCT_TARGET_BASES_100X",
-            "multiply_by": 100,
             "format": "{:.1%}"
             },
         "Exon target bases over 500X [%]": {
             "suffix": "",
             "data_field": "PCT_TARGET_BASES_500X",
-            "multiply_by": 100,
             "format": "{:.1%}"
             },
         "Mean exon target coverage": {
@@ -76,7 +71,6 @@ QC_COLUMN_MAP = {
         "Target bases with zero coverage [%]": {
             "suffix": "",
             "data_field": "ZERO_CVG_TARGETS_PCT",
-            "multiply_by": 100,
             "format": "{:.2%}"
             },
         "FOLD-80": {
