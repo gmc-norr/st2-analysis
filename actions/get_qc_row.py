@@ -60,9 +60,6 @@ QC_COLUMN_MAP = {
             },
         }
 
-class MultiQCDataError(Exception):
-    """Raised when the MultiQC JSON does not contain expected data."""
-
 class GetQCRow(Action):
     """
     Action that outputs qc row for sample based on a multiqc_data.json file
@@ -95,7 +92,7 @@ class GetQCRow(Action):
                         column_value=sample_qc_data[data_field]
                         break
                 if column_value is None:
-                    raise MultiQCDataError(f"No entry for {data_field} in {multiqc_data_file}")
+                    raise ValueError(f"No entry for {data_field} in {multiqc_data_file}")
                 qc_values.append(str(column_value) + data_spec["suffix"])
             
             qc_row += "\t".join(qc_values)
