@@ -167,7 +167,7 @@ tasks:
           report_failure
 
   write_qc_data:
-    action: gms_norr_analysis.write_qc_data
+    action: gmc_norr_analysis.write_qc_data
     input:
       destination_path: <% ctx().destination %>
       multiqc_data: <% ctx().destination %>/qc/multiqc/multiqc_DNA_data/multiqc_data.json

@@ -8,9 +8,9 @@ input:
   - sample_id
 
 vars:
-  - destination_file:
-  - header_exists:
-  - qc_row:
+  - destination_file: null
+  - header_exists: null
+  - qc_row: null
 
 tasks:
   get_destination_file:
@@ -58,7 +58,7 @@ tasks:
     next:
       - when: <% succeeded() %>
         publish:
-          - qc_row: <% result().result %>
+          - qc_row: <% result() %>
         do:
           - append_qc_row
 
