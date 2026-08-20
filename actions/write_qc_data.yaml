@@ -9,13 +9,13 @@ enabled: true
 parameters:
   destination_path:
     description: path to the sample analysis directory
-    type: str
+    type: string
     required: true
   multiqc_data:
     description: path to the multiqc_data.json file
-    type: str
+    type: string
     required: true
   sample_id:
     description: sample_id for sample
-    type: str
+    type: string
     required: true
