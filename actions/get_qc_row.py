@@ -4,59 +4,85 @@ from st2common.runners.base_action import Action
 QC_COLUMN_MAP = {
         "M Aligned reads": {
             "suffix": " M",
-            "data_field": "reads_mapped"
+            "data_field": "reads_mapped",
+            "multiply_by": 0.000001,
+            "format": "{:.1f}"
             },
         "% Mapped": {
             "suffix": "%",
-            "data_field": "reads_mapped_percent"
+            "data_field": "reads_mapped_percent",
+            "format": "{:,.1f}"
             },
         "Duplicates [%]": {
-            "suffix": "%",
-            "data_field": "PERCENT_DUPLICATION"
+            "suffix": "",
+            "data_field": "PERCENT_DUPLICATION",
+            "multiply_by": 100,
+            "format": "{:.1%}"
             },
         "Bases on exon target [%]": {
-            "suffix": "%",
-            "data_field": "PCT_SELECTED_BASES"
+            "suffix": "",
+            "data_field": "PCT_SELECTED_BASES",
+            "multiply_by": 100,
+            "format": "{:.1%}"
             },
         "Usable bases [%]": {
-            "suffix": "%",
-            "data_field": "PCT_USABLE_BASES_ON_TARGET"
+            "suffix": "",
+            "data_field": "PCT_USABLE_BASES_ON_TARGET",
+            "multiply_by": 100,
+            "format": "{:.1%}"
             },
         "Exon target bases over 100X [%]": {
-            "suffix": "%",
-            "data_field": "PCT_TARGET_BASES_100X"
+            "suffix": "",
+            "data_field": "PCT_TARGET_BASES_100X",
+            "multiply_by": 100,
+            "format": "{:.1%}"
             },
         "Exon target bases over 500X [%]": {
-            "suffix": "%",
-            "data_field": "PCT_TARGET_BASES_500X"
+            "suffix": "",
+            "data_field": "PCT_TARGET_BASES_500X",
+            "multiply_by": 100,
+            "format": "{:.1%}"
             },
         "Mean exon target coverage": {
             "suffix": "",
-            "data_field": "MEAN_TARGET_COVERAGE"
+            "data_field": "MEAN_TARGET_COVERAGE",
+            "format": "{:.1f}"
+            },
+        "Median exon target coverage": {
+            "suffix": "",
+            "data_field": "MEDIAN_TARGET_COVERAGE",
+            "format": "{:.1f}"
             },
         "Median insert size": {
             "suffix": "",
-            "data_field": "summed_median"
+            "data_field": "summed_median",
+            "format": "{:.1f}"
             },
         "contamination": {
             "suffix": "",
-            "data_field": "contamination"
+            "data_field": "contamination",
+            "format": "{:,.1f}"
             },
         "AT-dropout [%]": {
             "suffix": "%",
-            "data_field": "AT_DROPOUT"
+            "data_field": "AT_DROPOUT",
+            "format": "{:.3f}"
             },
         "GC-dropout [%]": {
             "suffix": "%",
-            "data_field": "GC_DROPOUT"
+            "data_field": "GC_DROPOUT",
+            "format": "{:.3f}"
             },
         "Target bases with zero coverage [%]": {
-            "suffix": "%",
-            "data_field": "ZERO_CVG_TARGETS_PCT"
+            "suffix": "",
+            "data_field": "ZERO_CVG_TARGETS_PCT",
+            "multiply_by": 100,
+            "format": "{:.2%}"
             },
         "FOLD-80": {
             "suffix": "",
-            "data_field": "FOLD_80_BASE_PENALTY"
+            "data_field": "FOLD_80_BASE_PENALTY",
+            "format": "{:.1f}"
             },
         }
 
@@ -93,6 +119,13 @@ class GetQCRow(Action):
                         break
                 if column_value is None:
                     raise ValueError(f"No entry for {data_field} in {multiqc_data_file}")
+
+                if "multiply_by" in data_spec:
+                    column_value *= data_spec["multiply_by"]
+
+                if "format" in data_spec:
+                    column_value = data_spec["format"].format(column_value)
+
                 qc_values.append(str(column_value) + data_spec["suffix"])
             
             qc_row += "\t".join(qc_values)
