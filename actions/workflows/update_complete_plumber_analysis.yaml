@@ -158,12 +158,21 @@ tasks:
           get_case_id
       - when: <% ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
         do:
-          check_twist_solid_needed_variables
+          - check_twist_solid_needed_variables
+          - write_qc_data
       - when: <% ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
         publish:
           - msg: "Unsupported pipeline {{ ctx().pipeline }}"
         do:
           report_failure
+
+  write_qc_data:
+    action: gms_norr_analysis.write_qc_data
+    input:
+      destination_path: <% ctx().destination %>
+      multiqc_data: <% ctx().destination %>/qc/multiqc/multiqc_DNA_data/multiqc_data.json
+      sample_id: <% ctx().sample_id %>
+
 
   get_case_id:
     action: core.local
