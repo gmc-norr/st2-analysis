@@ -40,24 +40,19 @@ get_pipeline_output_files       | Get output files for updating an analysis in C
 get_pipeline_input_files        | Format fastq files for adding an analysis in Cleve
 get_plumber_arguments           | Translate a iGene TestProfile into a pipeline with versions and config files
 get_qc_row                      | Get QC data from MultiQC JSON for a sample
+
 ## Workflows
 
 name                                              | description
 --------------------------------------------------|------------------------------------------
-tumor_evolution                 | Generate a tumor evolution report
-start_plumber_workflows         | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
-get_samples_for_plumber         | For all samples belonging to a run, start the plumber_analysis workflow
-plumber_analysis                | Run a downstream analysis with plumber on a sample
-second_plumber_analysis         | Run an annotation analysis with plumber on a sample
-prepare_twist_solid             | Symlink fastq files and make GMS Solid input files for a sample
-write_qc_data                   | Take MultiQC JSON data for a sample and write to a tsv file common for the run
-
-## Workflows
-
-name                                                | description
-----------------------------------------------------|------------------------------------------
-tumor_evolution                   | Workflow for generating a tumor evolution report
+tumor_evolution                   | Generate a tumor evolution report
+start_plumber_workflows           | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
+get_samples_for_plumber           | For all samples belonging to a run, start the plumber_analysis workflow
+plumber_analysis                  | Run a downstream analysis with plumber on a sample
+second_plumber_analysis           | Run an annotation analysis with plumber on a sample
+prepare_twist_solid               | Symlink fastq files and make GMS Solid input files for a sample
 update_complete_plumbler_analysis | Move output files and update the analysis in Cleve
+write_qc_data                     | Take MultiQC JSON data for a sample and write to a tsv file common for the run
 
 ## Rules
 
@@ -70,7 +65,6 @@ email_plumber_end                  | Trigger send_notification_email when plumbe
 update_complete_plumber_analysis   | Trigger workflow of same name if plumber ended successfully, and pipeline isn't GMS Solid
 update_incomplete_plumber_analysis | Update analysis to incomplete in Cleve if plumber ends unsuccessfully
 second_plumber_analysis            | Trigger second_plumber_analysis when plumber succesfully finishes a GMS Solid run for a sample
-
 
 ## Sensors
 
