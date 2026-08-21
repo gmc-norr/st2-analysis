@@ -8,7 +8,7 @@ input:
   - sample_id
 
 vars:
-  - destination_file: null
+  - destination_file: "<% ctx().destination_path %>/batch_qc.tsv"
   - header_exists: null
   - qc_row: null
 
@@ -17,7 +17,7 @@ tasks:
   create_qc_tsv:
     action: core.local
     input:
-      cmd: "touch <% ctx().destination_path %>/batch_qc.tsv" 
+      cmd: "touch <% ctx().destination_file" 
     next:
       - when: <% succeeded() %>
         do:
