@@ -21,7 +21,7 @@ vars:
   - pipeline_version:
   - pipeline_profile:
   - plumber_config_version:
-  - plumber_cmd:
+  - plumber_additional_arguments:
   - case_id:
   - fastq_files:
   - analysis_ids:
@@ -47,7 +47,6 @@ tasks:
           - mother_sample_id: <% result().result.body.Mother %>
           - father_sample_id: <% result().result.body.Father %>
           - sex: <% result().result.body.Sex %>
-          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().test_profile }}/{{ ctx().sample_id }}"
         do:
           get_fastq_files
       - when: "{{ succeeded() and result().result.body.TestProfile not in ctx().supported_profiles }}"
@@ -100,11 +99,12 @@ tasks:
           - pipeline_version: <% result().result.Version %>
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
+          - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
         do:
           divide_workflow
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get TestProfile configuration.
+          msg="Failed to get TestProfile configuration from config-repo.
           {{ result() | to_json_string }}"
         do:
           report_failure
@@ -113,9 +113,14 @@ tasks:
     action: core.noop
     next:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
+        publish:
+          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}/{{ ctx().sample_id }}"
         do:
           rd_check_flowcell
-      - when: "{{ ctx().pipeline != 'nf-core/raredisease'}}"
+      - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+        do:
+          gms_solid_workflow
+      - when: "{{ ctx().pipeline != 'nf-core/raredisease' and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid'}}"
         publish:
           msg="Unsupported pipeline {{ ctx().pipeline }}"
         do:
@@ -140,7 +145,7 @@ tasks:
           noop
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get number of reads for sample from Cleve.
+          msg="Failed to get flowcell name from Cleve.
           {{ result() | to_json_string }}"
         do:
           report_failure
@@ -155,7 +160,7 @@ tasks:
           rd_make_case_id
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to output directory.
+          msg="Failed to create output directory {{ ctx().output_dir }}.
           {{ result() | to_json_string }}"
         do: report_failure
 
@@ -193,7 +198,26 @@ tasks:
         do: format_cleve_input_files
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to make rare-disease samplesheet.
+          msg="Failed to make raredisease samplesheet.
+          {{ result() | to_json_string }}"
+        do: report_failure
+
+  gms_solid_workflow:
+    action: gmc_norr_analysis.prepare_twist_solid
+    input:
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      fastq_files: "{{ ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 }}"
+      host: <% ctx().plumber_host %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - output_dir: <% result().output.work_dir %>
+        do:
+          format_cleve_input_files
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to prepare for running {{ ctx().pipeline }}.
           {{ result() | to_json_string }}"
         do: report_failure
 
@@ -245,7 +269,7 @@ tasks:
     input:
       cmd: "nohup plumber run <% ctx().pipeline %>
         --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
-        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> &> plumber.log & echo $!"
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> <% ctx().plumber_additional_arguments %> &> plumber.log & echo $!"
       cwd: <% ctx().output_dir %>
       hosts: <% ctx().plumber_host %>
       env: <% ctx().plumber_env %>
@@ -275,13 +299,22 @@ tasks:
           in {{ ctx().output_dir }}."
         do:
           report_failure
+      - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: wait
+      - when: "{{ succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' }}"
+        do: noop
+
+  wait:
+    action: core.pause
+    input:
+      max_pause: 1800
 
   report_failure:
     action: core.inject_trigger
     input:
       trigger_name: gmc_norr_analysis.email_notification
       payload:
-        subject: "Failed to analyse sample <% ctx().sample_id %>"
+        subject: "Failed to start pipeline for sample <% ctx().sample_id %> from <% ctx().run_id %>"
         message: <% ctx().msg %>
     next:
       - do: fail
