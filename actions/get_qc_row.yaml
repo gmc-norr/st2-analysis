@@ -1,0 +1,21 @@
+---
+name: get_qc_row
+pack: gmc_norr_analysis
+description: Generate a TSV QC row for a GMS_solid sample based on the multiqc_data.json file
+runner_type: python-script
+entry_point: get_qc_row.py
+enabled: true
+parameters:
+  multiqc_data_file:
+    type: string
+    description: Path to the multiqc_data.json file
+    required: true
+  sample_id:
+    type: string
+    description: Sample id used in the multiqc_data.json file
+    required: true
+  existing_header:
+    type: boolean
+    description: Does the target tsv-file already exist and have a header
+    required: false
+    default: true

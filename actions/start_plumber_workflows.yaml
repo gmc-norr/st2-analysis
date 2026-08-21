@@ -1,0 +1,17 @@
+---
+name: start_plumber_workflows
+pack: gmc_norr_analysis
+description: Workflow for starting analysis of samples from ready analysis
+runner_type: orquesta
+entry_point: workflows/start_plumber_workflows.yaml
+enabled: true
+
+parameters:
+  analysis_id:
+    description: ID of the ready analysis
+    type: string
+    required: true
+  path:
+    description: The path to the analysis
+    type: string
+    required: true

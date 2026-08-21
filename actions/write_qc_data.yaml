@@ -1,0 +1,21 @@
+---
+name: write_qc_data
+pack: gmc_norr_analysis
+description: Workflow to append qc row for gms_solid sample
+runner_type: orquesta
+entry_point: workflows/write_qc_data.yaml
+enabled: true
+
+parameters:
+  destination_path:
+    description: path to the sample analysis directory
+    type: string
+    required: true
+  multiqc_data:
+    description: path to the multiqc_data.json file
+    type: string
+    required: true
+  sample_id:
+    description: sample_id for sample
+    type: string
+    required: true

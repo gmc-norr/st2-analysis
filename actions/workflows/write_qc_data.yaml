@@ -1,0 +1,58 @@
+version: "1.0"
+
+description: Create qc tsv file if not exists, and add sample qc row
+
+input:
+  - destination_path
+  - multiqc_data
+  - sample_id
+
+vars:
+  - destination_file: "<% ctx().destination_path %>/batch_qc.tsv"
+  - header_exists: null
+  - qc_row: null
+
+tasks:
+
+  create_qc_tsv:
+    action: core.local
+    input:
+      cmd: "touch <% ctx().destination_file %>" 
+    next:
+      - when: <% succeeded() %>
+        do:
+          - evaluate_header
+
+  evaluate_header:
+    action: core.local
+    input:
+      cmd: "head -n 1 <% ctx().destination_file %> | cut -f1"
+    next:
+      - when: <% succeeded() and result().stdout.trim() = "sample_id" %>
+        publish:
+          - header_exists: true
+        do: 
+          - get_qc_row
+      - when: <% succeeded() and result().stdout.trim() != "sample_id" %>
+        publish:
+          - header_exists: false
+        do: 
+          - get_qc_row
+        
+  get_qc_row:
+    action: gmc_norr_analysis.get_qc_row
+    input:
+      multiqc_data_file: <% ctx().multiqc_data %>
+      sample_id: <% ctx().sample_id %>
+      existing_header: <% ctx().header_exists %>
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - qc_row: <% result().result %>
+        do:
+          - append_qc_row
+
+  append_qc_row:
+    action: core.local
+    input:
+      cmd: "echo -e '<% ctx().qc_row %>' >> <% ctx().destination_file %>"

@@ -1,7 +1,8 @@
 ---
 name: update_complete_plumber_analysis
 pack: gmc_norr_analysis
-description: Workflow to update a complete plumber analysis in Cleve
+description: Workflow to move a complete plumber analysis, update it in Cleve,
+  and start scout generate and load case workflow
 runner_type: orquesta
 entry_point: workflows/update_complete_plumber_analysis.yaml
 enabled: true
@@ -19,3 +20,23 @@ parameters:
     description: The path to the work directory where the analysis was run by plumber
     type: string
     required: true
+  sample_id:
+    description: The ID of the sample that was analysed
+    type: string
+    required: false
+  run_id:
+    description: The ID of the run
+    type: string
+    required: false
+  case_id:
+    description: The ID of the case. Required for Twist Solid analyses.
+    type: string
+    required: false
+  secondary_analysis_id:
+    description: The id of the secondary analysis (e.g. scout-annotation). Required for Twist Solid analyses.
+    type: string
+    required: false
+  secondary_pipeline:
+    description: The pipeline the secondary analysis was performed with. Required for Twist Solid analyses.
+    type: string
+    required: false

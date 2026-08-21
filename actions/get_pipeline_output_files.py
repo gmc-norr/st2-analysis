@@ -4,13 +4,13 @@ from st2common.runners.base_action import Action
 def get_rd_output_files(sample_id, case_id):
     output_files = [
         {'path': 'raredisease_results/multiqc/multiqc_report.html',
-         'level': 'sample', 'type': 'html', 'parent_id': sample_id},
+         'level': 'case', 'type': 'html', 'parent_id': case_id},
         {'path': f'raredisease_results/peddy/{case_id}.peddy.ped',
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id},
+         'level': 'case', 'type': 'text', 'parent_id': case_id},
         {'path': f'raredisease_results/peddy/{case_id}.sex_check.csv',
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id},
+         'level': 'case', 'type': 'text', 'parent_id': case_id},
         {'path': f'raredisease_results/peddy/{case_id}.ped_check.csv',
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id},
+         'level': 'case', 'type': 'text', 'parent_id': case_id},
         {'path': f'raredisease_results/alignment/{sample_id}_sorted_md.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id},
         {'path': f'raredisease_results/qc_bam/{sample_id}_mosdepth.per-base.d4',
@@ -22,19 +22,68 @@ def get_rd_output_files(sample_id, case_id):
          + f'{sample_id}_tidditcov_chr*.png',
          'level': 'sample', 'type': 'png', 'parent_id': sample_id},
         {'path': f'raredisease_results/smncopynumbercaller/out/{case_id}_smncopynumbercaller.tsv',
-         'level': 'sample', 'type': 'text', 'parent_id': sample_id},
+         'level': 'case', 'type': 'text', 'parent_id': case_id},
         {'path': f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_clinical.vcf.gz',
-         'level': 'sample', 'type': 'vcf_snv', 'parent_id': sample_id},
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id},
         {'path': f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_research.vcf.gz',
-         'level': 'sample', 'type': 'vcf_snv', 'parent_id': sample_id}
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id}
          ]
     return output_files
 
 
+def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
+    output_files = [
+        {'path': f'bam_dna/{sample_id}_T.bam',
+         'level': 'sample', 'type': 'bam', 'parent_id': sample_id
+         },
+        {'path': f'results/dna/{sample_id}_T/vcf/{sample_id}_T.annotated.'
+         'exon_only.filter.hard_filter.codon_snv.vcf',
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id
+         },
+        {'path': f"results/dna/{sample_id}_T/cnv/{sample_id}_T"
+         ".pathology_purecn.cnv.html",
+         'level': 'case', 'type': 'html', 'parent_id': case_id
+         },
+        {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.TMB.txt",
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         },
+        {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T."
+         "pathology_purecn.scarhrd_cnvkit_score.txt",
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         },
+        {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro."
+         "filtered.score.tsv",
+         'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         }]
+    if complete:
+        output_files.append(
+            {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
+             'level': 'case', 'type': 'html', 'parent_id': case_id
+             }
+             )
+    return output_files
+
+
+def get_scout_annotation_output_files(sample_id, case_id):
+    output_files = [
+        {'path': f'results/annotation/{case_id}/{case_id}.annotated.genmod.vcf.gz',
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id
+         },
+        {'path': f'results/coverage/{case_id}/{sample_id}.coverage.d4',
+         'level': 'sample', 'type': 'd4', 'parent_id': sample_id
+         }]
+
+    return output_files
+
+
 class GetPipelineOutputFiles(Action):
-    def run(self, pipeline, sample_id, case_id):
-        if pipeline == "nf-core-raredisease":
+    def run(self, pipeline, sample_id, case_id, complete):
+        if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
+        elif pipeline == "genomic-medicine-sweden/Twist_Solid":
+            output_files = get_twist_solid_output_files(sample_id, case_id, complete)
+        elif pipeline == "gmc-norr/scout-annotation":
+            output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
         return (True,  output_files)

@@ -8,7 +8,7 @@ enabled: true
 
 parameters:
   pipeline:
-    description: The pipeline name (in plumber formatting)
+    description: The pipeline name, e.g. nf-core/raredisease
     type: string
     required: true
   sample_id:
@@ -18,4 +18,9 @@ parameters:
   case_id:
     description: The case ID
     type: string
-    required: true
+    required: false
+  complete:
+    description: Whether the analysis was complete, or if only a subset of the output
+      files should be returned. Only relevant for genomic-medicine-sweden/Twist_Solid
+    type: boolean
+    default: true

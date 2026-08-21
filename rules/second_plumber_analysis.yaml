@@ -1,5 +1,5 @@
 ---
-name: update_complete_plumber_analysis
+name: second_plumber_analysis
 pack: gmc_norr_analysis
 description: >
   Move a plumber analysis and update it in Cleve to state ready
@@ -19,12 +19,12 @@ criteria:
     type: equals
     pattern: true
   trigger.body.pipeline:
-    type: nequals
+    type: equals
     pattern: genomic-medicine-sweden/Twist_Solid
 
 action:
-  ref: gmc_norr_analysis.update_complete_plumber_analysis
+  ref: gmc_norr_analysis.second_plumber_analysis
   parameters:
-    analysis_id: "{{ trigger.body.analysis_id }}"
-    pipeline: "{{ trigger.body.pipeline }}"
-    workdir: "{{ trigger.body.workdir }}"
+    first_analysis_id: "{{ trigger.body.analysis_id }}"
+    first_pipeline: "{{ trigger.body.pipeline }}"
+    first_workdir: "{{ trigger.body.workdir }}"

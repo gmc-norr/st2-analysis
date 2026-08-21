@@ -1,0 +1,9 @@
+---
+name: second_plumber_analysis.concurrency
+description: Limits the concurrent executions for the second plumber analysis workflow.
+enabled: true
+resource_ref: gmc_norr_analysis.second_plumber_analysis
+policy_type: action.concurrency
+parameters:
+  action: delay
+  threshold: 1

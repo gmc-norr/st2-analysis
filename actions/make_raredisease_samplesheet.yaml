@@ -17,33 +17,23 @@ parameters:
     type: string
     required: true
     position: 1
-  referral_type:
-    description: Referral type
-    type: string
-    required: true
-    position: 2
   sex:
     description: Sex of sample
     type: string
     required: true
-    position: 3
-  panels:
-    description: The panels of the analysis
-    type: array
-    required: true
-    position: 4
+    position: 2
   fastq_r1:
     description: The sample's fastq R1 files
     type: array
     required: true
-    position: 5
+    position: 3
   fastq_r2:
     description: The sample's fastq R2 files
     type: array
     required: true
-    position: 6
+    position: 4
   out_dir:
     description: Output directory to save the samplesheet in.
     type: string
     required: true
-    position: 7
+    position: 5
