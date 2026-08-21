@@ -13,21 +13,11 @@ vars:
   - qc_row: null
 
 tasks:
-  get_destination_file:
-    action: core.local
-    input:
-      cmd: "dirname <% ctx().destination_path %>"
-    next:
-      - when: <% succeeded() %>  
-        publish:
-          - destination_file: <% result().stdout.trim() + "/batch_qc.tsv" %>
-        do:
-          - create_qc_tsv
 
   create_qc_tsv:
     action: core.local
     input:
-      cmd: "touch <% ctx().destination_file %>" 
+      cmd: "touch <% ctx().destination_path %>/batch_qc.tsv" 
     next:
       - when: <% succeeded() %>
         do:
