@@ -169,7 +169,7 @@ tasks:
   write_qc_data:
     action: gmc_norr_analysis.write_qc_data
     input:
-      destination_path: <% ctx().new_workdir %>
+      destination_path: <% ctx().destination %>
       multiqc_data: <% ctx().new_workdir %>/qc/multiqc/multiqc_DNA_data/multiqc_data.json
       sample_id: <% ctx().sample_id %>
 
