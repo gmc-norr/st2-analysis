@@ -1,0 +1,9 @@
+---
+name: write_qc_data.concurrency
+description: Limits the concurrent writing of qc data.
+enabled: true
+resource_ref: gmc_norr_analysis.write_qc_data
+policy_type: action.concurrency
+parameters:
+  action: delay
+  threshold: 1
