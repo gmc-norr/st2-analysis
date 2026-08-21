@@ -17,7 +17,7 @@ tasks:
   create_qc_tsv:
     action: core.local
     input:
-      cmd: "touch <% ctx().destination_file" 
+      cmd: "touch <% ctx().destination_file %>" 
     next:
       - when: <% succeeded() %>
         do:
