@@ -25,62 +25,67 @@ Furthermore, the following parameters needs to be defined in the datastore servi
 
 ## Actions
 
-ref                                               | description
+To run a specific action, refer to them with the pack name, for example:
+```bash
+st2 run gmc_norr_analysis.make_case_id samples=SampleX
+```
+
+name                                              | description
 --------------------------------------------------|------------------------------------------
-gmc_norr_analysis.generate_tumor_evolution_report | Generate a tumor evolution report from an Excel file
-gmc_norr_analysis.write_file                      | Write a text string to a file
-gmc_norr_analysis.make_case_id                    | Make a case id of random words and a hash of sample ids
-gmc_norr_analysis.make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
-gmc_norr_analysis.get_pipeline_output_files       | Get output files for updating an analysis in Cleve
-gmc_norr_analysis.get_pipeline_input_files        | Format fastq files for adding an analysis in Cleve
-gmc_norr_analysis.get_plumber_arguments           | Translate a iGene TestProfile into a pipeline with versions and config files
-gmc_norr_analysis.get_qc_row                      | Get QC data from MultiQC JSON for a sample
+generate_tumor_evolution_report | Generate a tumor evolution report from an Excel file
+write_file                      | Write a text string to a file
+make_case_id                    | Make a case id of random words and a hash of sample ids
+make_raredisease_samplesheet    | Make a samplesheet for the nf-core/raredisease pipeline
+get_pipeline_output_files       | Get output files for updating an analysis in Cleve
+get_pipeline_input_files        | Format fastq files for adding an analysis in Cleve
+get_plumber_arguments           | Translate a iGene TestProfile into a pipeline with versions and config files
+get_qc_row                      | Get QC data from MultiQC JSON for a sample
 ## Workflows
 
-ref                                               | description
+name                                              | description
 --------------------------------------------------|------------------------------------------
-gmc_norr_analysis.tumor_evolution                 | Generate a tumor evolution report
-gmc_norr_analysis.start_plumber_workflows         | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
-gmc_norr_analysis.get_samples_for_plumber         | For all samples belonging to a run, start the plumber_analysis workflow
-gmc_norr_analysis.plumber_analysis                | Run a downstream analysis with plumber on a sample
-gmc_norr_analysis.second_plumber_analysis         | Run an annotation analysis with plumber on a sample
-gmc_norr_analysis.prepare_twist_solid             | Symlink fastq files and make GMS Solid input files for a sample
-gmc_norr_analysis.write_qc_data                   | Take MultiQC JSON data for a sample and write to a tsv file common for the run
+tumor_evolution                 | Generate a tumor evolution report
+start_plumber_workflows         | For all runs belonging to an analysis, start the get_samples_for_plumber workflow
+get_samples_for_plumber         | For all samples belonging to a run, start the plumber_analysis workflow
+plumber_analysis                | Run a downstream analysis with plumber on a sample
+second_plumber_analysis         | Run an annotation analysis with plumber on a sample
+prepare_twist_solid             | Symlink fastq files and make GMS Solid input files for a sample
+write_qc_data                   | Take MultiQC JSON data for a sample and write to a tsv file common for the run
 
 ## Workflows
 
-ref                                                 | description
+name                                                | description
 ----------------------------------------------------|------------------------------------------
-gmc_norr_analysis.tumor_evolution                   | Workflow for generating a tumor evolution report
-gmc_norr_analysis.update_complete_plumbler_analysis | Move output files and update the analysis in Cleve
+tumor_evolution                   | Workflow for generating a tumor evolution report
+update_complete_plumbler_analysis | Move output files and update the analysis in Cleve
 
 ## Rules
 
-ref                                                  | description
+name                                                 | description
 -----------------------------------------------------|---------------------------------
-gmc_norr_analysis.generate_tumor_evolution_report    | Generate tumor evolution report
-gmc_norr_analysis.send_notification_email            | Send a notification email
-gmc_norr_analysis.start_plumber_analysis             | Runs start_plumber_workflows for an analysis with state "ready", software BCLConvert and the path includes "Analysis/1"
-gmc_norr_analysis.email_plumber_end                  | Trigger send_notification_email when plumber webhook reports a failure
-gmc_norr_analysis.update_complete_plumber_analysis   | Trigger workflow of same name if plumber ended successfully, and pipeline isn't GMS Solid
-gmc_norr_analysis.update_incomplete_plumber_analysis | Update analysis to incomplete in Cleve if plumber ends unsuccessfully
-gmc_norr_analysis.second_plumber_analysis            | Trigger second_plumber_analysis when plumber succesfully finishes a GMS Solid run for a sample
+generate_tumor_evolution_report    | Generate tumor evolution report
+send_notification_email            | Send a notification email
+start_plumber_analysis             | Runs start_plumber_workflows for an analysis with state "ready", software BCLConvert and the path includes "Analysis/1"
+email_plumber_end                  | Trigger send_notification_email when plumber webhook reports a failure
+update_complete_plumber_analysis   | Trigger workflow of same name if plumber ended successfully, and pipeline isn't GMS Solid
+update_incomplete_plumber_analysis | Update analysis to incomplete in Cleve if plumber ends unsuccessfully
+second_plumber_analysis            | Trigger second_plumber_analysis when plumber succesfully finishes a GMS Solid run for a sample
 
 
 ## Sensors
 
-ref                                               | description
+name                                              | description
 --------------------------------------------------|---------------------------------
-gmc_norr_analysis.TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
+TumorEvolutionSensor            | Sensor that detects new requests to generate tumor evolution reports
 
 ## Policies
 
-ref                                                            | description
+name                                                           | description
 ---------------------------------------------------------------|---------------------------------
-gmc_norr_analysis.tumor_evolution.concurrency                  | Limit concurrent executions to 1 at a time and delay the rest
-gmc_norr_analysis.update_complete_plumber_analysis.concurrency | Limit concurrent executions to 2 at a time and delay the rest
-gmc_norr_analysis.second_plumber_analysis.concurrency          | Limit concurrent executions to 1 at a time and delay the rest
-gmc_norr_analysis.write_qc_data.concurrency                    | Limit concurrent executions to 1 at a time and delay the rest
+tumor_evolution.concurrency                  | Limit concurrent executions to 1 at a time and delay the rest
+update_complete_plumber_analysis.concurrency | Limit concurrent executions to 2 at a time and delay the rest
+second_plumber_analysis.concurrency          | Limit concurrent executions to 1 at a time and delay the rest
+write_qc_data.concurrency                    | Limit concurrent executions to 1 at a time and delay the rest
 
 # Known issues
 
