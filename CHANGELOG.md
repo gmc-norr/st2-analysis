@@ -1,5 +1,28 @@
 # Changelog
 
+## [0.5.0](https://github.com/gmc-norr/st2-analysis/compare/v0.4.2...v0.5.0) (2026-08-21)
+
+
+### Features
+
+* add `prepare_twist_solid` workflow and support for it in `plumber_analysis` ([#66](https://github.com/gmc-norr/st2-analysis/issues/66)) ([89fe991](https://github.com/gmc-norr/st2-analysis/commit/89fe99157424b814b6518438f3f9562233a43d2f))
+* add `second plumber analysis` workflow ([#84](https://github.com/gmc-norr/st2-analysis/issues/84)) ([545a1fa](https://github.com/gmc-norr/st2-analysis/commit/545a1faee635eb2a052a280c23b131d5e21bf7c4))
+* add suport for genomic-medicine-sweden/Twist_Solid in get pipeline input files ([#67](https://github.com/gmc-norr/st2-analysis/issues/67)) ([a4abaf6](https://github.com/gmc-norr/st2-analysis/commit/a4abaf6f3622ac448b0d80846f5d8f3189bbc96b))
+* complete twist solid plumber webhook triggers second plumber analysis workflow, not update complete analysis ([#68](https://github.com/gmc-norr/st2-analysis/issues/68)) ([68f17fc](https://github.com/gmc-norr/st2-analysis/commit/68f17fc26ec0a8418143f8def03c6bbb9f0ab9c8))
+* **get_pipeline_output_files:** implement twist solid and scout-annotation ([#69](https://github.com/gmc-norr/st2-analysis/issues/69)) ([d5f9bf1](https://github.com/gmc-norr/st2-analysis/commit/d5f9bf15d94ae6387ab6add08202a250137f241f))
+* handle half-complete GMS solid runs by skipping output files if state is not "suceeded" in .plumber-analysis.json ([#95](https://github.com/gmc-norr/st2-analysis/issues/95)) ([dbbc22d](https://github.com/gmc-norr/st2-analysis/commit/dbbc22df20f5c5414a626cc685833178a16f39f9))
+* **update_complete_plumber_analysis:** call `copy bam` workflow for twist solid analyses ([#89](https://github.com/gmc-norr/st2-analysis/issues/89)) ([4939851](https://github.com/gmc-norr/st2-analysis/commit/493985169fa9542d00cd165939ab77d54c556c40))
+* **update_complete_plumber_analysis:** Handle a secondary plumber analysis  ([#85](https://github.com/gmc-norr/st2-analysis/issues/85)) ([b4fc899](https://github.com/gmc-norr/st2-analysis/commit/b4fc8994fede145610ce0ca57d124b4eefb6919c))
+* Write qc row for gms_samples ([#96](https://github.com/gmc-norr/st2-analysis/issues/96)) ([730a4e2](https://github.com/gmc-norr/st2-analysis/commit/730a4e282d5abc771e6a81510a01f582d1f2d674))
+
+
+### Bug Fixes
+
+* **get_plumber_aruments:** handle several downstream analyses ([#80](https://github.com/gmc-norr/st2-analysis/issues/80)) ([126ad71](https://github.com/gmc-norr/st2-analysis/commit/126ad71820d1190a0f7f4f7a77942a3fbb8874b5))
+* only trigger `start_plumber_workflow` for the first bclconvert run ([#92](https://github.com/gmc-norr/st2-analysis/issues/92)) ([1f32f76](https://github.com/gmc-norr/st2-analysis/commit/1f32f76ec5ef85bd2c040fe5743b601e742f1f7e))
+* Set biomarker files as sample level from twist_solid ([#93](https://github.com/gmc-norr/st2-analysis/issues/93)) ([540df8c](https://github.com/gmc-norr/st2-analysis/commit/540df8c021578be8037d6f6435388ab71bb0db05))
+* **update_complete_plumber_analysis:** make msg variable only stderr ([#88](https://github.com/gmc-norr/st2-analysis/issues/88)) ([7e4f0f0](https://github.com/gmc-norr/st2-analysis/commit/7e4f0f0dbd23f1200cd1babb1e6b5b720fa25a6a))
+
 ## [0.4.2](https://github.com/gmc-norr/st2-analysis/compare/v0.4.1...v0.4.2) (2026-06-01)
 
 
