@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.1](https://github.com/gmc-norr/st2-analysis/compare/v0.5.0...v0.5.1) (2026-08-26)
+
+
+### Bug Fixes
+
+* **plumber_analysis:** give timeout argument to gms solid pause action ([#99](https://github.com/gmc-norr/st2-analysis/issues/99)) ([1497eb8](https://github.com/gmc-norr/st2-analysis/commit/1497eb84c23018c0632b90fc23c9c89367af469e))
+
 ## [0.5.0](https://github.com/gmc-norr/st2-analysis/compare/v0.4.2...v0.5.0) (2026-08-21)
 
 
