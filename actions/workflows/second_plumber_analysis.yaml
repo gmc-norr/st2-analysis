@@ -245,7 +245,7 @@ tasks:
           - start_update_complete_workflow
       - when: <% failed() %>
         publish:
-          - msg: "Failed to run {{ ctx().pipeline }} for {{ ctx().sample }} with plumber"
+          - msg: "Failed to run {{ ctx().pipeline }} for {{ ctx().sample_id }} with plumber"
         do:
           - report_failure
 
