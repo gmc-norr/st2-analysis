@@ -308,6 +308,7 @@ tasks:
     action: core.pause
     input:
       max_pause: 1800
+      timeout: 2000
 
   report_failure:
     action: core.inject_trigger
