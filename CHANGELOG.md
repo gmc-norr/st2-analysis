@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.5.2](https://github.com/gmc-norr/st2-analysis/compare/v0.5.1...v0.5.2) (2026-08-26)
+
+
+### Bug Fixes
+
+* **secondary_plumber_analysis:** wrong variable name in msg ([#101](https://github.com/gmc-norr/st2-analysis/issues/101)) ([151245f](https://github.com/gmc-norr/st2-analysis/commit/151245fade309b6d659c78a7bb97dfd702447adf))
+
 ## [0.5.1](https://github.com/gmc-norr/st2-analysis/compare/v0.5.0...v0.5.1) (2026-08-26)
 
 
