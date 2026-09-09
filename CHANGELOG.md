@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.0](https://github.com/gmc-norr/st2-analysis/compare/v0.5.2...v1.0.0) (2026-09-09)
+
+
+### Miscellaneous Chores
+
+* release 1.0.0 ([#104](https://github.com/gmc-norr/st2-analysis/issues/104)) ([0183f79](https://github.com/gmc-norr/st2-analysis/commit/0183f7923085a9a3721be52847d9fb7c37d95ad5))
+* release 1.0.0 ([#105](https://github.com/gmc-norr/st2-analysis/issues/105)) ([0c5d940](https://github.com/gmc-norr/st2-analysis/commit/0c5d940c3c5e90633f939abaee5d857c0c655912))
+
 ## [0.5.2](https://github.com/gmc-norr/st2-analysis/compare/v0.5.1...v0.5.2) (2026-08-26)
 
 
