@@ -343,6 +343,23 @@ tasks:
               {{ result() | to_json_string }}"
         do:
           - report_failure
+      - when: "{{ succeeded() }}
+        do:
+          - copy_hotspots_file
+
+  copy_hotspots_file:
+    action: gmc_norr_seqdata.copy_misc
+    input:
+      run_id: <% ctx().run_id %>
+      pipeline: <% ctx().pipeline %>
+      file_path: <% ctx().new_workdir %>/results/dna/<% ctx().sample_id %>_T/qc/<% ctx().sample_id %>_T.coverage_and_mutations.tsv
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to move hotspot file to K:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
 
   report_failure:
     action: core.inject_trigger
