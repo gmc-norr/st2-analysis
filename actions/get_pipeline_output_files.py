@@ -54,6 +54,9 @@ def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
         {'path': f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro."
          "filtered.score.tsv",
          'level': 'sample', 'type': 'text', 'parent_id': sample_id
+         },
+         {'path': f"/results/dna/{sample_id}_T/qc/{sample_id}_T.coverage_and_mutations.tsv",
+         'level': 'case', 'type': "text", 'parent_id': case_id
          }]
     if complete:
         output_files.append(

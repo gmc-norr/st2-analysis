@@ -343,7 +343,7 @@ tasks:
               {{ result() | to_json_string }}"
         do:
           - report_failure
-      - when: "{{ succeeded() }}
+      - when: "{{ succeeded() }}"
         do:
           - copy_hotspots_file
 
