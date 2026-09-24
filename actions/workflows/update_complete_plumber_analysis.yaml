@@ -348,11 +348,13 @@ tasks:
           - copy_hotspots_file
 
   copy_hotspots_file:
-    action: gmc_norr_seqdata.copy_misc
+    action: gmc_norr_seqdata.copy_file
     input:
       run_id: <% ctx().run_id %>
       pipeline: <% ctx().pipeline %>
       file_path: <% ctx().new_workdir %>/results/dna/<% ctx().sample_id %>_T/qc/<% ctx().sample_id %>_T.coverage_and_mutations.tsv
+      type: "file"
+      subdir: "coverage_and_mutations"
     next:
       - when: "{{ failed() }}"
         publish:
