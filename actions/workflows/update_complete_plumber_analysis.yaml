@@ -363,9 +363,15 @@ tasks:
               {{ result() | to_json_string }}"
         do:
           - report_failure
-      - when: succeeded() and result().result.body.first().endsWith("_T.coverage_and_mutations.tsv")
+      - when: <% succeeded() and result().result.body.count() = 0 %>
         publish:
-          - hotspots_file: result().result.body.first()
+          - msg: "no hotspots file in cleve:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
+      - when: <% succeeded() and result().result.body.count() > 0 and result().result.body.first().path.endsWith("_T.coverage_and_mutations.tsv") %>
+        publish:
+          - hotspots_file: <% result().result.body.first().path %>
         do:
           - copy_hotspots_file
 
