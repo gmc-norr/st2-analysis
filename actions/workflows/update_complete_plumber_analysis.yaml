@@ -331,11 +331,13 @@ tasks:
         do: noop
 
   copy_bam:
-    action: gmc_norr_seqdata.copy_bam
+    action: gmc_norr_seqdata.copy_file
     input:
       run_id: <% ctx().run_id %>
+      subdir: BAM
+      type: file
       pipeline: <% ctx().pipeline %>
-      bam_path: <% ctx().new_workdir %>/bam_dna/
+      file_path: <% ctx().new_workdir %>/bam_dna/
     next:
       - when: "{{ failed() }}"
         publish:
@@ -345,6 +347,26 @@ tasks:
           - report_failure
       - when: "{{ succeeded() }}"
         do:
+          - get_hotspots_file
+
+  get_hotspots_file:
+    action: cleve.get_analysis_files
+    input:
+      analysis_id: <% ctx().analysis_id %>
+      level: case
+      parent_id: <% ctx().case_id %>
+      name: <% ctx().sample_id %>_T.coverage_and_mutations.tsv
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "failed to find hotspots file in cleve:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
+      - when: succeeded() and result().result.body.first().endsWith("_T.coverage_and_mutations.tsv")
+        publish:
+          - hotspots_file: result().result.body.first()
+        do:
           - copy_hotspots_file
 
   copy_hotspots_file:
@@ -352,8 +374,8 @@ tasks:
     input:
       run_id: <% ctx().run_id %>
       pipeline: <% ctx().pipeline %>
-      file_path: <% ctx().new_workdir %>/results/dna/<% ctx().sample_id %>_T/qc/<% ctx().sample_id %>_T.coverage_and_mutations.tsv
-      type: "file"
+      file_path: <%ctx().new_workdir %>/<% ctx().hotspots_file %>
+      type: file
       subdir: "coverage_and_mutations"
     next:
       - when: "{{ failed() }}"
