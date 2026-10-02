@@ -380,7 +380,7 @@ tasks:
     input:
       run_id: <% ctx().run_id %>
       pipeline: <% ctx().pipeline %>
-      file_path: <%ctx().new_workdir %>/<% ctx().hotspots_file %>
+      file_path: <% ctx().hotspots_file %>
       type: file
       subdir: "coverage_and_mutations"
     next:
