@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.0](https://github.com/gmc-norr/st2-analysis/compare/v1.0.0...v1.1.0) (2026-10-02)
+
+
+### Features
+
+* copy hotspots file to K ([#107](https://github.com/gmc-norr/st2-analysis/issues/107)) ([cc53ece](https://github.com/gmc-norr/st2-analysis/commit/cc53eceef165aff5f942f60871fe4a8251bc56c2))
+
 ## [1.0.0](https://github.com/gmc-norr/st2-analysis/compare/v0.5.2...v1.0.0) (2026-09-09)
 
 
