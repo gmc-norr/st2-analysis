@@ -331,15 +331,62 @@ tasks:
         do: noop
 
   copy_bam:
-    action: gmc_norr_seqdata.copy_bam
+    action: gmc_norr_seqdata.copy_file
     input:
       run_id: <% ctx().run_id %>
+      subdir: BAM
+      type: file
       pipeline: <% ctx().pipeline %>
-      bam_path: <% ctx().new_workdir %>/bam_dna/
+      file_path: <% ctx().new_workdir %>/bam_dna/
     next:
       - when: "{{ failed() }}"
         publish:
           - msg: "Failed to move bam files to K:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
+      - when: "{{ succeeded() }}"
+        do:
+          - get_hotspots_file
+
+  get_hotspots_file:
+    action: cleve.get_analysis_files
+    input:
+      analysis_id: <% ctx().analysis_id %>
+      level: case
+      parent_id: <% ctx().case_id %>
+      name: <% ctx().sample_id %>_T.coverage_and_mutations.tsv
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "failed to find hotspots file in cleve:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
+      - when: <% succeeded() and result().result.body.count() = 0 %>
+        publish:
+          - msg: "no hotspots file in cleve:
+              {{ result() | to_json_string }}"
+        do:
+          - report_failure
+      - when: <% succeeded() and result().result.body.count() > 0 and result().result.body.first().path.endsWith("_T.coverage_and_mutations.tsv") %>
+        publish:
+          - hotspots_file: <% result().result.body.first().path %>
+        do:
+          - copy_hotspots_file
+
+  copy_hotspots_file:
+    action: gmc_norr_seqdata.copy_file
+    input:
+      run_id: <% ctx().run_id %>
+      pipeline: <% ctx().pipeline %>
+      file_path: <% ctx().hotspots_file %>
+      type: file
+      subdir: "coverage_and_mutations"
+    next:
+      - when: "{{ failed() }}"
+        publish:
+          - msg: "Failed to move hotspot file to K:
               {{ result() | to_json_string }}"
         do:
           - report_failure
