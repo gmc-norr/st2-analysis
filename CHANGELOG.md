@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/gmc-norr/st2-analysis/compare/v1.1.0...v1.1.1) (2026-10-10)
+
+
+### Bug Fixes
+
+* relative path for all output-files ([#109](https://github.com/gmc-norr/st2-analysis/issues/109)) ([69cf0e8](https://github.com/gmc-norr/st2-analysis/commit/69cf0e871cc18cf291aca5e525ca1a13c447d1c7))
+
 ## [1.1.0](https://github.com/gmc-norr/st2-analysis/compare/v1.0.0...v1.1.0) (2026-10-02)
 
 
