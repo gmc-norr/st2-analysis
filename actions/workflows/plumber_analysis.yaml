@@ -116,7 +116,7 @@ tasks:
         publish:
           - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}/{{ ctx().sample_id }}"
         do:
-          rd_check_flowcell
+          prepare_raredisease
       - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do:
           gms_solid_workflow
@@ -126,79 +126,26 @@ tasks:
         do:
           report_failure
 
-  rd_check_flowcell: # stop the workflow if it's a prerun of the sequencing
-    action: cleve.get_runs
+  raredisease_workflow:
+    action: gmc_norr_analysis.prepare_raredisease
     input:
+      sample_id: <% ctx().sample_id %>
       run_id: <% ctx().run_id %>
-    retry:
-      when: "{{ failed() }}"
-      delay: 1
-      count: 2
+      sex: <% ctx().sex %>
+      fastq_files: <% ctx().fastq_files %>
+      output_dir: <% ctx().output_dir %>
     next:
-      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name != '1.5B' %>
-        do:
-          rd_prepare_output_folder
-      - when: <% succeeded() and result().result.body.runs.first().run_info.flowcell_name = '1.5B' %>
+      - when: <% succeeded() and result().output.case_id != null %>
         publish:
-          msg="Sequenced on a 1.5B flowcell, so probably a prerun sequencing. Stopping workflow here."
+          - case_id: <% result().output.case_id %>
+        do:
+          format_cleve_input_files
+      - when: <% succeeded() and result().output.case_id = null %>
         do:
           noop
       - when: "{{ failed() }}"
         publish:
-          msg="Failed to get flowcell name from Cleve.
-          {{ result() | to_json_string }}"
-        do:
-          report_failure
-
-  rd_prepare_output_folder:
-    action: core.local
-    input:
-      cmd:  "mkdir -p <% ctx().output_dir %>"
-    next:
-      - when: "{{ succeeded() }}"
-        do:
-          rd_make_case_id
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to create output directory {{ ctx().output_dir }}.
-          {{ result() | to_json_string }}"
-        do: report_failure
-
-  rd_make_case_id:
-    action: gmc_norr_analysis.make_case_id
-    input:
-      samples:
-        - <% ctx().sample_id %>
-        - "{% if ctx().mother_sample_id is not none %}{{ ctx().mother_sample_id }}{% endif %}"
-        - "{% if ctx().father_sample_id is not none %}{{ ctx().father_sample_id }}{% endif %}"
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          - case_id: <% result().result %>
-        do:
-          rd_make_input_files
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to generate case id.
-          {{ result() | to_json_string }}"
-        do:
-          report_failure
-
-  rd_make_input_files:
-    action: gmc_norr_analysis.make_raredisease_samplesheet
-    input:
-      sample_id: <% ctx().sample_id %>
-      case_id: <% ctx().case_id %>
-      sex: <% ctx().sex %>
-      fastq_r1: "{{ ctx().fastq_files.get(ctx().sample_id).R1 }}"
-      fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
-      out_dir: <% ctx().output_dir %>
-    next:
-      - when: "{{ succeeded() }}"
-        do: format_cleve_input_files
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to make raredisease samplesheet.
+          msg="Failed to prepare for running {{ ctx().pipeline }}.
           {{ result() | to_json_string }}"
         do: report_failure
 
