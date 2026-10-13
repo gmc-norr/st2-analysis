@@ -1,0 +1,173 @@
+version: "1.0"
+
+description: Run downstream analysis of a sample with plumber.
+input:
+  - dna_sample_id
+  - sample_id
+  - plumber_host
+  - plumber_env
+
+vars:
+  - msg:
+  - output_dir:
+  - pipeline:
+  - pipeline_version:
+  - pipeline_profile:
+  - plumber_config_version:
+  - plumber_additional_arguments:
+  - case_id:
+  - fastq_files:
+  - analysis_ids:
+  - input_files:
+  - pid:
+
+output:
+  - msg: <% ctx().msg %>
+
+tasks:
+  get_case_id:
+    action: scout.view_case #docker compose exec scout scout view cases -d D25-906
+    input:
+      display_name: <% ctx().dna_sample_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - case_id: <% result().result.split()[4] %>
+        do:
+          get_run_id
+
+  get_run_id: # this strikes me as a very ugly way to find it...
+    action: scout.export_case #docker compose exec scout scout view cases -d D25-906
+    input:
+      case_id: <% ctx().case_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - run_id: "{{ result().result.multiqc.split('novaseq/')[1].split('/raredisease') }}"
+        do:
+          get_analysis_id
+
+  get_analysis_id:
+    action: cleve.get_analyses
+    input:
+      run_id: <% ctx().run_id %>
+      software: "Dragen BCLConvert"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - analysis_id: "{{ result().get('result').get('body').get('analyses') | map(attribute='analysis_id') | first  }}"
+        do:
+          get_fastq_files
+
+  get_fastq_files:
+    action: cleve.get_analysis_files
+    input:
+      analysis_id: <% ctx().analysis_id %>
+      type: "fastq"
+      level: "sample"
+      parent_id: <% ctx().sample_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - fastq_files:
+              <% ctx().sample_id %>:
+                R1: <% result().result.body.where($.path.matches("_R1_")).select($.path).orderBy($) %>
+                R2: <% result().result.body.where($.path.matches("_R2_")).select($.path).orderBy($) %>
+        do:
+          get_plumber_arguments
+
+  get_plumber_arguments:
+    action: gmc_norr_analysis.get_plumber_arguments
+    input:
+       test_profile: WGSRareDisease_2 #TODO: new profile, same as WGSRareDisease_2 but with --skip-snv-calling
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - pipeline: <% result().result.Pipeline %>
+          - pipeline_version: <% result().result.Version %>
+          - pipeline_profile: <% result().result.Profile %>
+          - plumber_config_version: <% result().result.ConfigVersion %>
+          - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
+          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+        do:
+          mark_rerun
+
+  mark_rerun:
+    action: core.local
+    input:
+      cmd: "touch {{ ctx().output_dir }}/RERUN"
+    next:
+      - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
+        publish:
+        do:
+          raredisease_workflow
+
+  raredisease_workflow:
+    action: gmc_norr_analysis.prepare_raredisease
+    input:
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      sex: <% ctx().sex %>
+      fastq_files: <% ctx().fastq_files %>
+      output_dir: <% ctx().output_dir %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - case_id: <% result().output.case_id %>
+        do:
+          format_cleve_input_files
+
+  format_cleve_input_files:
+    action: gmc_norr_analysis.get_pipeline_input_files
+    input:
+      pipeline: <% ctx().pipeline %>
+      sample_id: <% ctx().sample_id %>
+      fastq_files: <% ctx().fastq_files %>
+      analysis_ids:
+        "{{ ctx().sample_id }}": "{{ ctx().analysis_id }}"
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          input_files="{{ result().result }}"
+        do:
+          add_plumber_analysis_to_cleve
+
+
+  add_plumber_analysis_to_cleve:
+    action: cleve.add_analysis
+    input:
+      run_id: <% ctx().run_id %>
+      state: pending
+      path: <% ctx().output_dir %>
+      software: <% ctx().pipeline %>
+      software_version: <% ctx().pipeline_version %>
+      input_files: <% ctx().input_files %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - plumber_analysis_id: <% result().result.body.analysis_id %>
+        do:
+          start_plumber
+
+  start_plumber:
+    action: core.remote
+    input:
+      cmd: "nohup plumber run <% ctx().pipeline %>
+        --version <% ctx().pipeline_version %> --config-version <% ctx().plumber_config_version %>
+        -p <% ctx().pipeline_profile %> --analysis-id <% ctx().plumber_analysis_id %> <% ctx().plumber_additional_arguments %> &> plumber.log & echo $!"
+      cwd: <% ctx().output_dir %>
+      hosts: <% ctx().plumber_host %>
+      env: <% ctx().plumber_env %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - pid: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
+        do: check_progress
+
+  check_progress:
+    action: core.remote
+    delay: 30
+    input:
+      cmd: "ps --no-headers --pid <% ctx().pid %>"
+      cwd: <% ctx().output_dir %>
+      hosts: <% ctx().plumber_host %>

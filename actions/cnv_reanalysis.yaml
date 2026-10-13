@@ -1,0 +1,27 @@
+---
+name: cnv_reanalysis
+pack: gmc_norr_analysis
+description: Workflow to run downstream analysis of a sample with plumber
+runner_type: orquesta
+entry_point: workflows/cnv_reanalysis.yaml
+enabled: true
+
+parameters:
+  dna_sample_id:
+    description: The ID of the DNA sample to analyze
+    type: string
+    required: true
+  sample_id:
+    description: The ID of seq sample
+    type: string
+  plumber_env:
+    type: object
+    secret: true
+    required: true
+    default:
+      PLUMBER_WEBHOOK_URL: "{{st2kv.system.api_url}}/webhooks/plumber"
+      PLUMBER_WEBHOOK_API_KEY: "St2-Api-Key={{ st2kv.system.plumber_api_key | decrypt_kv }}"
+  plumber_host:
+    description: Host to run plumber on
+    type: string
+    default: "{{config_context.plumber.host}}"
