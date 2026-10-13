@@ -30,7 +30,11 @@ def get_rd_output_files(sample_id, case_id):
         {'path': f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_clinical.vcf.gz',
          'level': 'case', 'type': 'vcf_sv', 'parent_id': case_id},
         {'path': f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_research.vcf.gz',
-         'level': 'case', 'type': 'vcf_sv', 'parent_id': case_id}
+         'level': 'case', 'type': 'vcf_sv', 'parent_id': case_id},
+        {'path': f'raredisease_results/gens/{sample_id}_gens.baf.bed.gz',
+         'level': 'case', 'type': 'bed', 'parent_id': sample_id},
+        {'path': f'raredisease_results/gens/{sample_id}_gens.cov.bed.gz',
+         'level': 'case', 'type': 'bed', 'parent_id': sample_id}
          ]
     return output_files
 
