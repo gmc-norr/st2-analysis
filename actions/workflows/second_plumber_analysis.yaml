@@ -8,6 +8,7 @@ input:
   - first_pipeline
   - first_analysis_id
   - first_workdir
+  - mock_run
   - plumber_host
 
 vars:
@@ -220,16 +221,20 @@ tasks:
       run_id: <% ctx().run_id %>
       state: pending
     next:
-      - when: <% succeeded() %>
+      - when: <% succeeded() and not ctx().mock_run %>
         publish:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do: start_plumber
+      - when: <% succeeded() and ctx().mock_run %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.analysis_id %>
+        do: mock_start_plumber
       - when: <% failed() %>
         publish:
           - msg: "{{ result() | to_json_string }}"
         do:
           - report_failure
-
+  
   start_plumber:
     action: core.remote
     input:
@@ -248,6 +253,18 @@ tasks:
           - msg: "Failed to run {{ ctx().pipeline }} for {{ ctx().sample_id }} with plumber"
         do:
           - report_failure
+
+  mock_start_plumber:
+    action: gmc_norr_analysis.mock_start_plumber
+    input:
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().new_workdir %>
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+    next:
+      - when: <% succeeded() %>
+        do:
+          - start_update_complete_workflow
 
   start_update_complete_workflow:
     action: gmc_norr_analysis.update_complete_plumber_analysis

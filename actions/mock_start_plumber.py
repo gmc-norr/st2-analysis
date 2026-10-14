@@ -15,6 +15,11 @@ def get_rd_output_files(sample_id, case_id):
         f'raredisease_results/smncopynumbercaller/out/{case_id}_smncopynumbercaller.tsv',
         f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_clinical.vcf.gz',
         f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_research.vcf.gz',
+        f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_clinical.vcf.gz',
+        f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_research.vcf.gz',
+        f'raredisease_results/gens/{sample_id}_gens.cov.bed.gz',
+        f'raredisease_results/gens/{sample_id}_gens.baf.bed.gz'
+
     ]
 
     return output_files
@@ -29,6 +34,14 @@ def get_twist_solid_output_files(sample_id, case_id):
         f"results/dna/{sample_id}_T/biomarker/{sample_id}_T.msisensor_pro.filtered.score.tsv",
         f"results/dna/{sample_id}_T/qc/{sample_id}_T.coverage_and_mutations.tsv",
         f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html"
+    ]
+
+    return output_files
+
+def get_scout_annotation_output_files(sample_id, case_id):
+    output_files = [ 
+        f'results/annotation/{case_id}/{case_id}.annotated.genmod.vcf.gz',
+        f'results/coverage/{case_id}/{sample_id}.coverage.d4'
     ]
 
     return output_files
