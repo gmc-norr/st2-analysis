@@ -253,7 +253,7 @@ tasks:
       software_version: <% ctx().pipeline_version %>
       input_files: <% ctx().input_files %>
     next:
-      - when: "<% succeeded() and !ctx().mock_run %>"
+      - when: <% succeeded() and not ctx().mock_run %>
         publish:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do:
