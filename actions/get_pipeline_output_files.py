@@ -91,6 +91,6 @@ class GetPipelineOutputFiles(Action):
             return (False, "unsupported pipeline")
         existing_output_files = []
         for file in output_files:
-            if os.path.exists(Path(work_dir) / file.get('path').replace('*', '1')):
+            if os.path.exists(Path(work_dir) / file.get('path').replace('chr*', 'chr1')):
                 existing_output_files.append(file)
         return (True,  existing_output_files)
