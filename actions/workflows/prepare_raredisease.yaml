@@ -41,8 +41,6 @@ tasks:
         publish:
           msg="Failed to get flowcell name from Cleve.
           {{ result() | to_json_string }}"
-        do:
-          report_failure
 
   rd_prepare_output_folder:
     action: core.local
@@ -59,7 +57,6 @@ tasks:
         publish:
           msg="Failed to create output directory {{ ctx().output_dir }}.
           {{ result() | to_json_string }}"
-        do: report_failure
 
   rd_make_case_id:
     action: gmc_norr_analysis.make_case_id
@@ -76,8 +73,6 @@ tasks:
         publish:
           msg="Failed to generate case id.
           {{ result() | to_json_string }}"
-        do:
-          report_failure
 
   rd_make_input_files:
     action: gmc_norr_analysis.make_raredisease_samplesheet
@@ -89,10 +84,7 @@ tasks:
       fastq_r2: "{{ ctx().fastq_files.get(ctx().sample_id).R2 }}"
       out_dir: <% ctx().output_dir %>
     next:
-      - when: "{{ succeeded() }}"
-        do: format_cleve_input_files
       - when: "{{ failed() }}"
         publish:
           msg="Failed to make raredisease samplesheet.
           {{ result() | to_json_string }}"
-        do: report_failure
