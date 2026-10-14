@@ -29,7 +29,7 @@ tasks:
   check_start:
     action: core.local
     input:
-      cmd: "if [[ -f {{ ctx().workdir }}/RERUN ]]; then \echo '_rerun'; fi"
+      cmd: 'if [[ -f {{ ctx().workdir }}/RERUN ]]; then \cat {{ ctx().workdir }}/RERUN; fi'
     next:
       - when: <% ctx(sample_id) != null and ctx(run_id) != null %>
         publish:
@@ -328,7 +328,7 @@ tasks:
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
-      rerun: "{{ ctx().rerun == '_rerun' }}"
+      rerun: "{{ ctx().rerun }}"
     next:
       - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do: copy_bam
