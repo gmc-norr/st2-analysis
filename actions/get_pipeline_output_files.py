@@ -26,7 +26,15 @@ def get_rd_output_files(sample_id, case_id):
         {'path': f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_clinical.vcf.gz',
          'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id},
         {'path': f'raredisease_results/rank_and_filter/{case_id}_snv_ranked_research.vcf.gz',
-         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id}
+         'level': 'case', 'type': 'vcf_snv', 'parent_id': case_id},
+        {'path': f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_clinical.vcf.gz',
+         'level': 'case', 'type': 'vcf_sv', 'parent_id': case_id},
+        {'path': f'raredisease_results/rank_and_filter/{case_id}_sv_ranked_research.vcf.gz',
+         'level': 'case', 'type': 'vcf_sv', 'parent_id': case_id},
+        {'path': f'raredisease_results/gens/{sample_id}_gens.baf.bed.gz',
+         'level': 'case', 'type': 'bed', 'parent_id': sample_id},
+        {'path': f'raredisease_results/gens/{sample_id}_gens.cov.bed.gz',
+         'level': 'case', 'type': 'bed', 'parent_id': sample_id}
          ]
     return output_files
 
@@ -55,7 +63,7 @@ def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
          "filtered.score.tsv",
          'level': 'sample', 'type': 'text', 'parent_id': sample_id
          },
-         {'path': f"results/dna/{sample_id}_T/qc/{sample_id}_T.coverage_and_mutations.tsv",
+        {'path': f"results/dna/{sample_id}_T/qc/{sample_id}_T.coverage_and_mutations.tsv",
          'level': 'case', 'type': "text", 'parent_id': case_id
          }]
     if complete:
