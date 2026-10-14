@@ -1,0 +1,33 @@
+---
+name: prepare_raredisease
+pack: gmc_norr_analysis
+description: Workflow for preparing to start a raredisease analysis of a sample or a trio with plumber
+runner_type: orquesta
+entry_point: workflows/prepare_raredisease.yaml
+enabled: true
+
+parameters:
+  sample_id:
+    description: The ID of the sample
+    type: string
+    required: true
+  run_id:
+    description: The ID of the run the sample was sequenced in
+    type: string
+    required: true
+  case_id:
+    description: The ID of the case the sample belongs to
+    type: string
+    required: false
+  sex:
+    description: The sex of the sample
+    type: string
+    required: true
+  fastq_files:
+    description: The samples' fastq files
+    type: object
+    required: true
+  output_dir:
+    description: The work directory of the analysis
+    type: string
+    required: true
