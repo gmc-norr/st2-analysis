@@ -1,0 +1,25 @@
+---
+name: mock_start_plumber
+pack: gmc_norr_analysis
+description: touches output files for pipeline
+runner_type: python-script
+entry_point: mock_start_plumber.py
+enabled: true
+
+parameters:
+  pipeline:
+    description: The pipeline name, e.g. nf-core/raredisease
+    type: string
+    required: true
+  workdir:
+    description: Workdir for mocked analysis
+    type: string
+    required: true
+  sample_id:
+    description: The ID of the sample
+    type: string
+    required: true
+  case_id:
+    description: The case ID
+    type: string
+    required: true
