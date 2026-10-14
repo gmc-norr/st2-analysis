@@ -116,7 +116,7 @@ tasks:
         publish:
           - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}/{{ ctx().sample_id }}"
         do:
-          prepare_raredisease
+          raredisease_workflow
       - when: "{{ ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do:
           gms_solid_workflow
