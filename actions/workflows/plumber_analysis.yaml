@@ -141,7 +141,8 @@ tasks:
         do:
           format_cleve_input_files
       - when: <% succeeded() and result().output.case_id = null %>
-        publish: <% result().output.msg %>
+        publish:
+          - msg: <% result().output.msg %>
         do:
           noop
       - when: "{{ failed() }}"
