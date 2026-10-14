@@ -40,3 +40,8 @@ parameters:
     description: The pipeline the secondary analysis was performed with. Required for Twist Solid analyses.
     type: string
     required: false
+  mock_run:
+    description: when activated, adds --dry-run to rsync
+    type: boolean
+    default: false
+    required: false
