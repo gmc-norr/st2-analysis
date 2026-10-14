@@ -323,6 +323,7 @@ tasks:
       sample_id: <% ctx().sample_id %>
       run_id: <% ctx().run_id %>
       case_id: <% ctx().case_id %>
+      mock_run: <% ctx().mock_run %>
 
   check_progress:
     action: core.remote

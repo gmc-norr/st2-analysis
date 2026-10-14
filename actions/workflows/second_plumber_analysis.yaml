@@ -277,6 +277,7 @@ tasks:
       case_id: <% ctx().case_id %>
       secondary_analysis_id: <% ctx().plumber_analysis_id %>
       secondary_pipeline: <% ctx().pipeline %>
+      mock_run: <% ctx().mock_run %>
 
   report_failure:
     action: core.inject_trigger
