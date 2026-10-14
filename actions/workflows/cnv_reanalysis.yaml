@@ -32,18 +32,18 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - case_id: <% result().result.split()[4] %>
+          - case_id: <% result().values().first().stdout.split('\n')[0].split('\t')[1].norm() %>
         do:
           get_run_id
 
-  get_run_id: # this strikes me as a very ugly way to find it...
-    action: scout.export_case #docker compose exec scout scout view cases -d D25-906 --json
+  get_run_id:
+    action: scout.export_case
     input:
       case_id: <% ctx().case_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - run_id: "{{ result().result.[0].multiqc.split('novaseq/')[1].split('/raredisease') }}"
+          - run_id: "{{ result().values().first().stdout.first().multiqc.split('novaseq/')[1].split('/raredisease') }}"
         do:
           get_run_path
 
@@ -120,7 +120,6 @@ tasks:
       cmd: "echo 'CNV' > {{ ctx().output_dir }}/RERUN"
     next:
       - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
-        publish:
         do:
           raredisease_workflow
 
