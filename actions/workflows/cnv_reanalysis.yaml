@@ -43,7 +43,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - run_id: "{{ result().values().first().stdout.first().multiqc.split('novaseq/')[1].split('/raredisease') }}"
+          - run_id: <% result().values().first().stdout.first().multiqc.split('novaseq/')[1].split('/raredisease')[0] %>
         do:
           get_run_path
 
