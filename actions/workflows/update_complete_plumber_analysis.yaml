@@ -16,7 +16,7 @@ input:
 
 vars:
   - msg:
-  - complete:
+  - rerun:
   - output_files:
   - secondary_output_files:
   - destination:
@@ -27,11 +27,17 @@ output:
 
 tasks:
   check_start:
-    action: core.noop
+    action: core.local
+    input:
+      cmd: 'if [[ -f {{ ctx().workdir }}/RERUN ]]; then \cat {{ ctx().workdir }}/RERUN; fi'
     next:
       - when: <% ctx(sample_id) != null and ctx(run_id) != null %>
+        publish:
+          - rerun: "{{ result().stdout if result().stdout!= '' else None }}"
         do: get_run_platform
       - when: <% ctx(sample_id) = null or ctx(run_id) = null %>
+        publish:
+          - rerun: "{{ result().stdout if result().stdout!= '' else None }}"
         do: get_sample_id
 
   get_sample_id:
@@ -119,7 +125,7 @@ tasks:
         do: report_failure
       - when: <% succeeded() and result().result != null %>
         publish:
-          - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}"
+          - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}{% if ctx().rerun != None %}_{{ ctx().rerun }}{% endif %}"
           - new_workdir: "{{ ctx().destination }}/{{ ctx().sample_id }}"
         do: make_destination
 
@@ -173,7 +179,6 @@ tasks:
       multiqc_data: <% ctx().new_workdir %>/qc/multiqc/multiqc_DNA_data/multiqc_data.json
       sample_id: <% ctx().sample_id %>
 
-
   get_case_id:
     action: core.local
     input:
@@ -201,14 +206,12 @@ tasks:
           - report_failure
 
   check_twist_solid_needed_variables:
-    action: core.local
-    input:
-      cmd: 'cat {{ ctx().new_workdir }}/.plumber-analysis.json'
+    action: core.noop
     next:
       - when: <% ctx().case_id != null and ctx().secondary_pipeline != null
          and ctx().secondary_analysis_id != null %>
         publish:
-          - complete: "{{ result().stdout.state.name == 'succeeded'}}"
+          - secondary_work_dir: "{{ ctx().new_workdir }}/{{ ctx().secondary_pipeline.split('/')[1] }}"
         do: format_secondary_output_files
       - when: <% ctx().case_id = null or ctx().secondary_pipeline = null
          or ctx().secondary_analysis_id = null %>
@@ -227,6 +230,7 @@ tasks:
       pipeline: "{{ ctx().secondary_pipeline }}"
       case_id: "{{ ctx().case_id }}"
       sample_id: "{{ ctx().sample_id }}"
+      work_dir:  "{{ ctx().secondary_work_dir }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -242,7 +246,7 @@ tasks:
     action: cleve.update_analysis
     input:
       analysis_id: <% ctx().secondary_analysis_id %>
-      path: "{{ ctx().new_workdir }}/{{ ctx().secondary_pipeline.split('/')[1] }}"
+      path: "{{ ctx().secondary_work_dir }}"
       state: ready
     next:
       - when: "{{ succeeded() }}"
@@ -273,7 +277,7 @@ tasks:
       pipeline: "{{ ctx().pipeline }}"
       case_id: "{{ ctx().case_id }}"
       sample_id: "{{ ctx().sample_id }}"
-      complete: "{{ ctx().complete }}"
+      work_dir: "{{ ctx().new_workdir }}"
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -324,6 +328,7 @@ tasks:
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
+      rerun: "{{ ctx().rerun }}"
     next:
       - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do: copy_bam
