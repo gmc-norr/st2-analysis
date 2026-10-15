@@ -263,12 +263,28 @@ tasks:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do:
           mock_start_plumber
+      - when: <% failed() and ctx().mock_run %>
+        do:
+          - mock_get_analysis_id
       - when: "{{ failed() }}"
         publish:
           msg="Failed to add {{ ctx().pipeline }} analysis to Cleve
             {{ result().stderr }}"
         do:
           - report_failure
+
+  mock_get_analysis_id:
+    action: cleve.get_analyses
+    input:
+      software: <% ctx().pipeline %>
+      run_id: <% ctx().run_id %>
+    next:
+      - when: <% succeeded %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.where($.path = ctx().output_dir).first().analysis_id %>
+        do:
+          - mock_start_plumber
+
 
   start_plumber:
     action: core.remote
