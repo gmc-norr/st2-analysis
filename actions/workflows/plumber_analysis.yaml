@@ -279,7 +279,7 @@ tasks:
       software: <% ctx().pipeline %>
       run_id: <% ctx().run_id %>
     next:
-      - when: <% succeeded %>
+      - when: <% succeeded() %>
         publish:
           - plumber_analysis_id: <% result().result.body.analyses.where($.path = ctx().output_dir).first().analysis_id %>
         do:
@@ -326,14 +326,14 @@ tasks:
     action: gmc_norr_analysis.second_plumber_analysis
     input:
       first_pipeline: <% ctx().pipeline %>
-      first_analysis_id: <% ctx().analysis_id %>
+      first_analysis_id: <% ctx().plumber_analysis_id %>
       first_workdir: <% ctx().output_dir %>
       mock_run: true
 
   mock_update_complete_plumber_analysis:
     action: gmc_norr_analysis.update_complete_plumber_analysis
     input:
-      analysis_id: <% ctx().analysis_id %>
+      analysis_id: <% ctx().plumber_analysis_id %>
       pipeline: <% ctx().pipeline %>
       workdir: <%ctx().output_dir %>
       sample_id: <% ctx().sample_id %>
