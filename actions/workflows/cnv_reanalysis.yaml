@@ -1,6 +1,7 @@
 version: "1.0"
 
-description: Run downstream analysis of a sample with plumber.
+description: Rerun raredisease samples to add CNVs.
+
 input:
   - dna_sample_id
   - sample_id
@@ -17,7 +18,8 @@ vars:
   - plumber_additional_arguments:
   - case_id:
   - fastq_files:
-  - analysis_ids:
+  - analysis_id:
+  - plumber_analysis_id:
   - input_files:
   - pid:
 
@@ -152,7 +154,6 @@ tasks:
           input_files="{{ result().result }}"
         do:
           add_plumber_analysis_to_cleve
-
 
   add_plumber_analysis_to_cleve:
     action: cleve.add_analysis

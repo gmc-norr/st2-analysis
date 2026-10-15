@@ -1,19 +1,19 @@
 ---
 name: cnv_reanalysis
 pack: gmc_norr_analysis
-description: Workflow to run downstream analysis of a sample with plumber
+description: Workflow to rerun raredisease samples to add CNVs.
 runner_type: orquesta
 entry_point: workflows/cnv_reanalysis.yaml
 enabled: true
 
 parameters:
+  sample_id:
+    description: The ID of seq sample to analyse
+    type: string
   dna_sample_id:
-    description: The ID of the DNA sample to analyze
+    description: The ID of the corresponding DNA sample
     type: string
     required: true
-  sample_id:
-    description: The ID of seq sample
-    type: string
   plumber_env:
     type: object
     secret: true
