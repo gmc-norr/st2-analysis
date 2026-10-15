@@ -273,20 +273,6 @@ tasks:
         do:
           - report_failure
 
-  mock_get_analysis_id:
-    action: cleve.get_analyses
-    input:
-      software: <% ctx().pipeline %>
-      run_id: <% ctx().run_id %>
-      page_size: 50
-    next:
-      - when: <% succeeded() %>
-        publish:
-          - plumber_analysis_id: <% result().result.body.analyses.where($.path = ctx().output_dir).first().analysis_id %>
-        do:
-          - mock_start_plumber
-
-
   start_plumber:
     action: core.remote
     input:
@@ -307,39 +293,6 @@ tasks:
         publish:
           - pid: "{{ result().get((result().keys() | list | first)).get('stdout') }}"
         do: check_progress
-
-  mock_start_plumber:
-    action: gmc_norr_analysis.mock_start_plumber
-    input:
-      pipeline: <% ctx().pipeline %>
-      workdir: <%ctx().output_dir %>
-      sample_id: <% ctx().sample_id %>
-      case_id: <% ctx().case_id %>
-    next:
-      - when: <% succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
-        do:
-          - mock_update_complete_plumber_analysis
-      - when: <% succeeded() and ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
-        do:
-          - mock_second_plumber_analysis
-  
-  mock_second_plumber_analysis:
-    action: gmc_norr_analysis.second_plumber_analysis
-    input:
-      first_pipeline: <% ctx().pipeline %>
-      first_analysis_id: <% ctx().plumber_analysis_id %>
-      first_workdir: <% ctx().output_dir %>
-      mock_run: true
-
-  mock_update_complete_plumber_analysis:
-    action: gmc_norr_analysis.update_complete_plumber_analysis
-    input:
-      analysis_id: <% ctx().plumber_analysis_id %>
-      pipeline: <% ctx().pipeline %>
-      workdir: <%ctx().output_dir %>
-      sample_id: <% ctx().sample_id %>
-      run_id: <% ctx().run_id %>
-      case_id: <% ctx().case_id %>
 
   check_progress:
     action: core.remote
@@ -375,3 +328,49 @@ tasks:
         message: <% ctx().msg %>
     next:
       - do: fail
+
+  mock_get_analysis_id:
+    action: cleve.get_analyses
+    input:
+      software: <% ctx().pipeline %>
+      run_id: <% ctx().run_id %>
+      page_size: 50
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.analyses.where($.path = ctx().output_dir).first().analysis_id %>
+        do:
+          - mock_start_plumber
+
+  mock_start_plumber:
+    action: gmc_norr_analysis.mock_start_plumber
+    input:
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().output_dir %>
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+    next:
+      - when: <% succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
+        do:
+          - mock_update_complete_plumber_analysis
+      - when: <% succeeded() and ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
+        do:
+          - mock_second_plumber_analysis
+  
+  mock_second_plumber_analysis:
+    action: gmc_norr_analysis.second_plumber_analysis
+    input:
+      first_pipeline: <% ctx().pipeline %>
+      first_analysis_id: <% ctx().plumber_analysis_id %>
+      first_workdir: <% ctx().output_dir %>
+      mock_run: true
+
+  mock_update_complete_plumber_analysis:
+    action: gmc_norr_analysis.update_complete_plumber_analysis
+    input:
+      analysis_id: <% ctx().plumber_analysis_id %>
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().output_dir %>
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      case_id: <% ctx().case_id %>

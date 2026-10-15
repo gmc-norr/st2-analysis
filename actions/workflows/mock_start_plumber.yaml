@@ -2,12 +2,10 @@ version: "1.0"
 
 description: Run downstream analysis of a sample with plumber.
 input:
+  - pipeline
+  - workdir
   - sample_id
   - case_id
-  - run_id
-  - pipeline
-  - analysis_id
-  - output_dir
 
 tasks:
   
