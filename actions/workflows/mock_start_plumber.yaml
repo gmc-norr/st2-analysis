@@ -17,7 +17,7 @@ tasks:
       sample_id: <% ctx().sample_id %>
       case_id: <% ctx().case_id %>
     next:
-      - when: <% succeeded() %>
+      - when: <% succeeded() and result().output_files.count() > 1 %>
         publish:
           - output_files: <% result().output_files %>
         do:
