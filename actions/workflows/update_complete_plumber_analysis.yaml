@@ -13,7 +13,6 @@ input:
   - case_id
   - secondary_analysis_id
   - secondary_pipeline
-  - mock_run
 
 vars:
   - msg:
@@ -140,7 +139,7 @@ tasks:
   rsync_output:
     action: core.local
     input:
-      cmd: "rsync -a --remove-source-files <% switch(ctx().mock_run => '--dry-run', true => '') %> <% ctx().workdir %> <% ctx().destination %>"
+      cmd: "rsync -a --remove-source-files <% ctx().workdir %> <% ctx().destination %>"
       timeout: 10000
     next:
       - when: "{{ succeeded() }}"
