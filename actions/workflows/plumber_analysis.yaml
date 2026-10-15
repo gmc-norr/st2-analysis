@@ -265,7 +265,7 @@ tasks:
           mock_start_plumber
       - when: <% failed() and ctx().mock_run %>
         do:
-          - mock_get_analysis_id
+          mock_start_plumber
       - when: <% failed() and not ctx().mock_run %>
         publish:
           msg="Failed to add {{ ctx().pipeline }} analysis to Cleve
