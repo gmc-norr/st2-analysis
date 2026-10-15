@@ -13,7 +13,7 @@ tasks:
     action: gmc_norr_analysis.mock_output_files
     input:
       pipeline: <% ctx().pipeline %>
-      workdir: <%ctx().output_dir %>
+      workdir: <%ctx().workdir %>
       sample_id: <% ctx().sample_id %>
       case_id: <% ctx().case_id %>
     next:
