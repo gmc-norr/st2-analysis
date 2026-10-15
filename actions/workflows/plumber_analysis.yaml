@@ -278,6 +278,7 @@ tasks:
     input:
       software: <% ctx().pipeline %>
       run_id: <% ctx().run_id %>
+      page_size: 50
     next:
       - when: <% succeeded() %>
         publish:
