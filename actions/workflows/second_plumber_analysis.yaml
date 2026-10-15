@@ -229,7 +229,10 @@ tasks:
         publish:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do: mock_start_plumber
-      - when: <% failed() %>
+      - when: <% failed() and ctx().mock_run %>
+        do:
+          mock_get_analysis_id
+      - when: <% failed() and not ctx().mock_run %>
         publish:
           - msg: "{{ result() | to_json_string }}"
         do:
@@ -253,6 +256,19 @@ tasks:
           - msg: "Failed to run {{ ctx().pipeline }} for {{ ctx().sample_id }} with plumber"
         do:
           - report_failure
+
+  mock_get_analysis_id:
+    action: cleve.get_analyses
+    input:
+      software: <% ctx().pipeline %>
+      run_id: <% ctx().run_id %>
+      page_size: 50
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.analyses.where($.path = ctx().new_workdir).first().analysis_id %>
+        do:
+          - mock_start_plumber
 
   mock_start_plumber:
     action: gmc_norr_analysis.mock_start_plumber
@@ -288,3 +304,4 @@ tasks:
         message: <% ctx().msg %>
     next:
       - do: fail
+
