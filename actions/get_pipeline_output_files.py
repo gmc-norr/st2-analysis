@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 from st2common.runners.base_action import Action
 
 
@@ -39,7 +42,7 @@ def get_rd_output_files(sample_id, case_id):
     return output_files
 
 
-def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
+def get_twist_solid_output_files(sample_id: str, case_id: str):
     output_files = [
         {'path': f'bam_dna/{sample_id}_T.bam',
          'level': 'sample', 'type': 'bam', 'parent_id': sample_id
@@ -65,13 +68,10 @@ def get_twist_solid_output_files(sample_id: str, case_id: str, complete: bool):
          },
         {'path': f"results/dna/{sample_id}_T/qc/{sample_id}_T.coverage_and_mutations.tsv",
          'level': 'case', 'type': "text", 'parent_id': case_id
+         },
+        {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
+         'level': 'case', 'type': 'html', 'parent_id': case_id
          }]
-    if complete:
-        output_files.append(
-            {'path': f"results/dna/{sample_id}_T/{sample_id}_T.general_report.html",
-             'level': 'case', 'type': 'html', 'parent_id': case_id
-             }
-             )
     return output_files
 
 
@@ -88,13 +88,17 @@ def get_scout_annotation_output_files(sample_id, case_id):
 
 
 class GetPipelineOutputFiles(Action):
-    def run(self, pipeline, sample_id, case_id, complete):
+    def run(self, pipeline, sample_id, case_id, work_dir):
         if pipeline == "nf-core/raredisease":
             output_files = get_rd_output_files(sample_id, case_id)
         elif pipeline == "genomic-medicine-sweden/Twist_Solid":
-            output_files = get_twist_solid_output_files(sample_id, case_id, complete)
+            output_files = get_twist_solid_output_files(sample_id, case_id)
         elif pipeline == "gmc-norr/scout-annotation":
             output_files = get_scout_annotation_output_files(sample_id, case_id)
         else:
             return (False, "unsupported pipeline")
-        return (True,  output_files)
+        existing_output_files = []
+        for file in output_files:
+            if os.path.exists(Path(work_dir) / file.get('path').replace('chr*', 'chr1')):
+                existing_output_files.append(file)
+        return (True,  existing_output_files)
