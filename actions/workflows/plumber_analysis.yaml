@@ -9,6 +9,7 @@ input:
   - plumber_host
   - plumber_env
   - supported_profiles
+  - mock_run
 
 vars:
   - msg:
@@ -201,12 +202,20 @@ tasks:
       software_version: <% ctx().pipeline_version %>
       input_files: <% ctx().input_files %>
     next:
-      - when: "{{ succeeded() }}"
+      - when: <% succeeded() and not ctx().mock_run %>
         publish:
           - plumber_analysis_id: <% result().result.body.analysis_id %>
         do:
           start_plumber
-      - when: "{{ failed() }}"
+      - when: "<% succeeded() and ctx().mock_run %>"
+        publish:
+          - plumber_analysis_id: <% result().result.body.analysis_id %>
+        do:
+          mock_start_plumber
+      - when: <% failed() and ctx().mock_run %>
+        do:
+          mock_get_analysis_id
+      - when: <% failed() and not ctx().mock_run %>
         publish:
           msg="Failed to add {{ ctx().pipeline }} analysis to Cleve
             {{ result().stderr }}"
@@ -268,3 +277,49 @@ tasks:
         message: <% ctx().msg %>
     next:
       - do: fail
+
+  mock_get_analysis_id:
+    action: cleve.get_analyses
+    input:
+      software: <% ctx().pipeline %>
+      run_id: <% ctx().run_id %>
+      page_size: 50
+    next:
+      - when: <% succeeded() %>
+        publish:
+          - plumber_analysis_id: <% result().result.body.analyses.where($.path = ctx().output_dir).first().analysis_id %>
+        do:
+          - mock_start_plumber
+
+  mock_start_plumber:
+    action: gmc_norr_analysis.mock_start_plumber
+    input:
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().output_dir %>
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+    next:
+      - when: <% succeeded() and ctx().pipeline != 'genomic-medicine-sweden/Twist_Solid' %>
+        do:
+          - mock_update_complete_plumber_analysis
+      - when: <% succeeded() and ctx().pipeline = 'genomic-medicine-sweden/Twist_Solid' %>
+        do:
+          - mock_second_plumber_analysis
+  
+  mock_second_plumber_analysis:
+    action: gmc_norr_analysis.second_plumber_analysis
+    input:
+      first_pipeline: <% ctx().pipeline %>
+      first_analysis_id: <% ctx().plumber_analysis_id %>
+      first_workdir: <% ctx().output_dir %>
+      mock_run: true
+
+  mock_update_complete_plumber_analysis:
+    action: gmc_norr_analysis.update_complete_plumber_analysis
+    input:
+      analysis_id: <% ctx().plumber_analysis_id %>
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().output_dir %>
+      sample_id: <% ctx().sample_id %>
+      run_id: <% ctx().run_id %>
+      case_id: <% ctx().case_id %>

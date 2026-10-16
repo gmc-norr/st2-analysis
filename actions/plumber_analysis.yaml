@@ -43,3 +43,8 @@ parameters:
     default:
       - WGSRareDisease_1
       - PanelTwistSolid_0.23.0
+  mock_run:
+    description: when activated, mocks the plumber analysis without running it
+    type: boolean
+    default: false
+    required: false

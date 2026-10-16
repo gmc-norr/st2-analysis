@@ -19,6 +19,11 @@ parameters:
     description: The path to the first analysis
     type: string
     required: true
+  mock_run:
+    description: when activated, mocks the plumber analysis without running it
+    type: boolean
+    default: false
+    required: false
   plumber_host:
     description: Host to run plumber on
     type: string
