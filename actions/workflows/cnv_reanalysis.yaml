@@ -136,7 +136,7 @@ tasks:
     input:
       cmd: "echo 'CNV' > {{ ctx().output_dir }}/RERUN"
     next:
-      - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
+      - when: "{{ succeeded() }}"
         do:
           format_cleve_input_files
 
