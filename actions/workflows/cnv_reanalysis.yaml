@@ -34,7 +34,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - case_id: <% result().values().first().stdout.split('\n')[0].split('\t')[1].norm() %>
+          - case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() %>
         do:
           get_run_id
 
@@ -114,15 +114,6 @@ tasks:
           - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
           - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
         do:
-          mark_rerun
-
-  mark_rerun:
-    action: core.local
-    input:
-      cmd: "echo 'CNV' > {{ ctx().output_dir }}/RERUN"
-    next:
-      - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
-        do:
           raredisease_workflow
 
   raredisease_workflow:
@@ -137,6 +128,15 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - case_id: <% result().output.case_id %>
+        do:
+          mark_rerun
+
+  mark_rerun:
+    action: core.local
+    input:
+      cmd: "echo 'CNV' > {{ ctx().output_dir }}/RERUN"
+    next:
+      - when: "{{ ctx().pipeline == 'nf-core/raredisease' }}"
         do:
           format_cleve_input_files
 
