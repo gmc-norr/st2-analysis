@@ -34,7 +34,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() %>
+          - case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() + "_CNV" %>
         do:
           get_run_id
 
