@@ -1,0 +1,31 @@
+version: "1.0"
+
+description: Run downstream analysis of a sample with plumber.
+input:
+  - pipeline
+  - workdir
+  - sample_id
+  - case_id
+
+tasks:
+  
+  mock_output_files:
+    action: gmc_norr_analysis.mock_output_files
+    input:
+      pipeline: <% ctx().pipeline %>
+      workdir: <%ctx().workdir %>
+      sample_id: <% ctx().sample_id %>
+      case_id: <% ctx().case_id %>
+    next:
+      - when: <% succeeded() and result().result.output_files.count() > 1 %>
+        publish:
+          - output_files: <% result().result.output_files %>
+        do:
+          - touch_files
+
+  touch_files:
+    with:
+      items: file in <% ctx().output_files %>
+    action: core.local
+    input:
+      cmd: "mkdir -p $(dirname <% item(file) %>) && touch <% item(file) %>"
