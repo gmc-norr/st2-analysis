@@ -75,15 +75,48 @@ tasks:
     input:
       analysis_id: <% ctx().analysis_id %>
       type: "fastq"
-      level: "sample"
-      parent_id: <% ctx().sample_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: <% result().result.body.where($.path.matches("_R1_")).select($.path).orderBy($) %>
-                R2: <% result().result.body.where($.path.matches("_R2_")).select($.path).orderBy($) %>
+                R1: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R1_")).select($.path).orderBy($) %>
+                R2: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R2_")).select($.path).orderBy($) %>
+        do:
+          check_file_location
+
+  check_file_location:
+    action: cleve.local
+    input:
+      cmd: "[[ -f {{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
+    next:
+      - when: "{{ succeeded() and ctx().run_path.startswith('/seqdata/') and ctx().fastq_files.get(ctx().sample_id).R1[0].startswith('/seqdata/') }}"
+        publish:
+          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+        do:
+          get_sample_data
+      - when: "{{ failed() }}"
+        publish:
+          - output_dir: "/storage/userdata/cnv-reruns/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+        do:
+          make_temp_location
+
+  make_temp_location:
+    action: core.local
+    input:
+      cmd: mkdir -p <% ctx().output_dir%>/fastq
+    next:
+      - when: "{{ succeeded() }}"
+        do:
+          copy_fastq
+
+  copy_fastq:
+    action: core.local
+    with: fastq_file in "{{ ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 }}"
+    input:
+      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx().output_dir %>/fastq'
+    next:
+      - when: "{{ succeeded() }}"
         do:
           get_sample_data
 
@@ -110,7 +143,6 @@ tasks:
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
           - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
-          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
         do:
           raredisease_workflow
 
