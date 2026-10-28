@@ -1,0 +1,35 @@
+version: "1.0"
+
+description: Start the cnv_reanalysis for each sample on the worklist
+
+input:
+  - worksheet_id
+
+vars:
+  - msg:
+  - worksheet:
+
+tasks:
+  get_worklist:
+    action: igene.get_worksheets
+    input:
+      worksheet_id: <% ctx().worklist_id %>
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          worksheet={{ result().get("result").get("body") }}
+        do:
+          start_run_workflow
+      - when: "{{ failed() }}"
+        publish:
+          msg="Failed to get run id from Cleve.
+          {{ result() | to_json_string }}"
+        do:
+          report_failure
+
+  start_run_workflow:
+    with: sample_data in <% ctx(worksheet) %>
+    action: gmc_norr_analysis.cnv_reanalysis
+    input:
+      sample_id: <% item(sample_data).get('SampleID') %>
+      dna_sample_id: <% item(sample_data).get('ParentSampleID') %>
