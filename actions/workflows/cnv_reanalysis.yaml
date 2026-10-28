@@ -9,13 +9,13 @@ input:
   - plumber_env
 
 vars:
-  - msg:
   - output_dir:
   - pipeline:
   - pipeline_version:
   - pipeline_profile:
   - plumber_config_version:
   - plumber_additional_arguments:
+  - original_case_id:
   - case_id:
   - fastq_files:
   - analysis_id:
@@ -34,14 +34,15 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() + "_CNV" %>
+          - original_case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() %>
+          - case_id: <% original_case_id + "_CNV" %>
         do:
           get_run_id
 
   get_run_id:
     action: scout.export_case
     input:
-      case_id: <% ctx().case_id %>
+      case_id: <% ctx().original_case_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -103,7 +104,7 @@ tasks:
   get_plumber_arguments:
     action: gmc_norr_analysis.get_plumber_arguments
     input:
-       test_profile: WGSRareDisease_2_komplettering_CNV #TODO: Is this the right name?
+       test_profile: WGSRareDiseaseCNV_2
     next:
       - when: "{{ succeeded() }}"
         publish:
@@ -121,13 +122,12 @@ tasks:
     input:
       sample_id: <% ctx().sample_id %>
       run_id: <% ctx().run_id %>
+      case_id: <% ctx().case_id %>
       sex: <% ctx().sex %>
       fastq_files: <% ctx().fastq_files %>
       output_dir: <% ctx().output_dir %>
     next:
       - when: "{{ succeeded() }}"
-        publish:
-          - case_id: <% result().output.case_id %>
         do:
           mark_rerun
 
