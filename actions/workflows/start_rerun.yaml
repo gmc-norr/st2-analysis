@@ -13,19 +13,13 @@ tasks:
   get_worklist:
     action: igene.get_worksheets
     input:
-      worksheet_id: <% ctx().worklist_id %>
+      worksheet_id: <% ctx().worksheet_id %>
     next:
       - when: "{{ succeeded() }}"
         publish:
-          worksheet={{ result().get("result").get("body") }}
+          - worksheet: "{{ result().get('result').get('body') }}"
         do:
           start_run_workflow
-      - when: "{{ failed() }}"
-        publish:
-          msg="Failed to get run id from Cleve.
-          {{ result() | to_json_string }}"
-        do:
-          report_failure
 
   start_run_workflow:
     with: sample_data in <% ctx(worksheet) %>
