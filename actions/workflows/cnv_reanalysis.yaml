@@ -142,8 +142,8 @@ tasks:
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: "{% for file in ctx().fastq_files.get(ctx().sample_id).R1 %}{{ ctx(output_dir)/fastq/file.split('/')[-1] }}{% endfor %}"
-                R2: "{% for file in ctx().fastq_files.get(ctx().sample_id).R2 %}{{ ctx(output_dir)/fastq/file.split('/')[-1] }}{% endfor %}"
+                R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().output_dir + '/fastq/' + $.split('/')[-1]) %>
+                R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().output_dir + '/fastq/' + $.split('/')[-1]) %>
         do:
           get_sample_data
 
