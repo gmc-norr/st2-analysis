@@ -6,7 +6,6 @@ input:
   - worksheet_id
 
 vars:
-  - msg:
   - worksheet:
 
 tasks:
