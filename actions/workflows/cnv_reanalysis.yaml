@@ -23,9 +23,6 @@ vars:
   - input_files:
   - pid:
 
-output:
-  - msg: <% ctx().msg %>
-
 tasks:
   get_case_id:
     action: scout.view_case
@@ -35,7 +32,7 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - original_case_id: <% result().values().first().stdout.split('\n')[1].split('\t')[0].norm() %>
-          - case_id: <% original_case_id + "_CNV" %>
+          - case_id: <% ctx().original_case_id + "_CNV" %>
         do:
           get_run_id
 
