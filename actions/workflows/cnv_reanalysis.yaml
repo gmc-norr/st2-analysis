@@ -24,6 +24,21 @@ vars:
   - pid:
 
 tasks:
+  get_plumber_arguments:
+    action: gmc_norr_analysis.get_plumber_arguments
+    input:
+       test_profile: WGSRareDiseaseCNV_2
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - pipeline: <% result().result.Pipeline %>
+          - pipeline_version: <% result().result.Version %>
+          - pipeline_profile: <% result().result.Profile %>
+          - plumber_config_version: <% result().result.ConfigVersion %>
+          - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
+        do:
+          get_case_id
+
   get_case_id:
     action: scout.view_case
     input:
@@ -86,7 +101,7 @@ tasks:
           check_file_location
 
   check_file_location:
-    action: cleve.local
+    action: core.local
     input:
       cmd: "[[ -f {{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
     next:
@@ -112,11 +127,23 @@ tasks:
 
   copy_fastq:
     action: core.local
-    with: fastq_file in "{{ ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 }}"
+    with: fastq_file in <% ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 %>
     input:
       cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx().output_dir %>/fastq'
     next:
       - when: "{{ succeeded() }}"
+        do:
+          format_new_fastq_files
+
+  format_new_fastq_files:
+    action: core.noop
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - fastq_files:
+              <% ctx().sample_id %>:
+                R1: "{% for file in ctx().fastq_files.get(ctx().sample_id).R1 %}{{ ctx(output_dir)/fastq/file.split('/')[-1] }}{% endfor %}"
+                R2: "{% for file in ctx().fastq_files.get(ctx().sample_id).R2 %}{{ ctx(output_dir)/fastq/file.split('/')[-1] }}{% endfor %}"
         do:
           get_sample_data
 
@@ -128,21 +155,6 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - sex: <% result().result.body.Sex %>
-        do:
-          get_plumber_arguments
-
-  get_plumber_arguments:
-    action: gmc_norr_analysis.get_plumber_arguments
-    input:
-       test_profile: WGSRareDiseaseCNV_2
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          - pipeline: <% result().result.Pipeline %>
-          - pipeline_version: <% result().result.Version %>
-          - pipeline_profile: <% result().result.Profile %>
-          - plumber_config_version: <% result().result.ConfigVersion %>
-          - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
         do:
           raredisease_workflow
 
