@@ -124,13 +124,14 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - output_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
+          - temp_fastq_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ctx().worksheet_id}}/temp_fastq/{{ ctx().sample_id }}"
         do:
           make_temp_location
 
   make_temp_location:
     action: core.local
     input:
-      cmd: mkdir -p <% ctx().output_dir%>/fastq
+      cmd: mkdir -p <% ctx().temp_fastq_dir %>
     next:
       - when: "{{ succeeded() }}"
         do:
@@ -140,7 +141,7 @@ tasks:
     action: core.local
     with: fastq_file in <% ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 %>
     input:
-      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx().output_dir %>/fastq'
+      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx()temp_fastq_dir %>'
     next:
       - when: "{{ succeeded() }}"
         do:
@@ -153,8 +154,8 @@ tasks:
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().output_dir + '/fastq/' + $.split('/')[-1]) %>
-                R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().output_dir + '/fastq/' + $.split('/')[-1]) %>
+                R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().temp_fastq_dir + $.split('/')[-1]) %>
+                R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().temp_fastq_dir + $.split('/')[-1]) %>
         do:
           get_sample_data
 

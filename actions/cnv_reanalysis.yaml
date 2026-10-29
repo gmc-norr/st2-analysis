@@ -21,7 +21,7 @@ parameters:
   temp_location:
     description: Place to copy fastq files if they no longer are on seqdata
     type: string
-    default: /storage/userdata/cnv-reruns
+    default: /storage/userdata/reruns
   plumber_env:
     type: object
     secret: true
