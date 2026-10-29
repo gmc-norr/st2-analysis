@@ -26,3 +26,4 @@ tasks:
     input:
       sample_id: <% item(sample_data).get('SampleID') %>
       dna_sample_id: <% item(sample_data).get('ParentSampleID') %>
+      worksheet_id: <% ctx().worksheet_id %>
