@@ -141,7 +141,7 @@ tasks:
     action: core.local
     with: fastq_file in <% ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 %>
     input:
-      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx()temp_fastq_dir %>'
+      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx().temp_fastq_dir %>'
     next:
       - when: "{{ succeeded() }}"
         do:
