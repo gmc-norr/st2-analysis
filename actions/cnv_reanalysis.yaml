@@ -14,6 +14,10 @@ parameters:
     description: The ID of the corresponding DNA sample
     type: string
     required: true
+  worksheet_id:
+    description: The ID of the rerun worksheet
+    type: string
+    required: true
   temp_location:
     description: Place to copy fastq files if they no longer are on seqdata
     type: string

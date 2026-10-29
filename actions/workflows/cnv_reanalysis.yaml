@@ -5,6 +5,7 @@ description: Rerun raredisease samples to add CNVs.
 input:
   - dna_sample_id
   - sample_id
+  - worksheet_id
   - temp_location
   - plumber_host
   - plumber_env
@@ -112,8 +113,17 @@ tasks:
         do:
           get_sample_data
       - when: "{{ failed() }}"
+        do:
+          confirm_alt_fastq_location
+
+  confirm_alt_fastq_location:
+    action: core.local
+    input:
+        cmd: "[[ -f /scale/{{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
+    next:
+      - when: "{{ succeeded() }}"
         publish:
-          - output_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+          - output_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
         do:
           make_temp_location
 
