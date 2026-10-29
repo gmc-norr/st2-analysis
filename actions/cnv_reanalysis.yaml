@@ -14,6 +14,10 @@ parameters:
     description: The ID of the corresponding DNA sample
     type: string
     required: true
+  temp_location:
+    description: Place to copy fastq files if they no longer are on seqdata
+    type: string
+    default: /storage/userdata/cnv-reruns
   plumber_env:
     type: object
     secret: true

@@ -5,6 +5,7 @@ description: Rerun raredisease samples to add CNVs.
 input:
   - dna_sample_id
   - sample_id
+  - temp_location
   - plumber_host
   - plumber_env
 
@@ -112,7 +113,7 @@ tasks:
           get_sample_data
       - when: "{{ failed() }}"
         publish:
-          - output_dir: "/storage/userdata/cnv-reruns/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+          - output_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
         do:
           make_temp_location
 
