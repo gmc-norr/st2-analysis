@@ -33,11 +33,11 @@ tasks:
     next:
       - when: <% ctx(sample_id) != null and ctx(run_id) != null %>
         publish:
-          - rerun: "{{ result().stdout if result().stdout!= '' else None }}"
+          - rerun: "{{ result().stdout if result().stdout!= '' else 'None' }}"
         do: get_run_platform
       - when: <% ctx(sample_id) = null or ctx(run_id) = null %>
         publish:
-          - rerun: "{{ result().stdout if result().stdout!= '' else None }}"
+          - rerun: "{{ result().stdout if result().stdout!= '' else 'None' }}"
         do: get_sample_id
 
   get_sample_id:
@@ -125,7 +125,7 @@ tasks:
         do: report_failure
       - when: <% succeeded() and result().result != null %>
         publish:
-          - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}{% if ctx().rerun != None %}_{{ ctx().rerun }}{% endif %}"
+          - destination: "{{ result().result }}/{{ ctx().run_id }}/{{ ctx().pipeline.split('/')[-1] }}{% if ctx().rerun != 'None' %}_{{ ctx().rerun }}{% endif %}"
           - new_workdir: "{{ ctx().destination }}/{{ ctx().sample_id }}"
         do: make_destination
 
