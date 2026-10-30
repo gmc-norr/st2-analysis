@@ -328,7 +328,7 @@ tasks:
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
       secondary_analysis_id: <% ctx().secondary_analysis_id %>
-      rerun: "{{ ctx().rerun }}"
+      rerun: <% ctx().rerun %>
     next:
       - when: "{{ succeeded() and ctx().pipeline == 'genomic-medicine-sweden/Twist_Solid' }}"
         do: copy_bam
