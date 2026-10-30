@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/gmc-norr/st2-analysis/compare/v1.2.0...v1.2.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* add work dir as input argument to get pipeline output files in secondary plumber analysis workflow ([#122](https://github.com/gmc-norr/st2-analysis/issues/122)) ([47f4d0d](https://github.com/gmc-norr/st2-analysis/commit/47f4d0db2bf3cc313b0eb6b2a8b46c4e349544e4))
+
 ## [1.2.0](https://github.com/gmc-norr/st2-analysis/compare/v1.1.1...v1.2.0) (2026-10-26)
 
 
