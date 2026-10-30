@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.3](https://github.com/gmc-norr/st2-analysis/compare/v1.2.2...v1.2.3) (2026-10-30)
+
+
+### Bug Fixes
+
+* revert None as string fix ([#126](https://github.com/gmc-norr/st2-analysis/issues/126)) ([f35e150](https://github.com/gmc-norr/st2-analysis/commit/f35e1503ca31c2aa2682046ded1465bfa8d6dfd0))
+
 ## [1.2.2](https://github.com/gmc-norr/st2-analysis/compare/v1.2.1...v1.2.2) (2026-10-30)
 
 
