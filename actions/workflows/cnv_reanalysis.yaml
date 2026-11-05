@@ -3,8 +3,7 @@ version: "1.0"
 description: Rerun raredisease samples to add CNVs.
 
 input:
-  - dna_sample_id
-  - sample_id
+  - processed_sample_id
   - worksheet_id
   - temp_location
   - plumber_host
@@ -38,6 +37,20 @@ tasks:
           - pipeline_profile: <% result().result.Profile %>
           - plumber_config_version: <% result().result.ConfigVersion %>
           - plumber_additional_arguments: "{{ result().result.get('AdditionalArguments', '') }}"
+        do:
+          get_sample_data
+
+  get_sample_data:
+    action: igene.get_sample
+    input:
+      sample_id: <% ctx().processed_sample_id %>
+      processed: true
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - dna_sample_id: <% result().result.body.ParentSampleID %>
+          - sample_id: <% result().result.body.SampleID %>
+          - sex: <% result().result.body.Sex %>
         do:
           get_case_id
 
@@ -156,17 +169,6 @@ tasks:
               <% ctx().sample_id %>:
                 R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().temp_fastq_dir + '/' + $.split('/')[-1]) %>
                 R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().temp_fastq_dir + '/' + $.split('/')[-1]) %>
-        do:
-          get_sample_data
-
-  get_sample_data:
-    action: igene.get_sample
-    input:
-      sample_id: <% ctx().sample_id %>
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          - sex: <% result().result.body.Sex %>
         do:
           raredisease_workflow
 

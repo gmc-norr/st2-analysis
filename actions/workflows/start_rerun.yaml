@@ -1,6 +1,7 @@
 version: "1.0"
 
-description: Start the cnv_reanalysis for each sample on the worklist
+description: Start the cnv_reanalysis for each sample on the worklist.
+  Note that For reruns, ProcessedSampleID actually shows under SampleID.
 
 input:
   - worksheet_id
@@ -24,6 +25,4 @@ tasks:
     with: sample_data in <% ctx(worksheet) %>
     action: gmc_norr_analysis.cnv_reanalysis
     input:
-      sample_id: <% item(sample_data).get('SampleID') %>
-      dna_sample_id: <% item(sample_data).get('ParentSampleID') %>
-      worksheet_id: <% ctx().worksheet_id %>
+      procesed_sample_id: <% item(sample_data).get('SampleID') %>

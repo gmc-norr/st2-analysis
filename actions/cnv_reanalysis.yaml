@@ -7,13 +7,9 @@ entry_point: workflows/cnv_reanalysis.yaml
 enabled: true
 
 parameters:
-  sample_id:
+  processed_sample_id:
     description: The ID of seq sample to analyse
     type: string
-  dna_sample_id:
-    description: The ID of the corresponding DNA sample
-    type: string
-    required: true
   worksheet_id:
     description: The ID of the rerun worksheet
     type: string
