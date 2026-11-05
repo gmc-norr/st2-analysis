@@ -1,0 +1,13 @@
+---
+name: start_rerun
+pack: gmc_norr_analysis
+description: Workflow for starting CNV reanalysis of raredisase samples
+runner_type: orquesta
+entry_point: workflows/start_rerun.yaml
+enabled: true
+
+parameters:
+  worksheet_id:
+    description: ID of the ready analysis
+    type: string
+    required: true

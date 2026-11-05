@@ -12,7 +12,6 @@ input:
   - output_dir
 
 vars:
-  - case_id:
   - msg:
 
 output:
