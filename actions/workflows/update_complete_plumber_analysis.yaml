@@ -145,7 +145,7 @@ tasks:
   rsync_output:
     action: core.local
     input:
-      cmd: "rsync -a --remove-source-files <% ctx().workdir %> <% ctx().destination %>"
+      cmd: rsync -a --remove-source-files <% switch(ctx().rerun != null => '--exclude "*.bam"  --exclude "*fastq.gz"'), true => '') %>  <% ctx().workdir %> <% ctx().destination %>
       timeout: 10000
     next:
       - when: "{{ succeeded() }}"
