@@ -402,8 +402,7 @@ tasks:
     action: scout.generate_and_load_rerun_case
     input:
       case_id: <% ctx().case_id %>
-      sample_ids:
-        - <% ctx().sample_id %>
+      sample_id: <% ctx().sample_id %>
       pipeline: <% ctx().pipeline %>
       analysis_id: <% ctx().analysis_id %>
       output_path: <% ctx().new_workdir %>
