@@ -145,7 +145,7 @@ tasks:
   rsync_output:
     action: core.local
     input:
-      cmd: "rsync -a --remove-source-files <% ctx().workdir %> <% ctx().destination %>"
+      cmd: rsync -a --remove-source-files <% switch(ctx().rerun != null => '--exclude "*.bam"  --exclude "*fastq.gz"', true => '') %> <% ctx().workdir %> <% ctx().destination %>
       timeout: 10000
     next:
       - when: "{{ succeeded() }}"
@@ -310,8 +310,10 @@ tasks:
       analysis_id: <% ctx().analysis_id %>
       files: <% ctx().output_files %>
     next:
-      - when: "{{ succeeded() }}"
+      - when: <% succeeded() and ctx().rerun = null %>
         do: start_scout_workflow
+      - when: <% succeeded() and ctx().rerun != null %>
+        do: start_rerun_scout_workflow
       - when: "{{ failed() }}"
         publish:
           - msg: <% result().stderr %>
@@ -395,6 +397,19 @@ tasks:
               {{ result() | to_json_string }}"
         do:
           - report_failure
+
+  start_rerun_scout_workflow:
+    action: scout.generate_and_load_rerun_case
+    input:
+      case_id: <% ctx().case_id %>
+      sample_id: <% ctx().sample_id %>
+      pipeline: <% ctx().pipeline %>
+      analysis_id: <% ctx().analysis_id %>
+      output_path: <% ctx().new_workdir %>
+      rerun: "{{ ctx().rerun }}"
+    next:
+      - when: "{{ succeeded() }}"
+        do: noop
 
   report_failure:
     action: core.inject_trigger
