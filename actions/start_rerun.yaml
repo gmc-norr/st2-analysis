@@ -8,6 +8,6 @@ enabled: true
 
 parameters:
   worksheet_id:
-    description: ID of the ready analysis
+    description: ID of the worksheet with the rerun samples (ALYY.XX)
     type: string
     required: true

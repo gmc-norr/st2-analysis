@@ -8,7 +8,7 @@ enabled: true
 
 parameters:
   processed_sample_id:
-    description: The ID of seq sample to analyse
+    description: The ID of processed seq sample to analyse
     type: string
   worksheet_id:
     description: The ID of the rerun worksheet
