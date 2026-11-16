@@ -132,7 +132,7 @@ tasks:
   confirm_alt_fastq_location:
     action: core.local
     input:
-        cmd: "[[ -f /scale/{{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
+        cmd: "[[ -f /scale{{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
     next:
       - when: "{{ succeeded() }}"
         publish:
