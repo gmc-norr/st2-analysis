@@ -124,7 +124,7 @@ tasks:
         publish:
           - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
         do:
-          get_sample_data
+          raredisease_workflow
       - when: "{{ failed() }}"
         do:
           confirm_alt_fastq_location
