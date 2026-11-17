@@ -112,6 +112,8 @@ tasks:
               <% ctx().sample_id %>:
                 R1: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R1_")).select($.path).orderBy($) %>
                 R2: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R2_")).select($.path).orderBy($) %>
+          - output_dir: "{{ ctx().temp_location}}/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
+          - fastq_dir: "{{ ctx().output_dir }}/fastq"
         do:
           check_file_location
 
@@ -120,11 +122,11 @@ tasks:
     input:
       cmd: "[[ -f {{ ctx().fastq_files.get(ctx().sample_id).R1[0] }} ]]"
     next:
-      - when: "{{ succeeded() and ctx().run_path.startswith('/seqdata/') and ctx().fastq_files.get(ctx().sample_id).R1[0].startswith('/seqdata/') }}"
+      - when: "{{ succeeded() }}"
         publish:
-          - output_dir: "{{ ctx().run_path.rstrip('/') }}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ ctx().sample_id }}"
+          - path_addition: ""
         do:
-          raredisease_workflow
+          make_temp_location
       - when: "{{ failed() }}"
         do:
           confirm_alt_fastq_location
@@ -136,15 +138,14 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - output_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
-          - temp_fastq_dir: "{{ ctx().temp_location}}/{{ ctx().pipeline.split('/')[-1] }}_CNV/{{ctx().worksheet_id}}/temp_fastq/{{ ctx().sample_id }}"
+          - path_addition: "/scale"
         do:
           make_temp_location
 
   make_temp_location:
     action: core.local
     input:
-      cmd: mkdir -p <% ctx().temp_fastq_dir %>
+      cmd: mkdir -p <% ctx().fastq_dir %>
     next:
       - when: "{{ succeeded() }}"
         do:
@@ -154,7 +155,7 @@ tasks:
     action: core.local
     with: fastq_file in <% ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 %>
     input:
-      cmd: 'rsync -a /scale<% item(fastq_file) %> <% ctx().temp_fastq_dir %>'
+      cmd: 'rsync -a <% ctx().path_addition %><% item(fastq_file) %> <% ctx().fastq_dir %>'
     next:
       - when: "{{ succeeded() }}"
         do:
@@ -167,8 +168,8 @@ tasks:
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().temp_fastq_dir + '/' + $.split('/')[-1]) %>
-                R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().temp_fastq_dir + '/' + $.split('/')[-1]) %>
+                R1: <% ctx().fastq_files.get(ctx().sample_id).R1.select( ctx().fastq_dir + '/' + $.split('/')[-1]) %>
+                R2: <% ctx().fastq_files.get(ctx().sample_id).R2.select( ctx().fastq_dir + '/' + $.split('/')[-1]) %>
         do:
           raredisease_workflow
 
