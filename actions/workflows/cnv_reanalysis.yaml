@@ -96,7 +96,7 @@ tasks:
     next:
       - when: "{{ succeeded() }}"
         publish:
-          - analysis_id: "{{ result().get('result').get('body').get('analyses') | map(attribute='analysis_id') | last }}"
+          - analysis_id: "{{ result().result.body.analyses[-1].analysis_id }}"
         do:
           get_fastq_files
 
