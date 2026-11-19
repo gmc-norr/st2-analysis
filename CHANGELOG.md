@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.3.0](https://github.com/gmc-norr/st2-analysis/compare/v1.2.2...v1.3.0) (2026-11-19)
+
+
+### Features
+
+* add cnv_reanalysis workflow ([#115](https://github.com/gmc-norr/st2-analysis/issues/115)) ([8b631d2](https://github.com/gmc-norr/st2-analysis/commit/8b631d2e06aae9cc11a0fc252a6081cd372f5dce))
+
+
+### Bug Fixes
+
+* revert None as string fix ([#126](https://github.com/gmc-norr/st2-analysis/issues/126)) ([f35e150](https://github.com/gmc-norr/st2-analysis/commit/f35e1503ca31c2aa2682046ded1465bfa8d6dfd0))
+
 ## [1.2.2](https://github.com/gmc-norr/st2-analysis/compare/v1.2.1...v1.2.2) (2026-10-30)
 
 
