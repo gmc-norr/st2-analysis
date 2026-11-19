@@ -1,5 +1,34 @@
 # Changelog
 
+## [1.2.2](https://github.com/gmc-norr/st2-analysis/compare/v1.2.1...v1.2.2) (2026-10-30)
+
+
+### Bug Fixes
+
+* rerun None as string instead ([#124](https://github.com/gmc-norr/st2-analysis/issues/124)) ([5813589](https://github.com/gmc-norr/st2-analysis/commit/58135893381c88dac974eb0f1e3de9eae8fab537))
+
+## [1.2.1](https://github.com/gmc-norr/st2-analysis/compare/v1.2.0...v1.2.1) (2026-10-30)
+
+
+### Bug Fixes
+
+* add work dir as input argument to get pipeline output files in secondary plumber analysis workflow ([#122](https://github.com/gmc-norr/st2-analysis/issues/122)) ([47f4d0d](https://github.com/gmc-norr/st2-analysis/commit/47f4d0db2bf3cc313b0eb6b2a8b46c4e349544e4))
+
+## [1.2.0](https://github.com/gmc-norr/st2-analysis/compare/v1.1.1...v1.2.0) (2026-10-26)
+
+
+### Features
+
+* add sv vcfs to raredisease output files ([#111](https://github.com/gmc-norr/st2-analysis/issues/111)) ([b6e6e3e](https://github.com/gmc-norr/st2-analysis/commit/b6e6e3e3c164f9ecddbe71e7ead9852fbe8ed722))
+* add WGSRareDisease_2 as supported testprofile for plumber_analysis ([#120](https://github.com/gmc-norr/st2-analysis/issues/120)) ([060f63d](https://github.com/gmc-norr/st2-analysis/commit/060f63df97f0bb78d264cd22e1087a27a8882adb))
+* get_pipeline_output_files only returns existing files ([#113](https://github.com/gmc-norr/st2-analysis/issues/113)) ([4cc8fab](https://github.com/gmc-norr/st2-analysis/commit/4cc8fab0facdfd0cf32203f261bd32c4ba6bc5d5))
+* make update_complete_plumber_analysis handle reruns ([#114](https://github.com/gmc-norr/st2-analysis/issues/114)) ([989cc58](https://github.com/gmc-norr/st2-analysis/commit/989cc5820ad1502043b27de0b8b4e1e1e7d71d1d))
+
+
+### Bug Fixes
+
+* correct level for bed-files ([#118](https://github.com/gmc-norr/st2-analysis/issues/118)) ([e310d73](https://github.com/gmc-norr/st2-analysis/commit/e310d734441b6b3374ae41878732669cdf7152fc))
+
 ## [1.1.1](https://github.com/gmc-norr/st2-analysis/compare/v1.1.0...v1.1.1) (2026-10-10)
 
 
