@@ -129,8 +129,8 @@ tasks:
         publish:
           - fastq_files:
               <% ctx().sample_id %>:
-                R1: <% result().stdout.split('\n').select($.matches("_R1_")).orderBy($) %>
-                R2: <% result().stdout.split('\n').select($.matches("_R2_")).orderBy($) %>
+                R1: <% result().stdout.split().where($.matches("_R1_")).orderBy($) %>
+                R2: <% result().stdout.split().where($.matches("_R2_")).orderBy($) %>
         do:
           check_file_location
 
