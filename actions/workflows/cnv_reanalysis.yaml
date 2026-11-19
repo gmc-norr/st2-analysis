@@ -85,6 +85,8 @@ tasks:
       - when: "{{ succeeded() }}"
         publish:
           - run_path: "{{ result().get('result').get('body').get('runs') | map(attribute='path') | first }}"
+          - output_dir: "{{ ctx().temp_location}}/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
+          - fastq_dir: "{{ ctx().output_dir }}/fastq"
         do:
           get_analysis_id
 
@@ -94,11 +96,14 @@ tasks:
       run_id: <% ctx().run_id %>
       software: "Dragen BCLConvert"
     next:
-      - when: "{{ succeeded() }}"
+      - when: "{{ succeeded() and result().result.body.metadata.count > 0}}"
         publish:
           - analysis_id: "{{ result().result.body.analyses[-1].analysis_id }}"
         do:
           get_fastq_files
+      - when: "{{ succeeded() and result().result.body.metadata.count == 0}}"
+        do:
+          get_fastq_files_alt
 
   get_fastq_files:
     action: cleve.get_analysis_files
@@ -112,8 +117,20 @@ tasks:
               <% ctx().sample_id %>:
                 R1: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R1_")).select($.path).orderBy($) %>
                 R2: <% result().result.body.where($.path.matches(ctx().sample_id or ctx().dna_sample_id)).where($.path.matches("_R2_")).select($.path).orderBy($) %>
-          - output_dir: "{{ ctx().temp_location}}/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
-          - fastq_dir: "{{ ctx().output_dir }}/fastq"
+        do:
+          check_file_location
+
+  get_fastq_files_alt:
+    action: core.local
+    input:
+      cmd: ls /scale/seqdata/novaseq/{{ ctx().run_id }}/Analysis/1/Data/DragenGermline/fastq/{{ ctx().sample_id }}_*.fastq.gz
+    next:
+      - when: "{{ succeeded() }}"
+        publish:
+          - fastq_files:
+              <% ctx().sample_id %>:
+                R1: <% result().stdout.split('\n').select($.matches("_R1_")).orderBy($) %>
+                R2: <% result().stdout.split('\n').select($.matches("_R2_")).orderBy($) %>
         do:
           check_file_location
 
