@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.1](https://github.com/gmc-norr/st2-analysis/compare/v1.3.0...v1.3.1) (2026-11-20)
+
+
+### Bug Fixes
+
+* **cnv_reanalysis:** actually get last analysis id if more than 1 ([#130](https://github.com/gmc-norr/st2-analysis/issues/130)) ([6ddd88e](https://github.com/gmc-norr/st2-analysis/commit/6ddd88eff6c1852f9d08a49e250aa168241c7771))
+* **cnv_reanalysis:** check for fastq files on scale if there is no BCLConvert analysis in Cleve ([#132](https://github.com/gmc-norr/st2-analysis/issues/132)) ([206886d](https://github.com/gmc-norr/st2-analysis/commit/206886da65eebd7e0a14981e3d36ba522c1a7e51))
+
 ## [1.3.0](https://github.com/gmc-norr/st2-analysis/compare/v1.2.2...v1.3.0) (2026-11-19)
 
 
