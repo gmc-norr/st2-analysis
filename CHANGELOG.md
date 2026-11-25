@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.3](https://github.com/gmc-norr/st2-analysis/compare/v1.3.2...v1.3.3) (2026-11-25)
+
+
+### Bug Fixes
+
+* **cnv_reanalysis:** add timeout argument to rsync step ([#137](https://github.com/gmc-norr/st2-analysis/issues/137)) ([c6f0456](https://github.com/gmc-norr/st2-analysis/commit/c6f0456791178ad34bfd3da04be3c45a822a4806))
+
 ## [1.3.2](https://github.com/gmc-norr/st2-analysis/compare/v1.3.1...v1.3.2) (2026-11-25)
 
 
