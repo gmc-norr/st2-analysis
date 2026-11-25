@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.2](https://github.com/gmc-norr/st2-analysis/compare/v1.3.1...v1.3.2) (2026-11-25)
+
+
+### Bug Fixes
+
+* **cnv_reanalysis:** skip input files for Cleve if there is no corresponding analysis id ([#135](https://github.com/gmc-norr/st2-analysis/issues/135)) ([8b3f923](https://github.com/gmc-norr/st2-analysis/commit/8b3f9235e836fdb3550c8468394162385595b504))
+
 ## [1.3.1](https://github.com/gmc-norr/st2-analysis/compare/v1.3.0...v1.3.1) (2026-11-20)
 
 
