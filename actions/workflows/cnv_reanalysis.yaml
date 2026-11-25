@@ -162,6 +162,7 @@ tasks:
     with: fastq_file in <% ctx().fastq_files.get(ctx().sample_id).R1 + ctx().fastq_files.get(ctx().sample_id).R2 %>
     input:
       cmd: 'rsync -a <% ctx().path_addition %><% item(fastq_file) %> <% ctx().fastq_dir %>'
+      timeout: 5000
     next:
       - when: "{{ succeeded() }}"
         do:
