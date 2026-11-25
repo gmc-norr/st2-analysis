@@ -75,19 +75,6 @@ tasks:
         publish:
           - run_id: <% result().values().first().stdout.first().multiqc.split('novaseq/')[1].split('/raredisease')[0] %>
         do:
-          get_run_path
-
-  get_run_path:
-    action: cleve.get_runs
-    input:
-      run_id: <% ctx().run_id %>
-    next:
-      - when: "{{ succeeded() }}"
-        publish:
-          - run_path: "{{ result().get('result').get('body').get('runs') | map(attribute='path') | first }}"
-          - output_dir: "{{ ctx().temp_location}}/{{ctx().worksheet_id}}/{{ ctx().sample_id }}"
-          - fastq_dir: "{{ ctx().output_dir }}/fastq"
-        do:
           get_analysis_id
 
   get_analysis_id:
@@ -209,9 +196,12 @@ tasks:
     input:
       cmd: "echo 'CNV' > {{ ctx().output_dir }}/RERUN"
     next:
-      - when: "{{ succeeded() }}"
+      - when: "{{ succeeded() and ctx().analysis_id != None }}"
         do:
           format_cleve_input_files
+      - when: "{{ succeeded() and ctx().analysis_id == None }}"
+        do:
+          add_plumber_analysis_to_cleve
 
   format_cleve_input_files:
     action: gmc_norr_analysis.get_pipeline_input_files
