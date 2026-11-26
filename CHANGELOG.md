@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.4](https://github.com/gmc-norr/st2-analysis/compare/v1.3.3...v1.3.4) (2026-11-26)
+
+
+### Bug Fixes
+
+* exclude snv vcf when cnv rerun ([#139](https://github.com/gmc-norr/st2-analysis/issues/139)) ([4d6514e](https://github.com/gmc-norr/st2-analysis/commit/4d6514ebc88e53a05157452dfc36f9120bdf4945))
+
 ## [1.3.3](https://github.com/gmc-norr/st2-analysis/compare/v1.3.2...v1.3.3) (2026-11-25)
 
 
