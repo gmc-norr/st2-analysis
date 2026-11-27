@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.0](https://github.com/gmc-norr/st2-analysis/compare/v1.3.4...v1.4.0) (2026-11-27)
+
+
+### Features
+
+* add twist solid development testprofile to list of supported ([#128](https://github.com/gmc-norr/st2-analysis/issues/128)) ([53a0d2c](https://github.com/gmc-norr/st2-analysis/commit/53a0d2cdac97dba34996e65d4af970f31c532f92))
+
 ## [1.3.4](https://github.com/gmc-norr/st2-analysis/compare/v1.3.3...v1.3.4) (2026-11-26)
 
 
